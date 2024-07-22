@@ -1,0 +1,10 @@
+.vs/
+admin-backend/admin-backend.csproj.user
+admin-backend/admin-backend.http
+client-backend/obj/
+admin-backend/obj/
+CommonLibrary/obj/
+client-backend/client-backend.csproj.user
+client-backend/client-backend.http
+admin-backend/Properties/launchSettings.json
+client-backend/Properties/launchSettings.json

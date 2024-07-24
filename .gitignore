@@ -8,3 +8,6 @@ client-backend/client-backend.csproj.user
 client-backend/client-backend.http
 admin-backend/Properties/launchSettings.json
 client-backend/Properties/launchSettings.json
+admin-backend/bin/
+client-backend/bin/
+CommonLibrary/bin/

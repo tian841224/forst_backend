@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "admin-backend", "admin-back
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "client-backend", "client-backend\client-backend.csproj", "{958EB6BE-2D6E-4655-A8C9-2074A46F82B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonLibrary", "CommonLibrary\CommonLibrary.csproj", "{B6F33854-A516-48A5-8F40-E0C5F0269C92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,11 +23,18 @@ Global
 		{958EB6BE-2D6E-4655-A8C9-2074A46F82B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{958EB6BE-2D6E-4655-A8C9-2074A46F82B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{958EB6BE-2D6E-4655-A8C9-2074A46F82B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6F33854-A516-48A5-8F40-E0C5F0269C92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6F33854-A516-48A5-8F40-E0C5F0269C92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6F33854-A516-48A5-8F40-E0C5F0269C92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6F33854-A516-48A5-8F40-E0C5F0269C92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3017DEE0-6966-4C55-A71C-694D3B040062}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		CommonLibrary\CommonLibrary.projitems*{958eb6be-2d6e-4655-a8c9-2074a46f82b5}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

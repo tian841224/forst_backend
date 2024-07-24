@@ -1,6 +1,10 @@
+using CommonLibrary.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 加入 DbContext 服務
+builder.Services.AddMySqlDbContext();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

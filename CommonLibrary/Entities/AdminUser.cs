@@ -58,7 +58,7 @@ namespace CommonLibrary.Entities
         /// 登入時間
         /// </summary>
         [Comment("登入時間")]
-        public DateTime LoginTime { get; set; } = DateTime.UtcNow;
+        public DateTime LoginTime { get; set; } 
 
         [ForeignKey("RoleId")]
         public virtual Role Role { get; set; } 

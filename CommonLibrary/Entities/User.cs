@@ -1,8 +1,6 @@
 ﻿using CommonLibrary.Enums;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CommonLibrary.Entities
 {
@@ -36,6 +34,6 @@ namespace CommonLibrary.Entities
         /// 最後登入時間
         /// </summary>
         [Comment("最後登入時間")]
-        public DateTime LoginTime { get; set; } = DateTime.UtcNow;
+        public DateTime LoginTime { get; set; }
     }
 }

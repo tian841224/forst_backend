@@ -69,7 +69,7 @@ namespace admin_backend.Services
             return user;
         }
 
-        public async Task Update(UpdateUserDto dto)
+        public async Task<User> Update(UpdateUserDto dto)
         {
             var user = await _context.User.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
 
@@ -87,6 +87,8 @@ namespace admin_backend.Services
             _context.User.Update(user);
 
             await _context.SaveChangesAsync();
+
+            return user;
         }
     }
 }

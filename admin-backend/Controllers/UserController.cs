@@ -51,8 +51,7 @@ namespace admin_backend.Controllers
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(UpdateUserDto dto)
         {
-            await _userService.Update(dto);
-            return Ok();
+            return Ok(await _userService.Update(dto));
         }
 
     }

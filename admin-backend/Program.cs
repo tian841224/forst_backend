@@ -1,6 +1,8 @@
+using admin_backend.Services;
 using CommonLibrary.Data;
 using CommonLibrary.Extensions;
 using CommonLibrary.Infrastructure;
+using CommonLibrary.Middleware;
 using NLog;
 using NLog.Web;
 using System.Reflection;
@@ -25,6 +27,8 @@ try
     else throw new Exception("¥¼³]©wDefaultConnection");
 
     builder.Services.AddControllers();
+    builder.Services.AddScoped<UserService>();
+    builder.Services.AddScoped<RoleServices>();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>
@@ -39,6 +43,8 @@ try
     {
         await new SeedData().SeedAsync(context, services);
     });
+
+    app.UseMiddleware<ExceptionHandling>();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())

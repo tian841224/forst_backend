@@ -5,12 +5,12 @@
         /// <summary>
         /// 是否成功
         /// </summary>
-        public bool IsSuccess { get; set; }
+        public bool Success { get; set; }
 
         /// <summary>
         /// 資料
         /// </summary>
-        public object? Date { get; set; }
+        public object? Data { get; set; }
 
         /// <summary>
         /// 錯誤訊息

@@ -70,7 +70,7 @@ namespace CommonLibrary.Entities
         public bool Delete { get; set; }
 
         [ForeignKey("RoleId")]
-        public virtual Role Role { get; set; } = new();
+        public virtual Role Role { get; set; } 
 
         //[ForeignKey("PermissionsId")]
         //public virtual Permission Permission { get; set; }

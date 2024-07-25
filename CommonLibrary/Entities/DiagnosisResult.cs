@@ -74,7 +74,7 @@ namespace CommonLibrary.Entities
         public bool IsSubmitted { get; set; }
 
         [ForeignKey("RoleId")]
-        public virtual Role Role { get; set; } = new();
+        public virtual Role Role { get; set; } 
 
     }
 }

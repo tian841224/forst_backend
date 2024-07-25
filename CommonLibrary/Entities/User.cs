@@ -36,6 +36,6 @@ namespace CommonLibrary.Entities
         /// 最後登入時間
         /// </summary>
         [Comment("最後登入時間")]
-        public DateTime LoginTime { get; set; }
+        public DateTime LoginTime { get; set; } = DateTime.UtcNow;
     }
 }

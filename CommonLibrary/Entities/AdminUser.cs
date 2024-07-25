@@ -37,7 +37,6 @@ namespace CommonLibrary.Entities
         /// <summary>
         /// 照片
         /// </summary>
-        [Required]
         [Comment("照片")]
         public string Photo { get; set; } = string.Empty;
 
@@ -59,9 +58,9 @@ namespace CommonLibrary.Entities
         /// 登入時間
         /// </summary>
         [Comment("登入時間")]
-        public DateTime LoginTime { get; set; }
+        public DateTime LoginTime { get; set; } = DateTime.UtcNow;
 
         [ForeignKey("RoleId")]
-        public virtual Role Role { get; set; } = new();
+        public virtual Role Role { get; set; } 
     }
 }

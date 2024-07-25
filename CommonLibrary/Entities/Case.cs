@@ -124,7 +124,7 @@ namespace CommonLibrary.Entities
         /// 現地種植時間
         /// </summary>
         [Comment("現地種植時間")]
-        public string LocalPlantingTime { get; set; } = string.Empty;
+        public int LocalPlantingTime { get; set; }
 
         /// <summary>
         /// 首次發現受害時間
@@ -160,9 +160,9 @@ namespace CommonLibrary.Entities
         public string Photo { get; set; } = string.Empty;
 
         [ForeignKey("AdminUserId")]
-        public virtual AdminUser AdminUser { get; set; } = new();
+        public virtual AdminUser AdminUser { get; set; } 
 
         [ForeignKey("TreeBasicInfoId")]
-        public virtual TreeBasicInfo TreeBasicInfo { get; set; } = new();
+        public virtual TreeBasicInfo TreeBasicInfo { get; set; }
     }
 }

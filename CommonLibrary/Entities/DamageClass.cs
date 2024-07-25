@@ -33,6 +33,6 @@ namespace CommonLibrary.Entities
         public StatusEnum Status { get; set; }
 
         [ForeignKey("DamageTypeId")]
-        public virtual DamageType DamageType { get; set; } = new();
+        public virtual DamageType DamageType { get; set; } 
     }
 }

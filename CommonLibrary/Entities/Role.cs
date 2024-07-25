@@ -14,5 +14,7 @@ namespace CommonLibrary.Entities
         [Comment("角色名稱")]
         [Required]
         public string Name { get; set; } = string.Empty;
+
+        public ICollection<AdminUser> AdminUser { get; set; } 
     }
 }

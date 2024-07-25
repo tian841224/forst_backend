@@ -1,5 +1,7 @@
 ﻿using CommonLibrary.DTOs;
+using Microsoft.AspNetCore.Http;
 using System.Net;
+using System.Net.Http;
 using System.Text.Json;
 
 namespace CommonLibrary.Middleware
@@ -16,8 +18,18 @@ namespace CommonLibrary.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            string STATICS_PATH = "/statics";
+            string SWAGGER_PATH = "/swagger";
+            var notConvertUrlList = new List<string>() { STATICS_PATH, SWAGGER_PATH };
+
             try
             {
+                if (context.Request.Path.HasValue && notConvertUrlList.Any(p => context.Request.Path.Value.Contains(p)))
+                {
+                    await _next(context);
+                    return;
+                }
+
                 // Capture the original response stream
                 var originalResponseBodyStream = context.Response.Body;
 

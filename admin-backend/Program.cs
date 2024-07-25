@@ -1,29 +1,67 @@
 using CommonLibrary.Data;
+using CommonLibrary.Extensions;
+using CommonLibrary.Infrastructure;
+using NLog;
+using NLog.Web;
+using System.Reflection;
 
-var builder = WebApplication.CreateBuilder(args);
+var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+logger.Info("啟動程式");
 
-// 加入 DbContext 服務
-builder.Services.AddMySqlDbContext();
-
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var builder = WebApplication.CreateBuilder(args);
+
+    //加入NLog
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
+
+    // 加入 DbContext 服務
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (connectionString != null)
+    {
+        builder.Services.AddMySqlDbContext(connectionString);
+    }
+    else throw new Exception("未設定DefaultConnection");
+
+    builder.Services.AddControllers();
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(c =>
+    {
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        c.IncludeXmlComments(xmlPath);
+    });
+    var app = builder.Build();
+
+    await builder.MigrateDbContextAsync<MysqlDbContext>(async (context, services) =>
+    {
+        await new SeedData().SeedAsync(context, services);
+    });
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
+
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+    logger.Error(ex, "Stopped program because of exception");
+    throw;
+}
+finally
+{
+    LogManager.Shutdown();
+}

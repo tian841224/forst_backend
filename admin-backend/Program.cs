@@ -1,5 +1,6 @@
 using admin_backend.Services;
 using CommonLibrary.Data;
+using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using CommonLibrary.Infrastructure;
 using CommonLibrary.Middleware;
@@ -29,6 +30,9 @@ try
         builder.Services.AddMySqlDbContext(connectionString);
     }
     else throw new Exception("¥¼³]©wDefaultConnection");
+
+    var jwtConfigSection = builder.Configuration.GetSection(nameof(JwtConfig));
+    builder.Services.Configure<JwtConfig>(jwtConfigSection);
 
     builder.Services.AddControllers();
     builder.Services.AddScoped<RedisService>();

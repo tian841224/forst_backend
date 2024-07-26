@@ -34,7 +34,7 @@ namespace admin_backend.Controllers
         /// µn¤J
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Login(LoginDto dto)
         {

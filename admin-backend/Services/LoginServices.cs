@@ -2,6 +2,7 @@
 using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.Login;
 using CommonLibrary.Service;
+using Google.Protobuf.WellKnownTypes;
 using IdentityModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -54,6 +55,9 @@ namespace admin_backend.Services
             {
                 throw new Exception("請先設定此帳號身分");
             }
+
+            //驗證驗證碼
+            VerifyCaptchaAsync(dto.CaptchaCode);
 
             var refreshToken = Guid.NewGuid().ToString();
 
@@ -138,67 +142,78 @@ namespace admin_backend.Services
                 ImageBase64 = "data:image/png;base64," + Captcha.CaptchaBase64Data
             };
 
-            await redisDb.StringSetAsync(CAPTCHA_CODE_PRE + result.CaptchaCode, Captcha.CaptchaCode);
+            await redisDb.StringSetAsync(CAPTCHA_CODE_PRE + result.CaptchaCode, Captcha.CaptchaCode,new TimeSpan(0,1,0));
 
             return result;
         }
 
         public CaptchaResult GenerateCaptcha(int width = 100, int height = 36)
         {
-            // 生成驗證碼
-            string code = GenerateCode();
-
-            var image = new Bitmap(width, height);
-            var graphics = Graphics.FromImage(image);
-            var _random = new Random();
-
-            // 背景顏色
-            int num5 = 180;
-            int num6 = 255;
-            int num7 = _random.Next(num5, num6);
-            int num8 = _random.Next(num5, num6);
-            int num9 = _random.Next(num5, num6);
-            graphics.Clear(Color.FromArgb(num7, num8, num9));
-
-            // 畫驗證碼字串
-            var font = new Font("Arial", 15, FontStyle.Bold | FontStyle.Italic);
-            var brush = new LinearGradientBrush(new Rectangle(0, 0, image.Width, image.Height), Color.Blue, Color.Gray, 1.2f, true);
-
-            int margin = 10; // 邊距，確保文字不靠近邊緣
-
-            // 計算單個字符的寬高
-            SizeF textSize = graphics.MeasureString(code[0].ToString(), font);
-            float charWidth = textSize.Width;
-            float charHeight = textSize.Height;
-
-            for (int i = 0; i < code.Length; i++)
+            try
             {
-                // 隨機生成文字位置，確保文字不靠近圖片邊緣
-                int x = _random.Next(margin, width - margin - (int)charWidth);
-                int y = _random.Next(margin, height - margin - (int)charHeight);
-                graphics.DrawString(code[i].ToString(), font, brush, x, y);
+                string captchaText = GenerateCode();
+
+                using (Bitmap bitmap = new Bitmap(width, height))
+                using (Graphics graphics = Graphics.FromImage(bitmap))
+                {
+                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                    graphics.Clear(Color.White);
+
+                    // 添加背景噪點
+                    //AddNoise(graphics, width, height);
+
+                    // 為每個字符創建單獨的路徑
+                    for (int i = 0; i < captchaText.Length; i++)
+                    {
+                        using (GraphicsPath charPath = new GraphicsPath())
+                        {
+                            float fontSize = height * 0.7f; // 調整字體大小
+                            using (Font font = new Font("Arial", fontSize, FontStyle.Bold))
+                            {
+                                float charWidth = width / captchaText.Length;
+                                float x = i * charWidth + (charWidth - graphics.MeasureString(captchaText[i].ToString(), font).Width) / 2;
+                                float y = (height - graphics.MeasureString(captchaText[i].ToString(), font).Height) / 2;
+
+                                charPath.AddString(
+                                    captchaText[i].ToString(),
+                                    font.FontFamily,
+                                    (int)font.Style,
+                                    graphics.DpiY * fontSize / 72,
+                                    new PointF(x, y),
+                                    new StringFormat());
+
+                                // 使用隨機顏色繪製字符
+                                using (Brush brush = new SolidBrush(GetRandomColor()))
+                                {
+                                    graphics.FillPath(brush, charPath);
+                                }
+                            }
+                        }
+                    }
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        bitmap.Save(ms, ImageFormat.Png);
+                        return new CaptchaResult
+                        {
+                            CaptchaCode = captchaText,
+                            CaptchaByteData = ms.ToArray()
+                        };
+                    }
+                }
             }
-
-            // 畫干擾點
-            for (int i = 0; i < 100; i++)
+            catch (Exception ex) 
             {
-                int x = _random.Next(image.Width);
-                int y = _random.Next(image.Height);
-                image.SetPixel(x, y, Color.FromArgb(_random.Next()));
+                _log.LogError(ex.Message);
+                throw;
             }
+        }
 
-            graphics.Dispose();
 
-            using var ms = new MemoryStream();
-            image.Save(ms, ImageFormat.Png);
-            ms.Seek(0, SeekOrigin.Begin); // 確保 MemoryStream 的指針在開頭
-
-            return new CaptchaResult
-            {
-                CaptchaCode = code,
-                CaptchaByteData = ms.ToArray(),
-                Timestamp = DateTime.UtcNow
-            };
+        private static Color GetRandomColor()
+        {
+            Random random = new Random();
+            return Color.FromArgb(random.Next(0, 100), random.Next(0, 100), random.Next(0, 100));
         }
 
         private static string GenerateCode(int length = 4)
@@ -259,5 +274,21 @@ namespace admin_backend.Services
 
             return token;
         }
+
+        public async Task VerifyCaptchaAsync(string captcha)
+        {
+            var cacheKey = CAPTCHA_CODE_PRE + captcha;
+            var cacheValue = await redisDb.StringGetAsync(cacheKey);
+            if (cacheValue == RedisValue.Null)
+                throw new Exception("驗證碼已過期");
+
+            var verifyResult = cacheValue.ToString().Equals(captcha, StringComparison.OrdinalIgnoreCase);
+
+            await redisDb.StringGetDeleteAsync(cacheKey);
+
+            if (verifyResult == false)
+                throw new Exception("圖形密碼不正確");
+        }
+
     }
 }

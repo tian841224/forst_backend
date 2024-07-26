@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CommonLibrary.Migrations
 {
     [DbContext(typeof(MysqlDbContext))]
-    [Migration("20240725095101_InitialCreate")]
+    [Migration("20240726085019_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -91,6 +91,12 @@ namespace CommonLibrary.Migrations
                     b.Property<DateTime>("LoginTime")
                         .HasColumnType("datetime(6)")
                         .HasComment("登入時間");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasComment("姓名");
 
                     b.Property<string>("Password")
                         .IsRequired()

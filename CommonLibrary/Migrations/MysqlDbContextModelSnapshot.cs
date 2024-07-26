@@ -59,7 +59,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AdSetting", (string)null);
+                    b.ToTable("AdSetting");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.AdminUser", b =>
@@ -89,6 +89,12 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("datetime(6)")
                         .HasComment("登入時間");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasComment("姓名");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -117,7 +123,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AdminUser", (string)null);
+                    b.ToTable("AdminUser");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.CommonPest", b =>
@@ -184,7 +190,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("DamageTypeId");
 
-                    b.ToTable("CommonPest", (string)null);
+                    b.ToTable("CommonPest");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.DamageClass", b =>
@@ -221,7 +227,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("DamageTypeId");
 
-                    b.ToTable("DamageClass", (string)null);
+                    b.ToTable("DamageClass");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.DamageType", b =>
@@ -252,7 +258,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DamageType", (string)null);
+                    b.ToTable("DamageType");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.Documentation", b =>
@@ -282,7 +288,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Documentation", (string)null);
+                    b.ToTable("Documentation");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.EpidemicSummary", b =>
@@ -313,7 +319,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EpidemicSummary", (string)null);
+                    b.ToTable("EpidemicSummary");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.FAQ", b =>
@@ -348,7 +354,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FAQ", (string)null);
+                    b.ToTable("FAQ");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.Log", b =>
@@ -378,7 +384,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Log", (string)null);
+                    b.ToTable("Log");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.MailConfig", b =>
@@ -429,7 +435,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MailConfig", (string)null);
+                    b.ToTable("MailConfig");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.News", b =>
@@ -488,7 +494,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("News", (string)null);
+                    b.ToTable("News");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.OperationLog", b =>
@@ -529,7 +535,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("AdminUserId");
 
-                    b.ToTable("OperationLog", (string)null);
+                    b.ToTable("OperationLog");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.Permission", b =>
@@ -560,7 +566,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permission", (string)null);
+                    b.ToTable("Permission");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.Role", b =>
@@ -586,7 +592,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.User", b =>
@@ -625,7 +631,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("CommonLibrary.Entities.AdminUser", b =>

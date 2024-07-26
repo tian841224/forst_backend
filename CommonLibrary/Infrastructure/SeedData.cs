@@ -1,5 +1,6 @@
 ﻿using CommonLibrary.Data;
 using CommonLibrary.Entities;
+using CommonLibrary.Enums;
 
 namespace CommonLibrary.Infrastructure
 {
@@ -25,10 +26,12 @@ namespace CommonLibrary.Infrastructure
             {
                 context.AdminUser.Add(new AdminUser
                 {
+                    Name = "管理員帳號",
                     Account = "admin",
                     Password = "!Allpower123",
                     Email = "admin@allpower.in",
                     Photo = "",
+                    Status = StatusEnum.Open,
                     RoleId = roleId
                 });
                 await context.SaveChangesAsync();

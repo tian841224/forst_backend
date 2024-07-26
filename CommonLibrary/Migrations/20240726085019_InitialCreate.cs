@@ -271,6 +271,7 @@ namespace CommonLibrary.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "姓名"),
                     Account = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, comment: "帳號"),
                     Password = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, comment: "密碼"),
                     Email = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, comment: "信箱"),

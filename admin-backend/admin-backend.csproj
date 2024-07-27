@@ -7,7 +7,6 @@
     <RootNamespace>admin_backend</RootNamespace>
     <UserSecretsId>994a6df9-5201-4c5f-8b93-3d23422e48c1</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
   </PropertyGroup>
 

@@ -7,6 +7,7 @@ using CommonLibrary.Middleware;
 using CommonLibrary.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
 using System.Reflection;
@@ -40,13 +41,42 @@ try
     builder.Services.AddScoped<AdminUserServices>();
     builder.Services.AddScoped<RoleServices>();
     builder.Services.AddScoped<LoginServices>();
+    builder.Services.AddScoped<IdentityService>();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen(c =>
+    builder.Services.AddSwaggerGen(options =>
     {
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-        c.IncludeXmlComments(xmlPath);
+        options.IncludeXmlComments(xmlPath);
+
+        options.AddSecurityDefinition("Bearer",
+         new OpenApiSecurityScheme
+         {
+             Name = "Authorization",
+             Type = SecuritySchemeType.ApiKey,
+             Scheme = "Bearer",
+             BearerFormat = "JWT",
+             In = ParameterLocation.Header,
+             Description = "Example: \"Bearer xxxxxxxxxxxxxxx\""
+         });
+
+        options.AddSecurityRequirement(
+            new OpenApiSecurityRequirement
+            {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                new string[] {}
+            }
+            });
+
     });
 
     // ≥]©wJwt≈Á√“

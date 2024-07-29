@@ -1,10 +1,13 @@
 ﻿using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.Login;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SkiaSharp;
 using StackExchange.Redis;
 using System.IdentityModel.Tokens.Jwt;
+using IdentityModel;
 
 namespace CommonLibrary.Service
 {
@@ -19,13 +22,42 @@ namespace CommonLibrary.Service
         private readonly ILogger<IdentityService> _log;
         private readonly JwtConfig _jwtConfig;
         private readonly RedisService _redisService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         public IDatabase redisDb => _redisService.redisDb;
 
-        public IdentityService(RedisService redisService, IOptions<JwtConfig> jwtConfig, ILogger<IdentityService> log)
+        public IdentityService(RedisService redisService, IOptions<JwtConfig> jwtConfig, ILogger<IdentityService> log, IHttpContextAccessor httpContextAccessor)
         {
             _jwtConfig = jwtConfig.Value;
             _log = log;
             _redisService = redisService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        /// <summary>
+        /// 取得使用者資訊
+        /// </summary>
+        /// <returns></returns>
+        public ClaimDto GetUser()
+        {
+            var JwtClaims = _httpContextAccessor.HttpContext?.User?.Claims.ToList();
+
+            var claimsDto = new ClaimDto();
+
+            if (JwtClaims != null)
+            {
+                claimsDto = new ClaimDto
+                {
+                    RoleId = JwtClaims.FirstOrDefault(c => c.Type == "RoleId")?.Value,
+                    RoleNane = JwtClaims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value,
+                    UserId = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.Id)?.Value,
+                    UserNane = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value,
+                    Account = JwtClaims.FirstOrDefault(c => c.Type == "Account")?.Value,
+                    Email = JwtClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
+                    ReferenceTokenId = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.ReferenceTokenId)?.Value,
+                };
+            }
+            return claimsDto;
         }
 
         /// <summary>
@@ -37,7 +69,16 @@ namespace CommonLibrary.Service
         {
             try
             {
-                var claims = dto.Claims;
+                var claims = new List<Claim>
+                {
+                    new Claim(JwtClaimTypes.Id,dto.Id.ToString()),
+                    new Claim(JwtClaimTypes.Role,dto.Claims.RoleNane),
+                    new Claim(JwtClaimTypes.Name,dto.Claims.UserNane),
+                    new Claim(JwtClaimTypes.Email,dto.Claims.Email),
+                    new Claim(JwtClaimTypes.ReferenceTokenId,dto.RefreshToken),
+                    new Claim("Account",dto.Claims.Account),
+                    new Claim("RoleId",dto.Claims.RoleId),
+                };
 
                 var securityToken = new JwtSecurityToken(
                     issuer: _jwtConfig.Issuer,

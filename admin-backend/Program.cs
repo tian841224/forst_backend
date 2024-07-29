@@ -35,6 +35,7 @@ try
     var jwtConfigSection = builder.Configuration.GetSection(nameof(JwtConfig));
     builder.Services.Configure<JwtConfig>(jwtConfigSection);
 
+    #region 注入
     builder.Services.AddControllers();
     builder.Services.AddScoped<RedisService>();
     builder.Services.AddScoped<UserService>();
@@ -42,8 +43,15 @@ try
     builder.Services.AddScoped<RoleServices>();
     builder.Services.AddScoped<LoginServices>();
     builder.Services.AddScoped<IdentityService>();
+    builder.Services.AddScoped<MailConfigService>();
+    builder.Services.AddScoped<OperationLogService>();
+    builder.Services.AddScoped<RolePermissionService>();
+    #endregion
+
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
+
+    #region Swagger 
     builder.Services.AddSwaggerGen(options =>
     {
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -78,7 +86,9 @@ try
             });
 
     });
+    #endregion
 
+    #region Jwt
     // 設定Jwt驗證
     builder.Services.AddAuthentication(options =>
     {
@@ -111,6 +121,9 @@ try
             ClockSkew = TimeSpan.Zero
         };
     });
+    #endregion
+
+    builder.Services.AddHttpContextAccessor();
 
     var app = builder.Build();
 
@@ -130,6 +143,7 @@ try
 
     app.UseHttpsRedirection();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();

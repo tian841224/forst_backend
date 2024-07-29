@@ -1,6 +1,10 @@
 ﻿using CommonLibrary.Data;
+using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.DTOs.Role;
 using CommonLibrary.Entities;
+using CommonLibrary.Enums;
+using CommonLibrary.Extensions;
+using CommonLibrary.Service;
 using Microsoft.EntityFrameworkCore;
 
 namespace admin_backend.Services
@@ -8,9 +12,11 @@ namespace admin_backend.Services
     public class RoleServices
     {
         private readonly MysqlDbContext _context;
-        public RoleServices(MysqlDbContext context)
+        private readonly OperationLogService _operationLogService;
+        public RoleServices(MysqlDbContext context,OperationLogService operationLogService)
         {
             _context = context;
+            _operationLogService = operationLogService;
         }
 
         public async Task<List<Role>> Get(GetRoleDto dto)
@@ -36,7 +42,7 @@ namespace admin_backend.Services
 
             if (role != null)
             {
-                throw new Exception($"此身分已存在-{dto.Name}");
+                throw new ApiException($"此身分已存在-{dto.Name}");
             }
 
             role = new Role
@@ -46,7 +52,15 @@ namespace admin_backend.Services
 
             await _context.Role.AddAsync(role);
 
-            await _context.SaveChangesAsync();
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Add,
+                    Content = $"新增角色：{role.Id}/{role.Name}",
+                });
+            }
 
             return role;
         }
@@ -57,7 +71,7 @@ namespace admin_backend.Services
 
             if (role == null)
             {
-                throw new Exception($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{dto.Id}");
             }
 
             if (!string.IsNullOrEmpty(dto.Name))
@@ -65,7 +79,15 @@ namespace admin_backend.Services
 
             _context.Role.Update(role);
 
-            await _context.SaveChangesAsync();
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Edit,
+                    Content = $"修改角色：{role.Id}/{role.Name}",
+                });
+            }
 
             return role;
         }
@@ -76,12 +98,20 @@ namespace admin_backend.Services
 
             if (role == null)
             {
-                throw new Exception($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{dto.Id}");
             }
 
             _context.Role.Remove(role);
 
-            await _context.SaveChangesAsync();
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Delete,
+                    Content = $"刪除角色：{role.Id}/{role.Name}",
+                });
+            }
 
             return role;
         }

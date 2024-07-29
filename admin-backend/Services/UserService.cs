@@ -1,17 +1,25 @@
 ﻿using CommonLibrary.Data;
+using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.DTOs.User;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
+using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace admin_backend.Services
 {
     public class UserService
     {
         private readonly MysqlDbContext _context;
-        public UserService(MysqlDbContext context)
+        private readonly OperationLogService _operationLogService;
+        private readonly ILogger<UserService> _log;
+
+        public UserService(MysqlDbContext context,OperationLogService operationLogService, ILogger<UserService> log)
         {
             _context = context;
+            _operationLogService = operationLogService;
+            _log = log;
         }
 
         public async Task<List<User>> Get(GetUserDto dto)
@@ -52,7 +60,7 @@ namespace admin_backend.Services
 
             if (user != null)
             {
-                throw new Exception($"此帳號已註冊-{dto.Account}");
+                throw new ApiException($"此帳號已註冊-{dto.Account}");
             }
 
             user = new User
@@ -64,7 +72,15 @@ namespace admin_backend.Services
 
             await _context.User.AddAsync(user);
 
-            await _context.SaveChangesAsync();
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Add,
+                    Content = $"新增會員：{user.Id}/{user.Name}",
+                });
+            }
 
             return user;
         }
@@ -75,7 +91,7 @@ namespace admin_backend.Services
 
             if (user == null)
             {
-                throw new Exception($"無此使用者-{dto.Id}");
+                throw new ApiException($"無此使用者-{dto.Id}");
             }
 
             if (!string.IsNullOrEmpty(dto.Name))
@@ -86,7 +102,15 @@ namespace admin_backend.Services
 
             _context.User.Update(user);
 
-            await _context.SaveChangesAsync();
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Edit,
+                    Content = $"修改會員：{user.Id}/{user.Name}",
+                });
+            }
 
             return user;
         }

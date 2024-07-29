@@ -2,6 +2,7 @@ using CommonLibrary.Data;
 using CommonLibrary.DTOs.AdminUser;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
+using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace admin_backend.Services
@@ -9,9 +10,13 @@ namespace admin_backend.Services
     public class AdminUserServices
     {
         private readonly MysqlDbContext _context;
-        public AdminUserServices(MysqlDbContext context)
+        private readonly ILogger<AdminUserServices> _log;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AdminUserServices(MysqlDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<AdminUserServices> log)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
+            _log = log;
         }
 
         public async Task<List<AdminUser>> Get(GetAdminUserDto dto)
@@ -46,37 +51,61 @@ namespace admin_backend.Services
 
         public async Task<AdminUser> Add(AddAdminUserDto dto)
         {
-            var adminUser = await _context.AdminUser.Where(x => x.Account == dto.Account).FirstOrDefaultAsync();
-
-            if (adminUser != null)
+            try
             {
-                throw new Exception($"此帳號已存在-{dto.Name}");
+                var adminUser = await _context.AdminUser.Where(x => x.Account == dto.Account).FirstOrDefaultAsync();
+
+                if (adminUser != null)
+                {
+                    throw new ApiException($"此帳號已註冊-{dto.Name}");
+                }
+
+                adminUser = new AdminUser
+                {
+                    Name = dto.Name,
+                    Account = dto.Account,
+                    Password = dto.Password,
+                    Email = dto.Email,
+                    RoleId = dto.RoleId,
+                    Status = dto.Status,
+                    Photo = dto.Photo,
+                };
+
+                await _context.AdminUser.AddAsync(adminUser);
+
+                //新增操作紀錄
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    //取得IP
+                    var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
+
+                    //新增操作紀錄
+                    await _context.OperationLog.AddAsync(new OperationLog
+                    {
+                        AdminUserId = adminUser.Id,
+                        Type = ChangeTypeEnum.Add,
+                        Content = $"新增後台帳號:{adminUser.Name}/{adminUser.Account}",
+                        Ip = ipAddress.ToString(),
+                    });
+
+                    await _context.SaveChangesAsync();
+                }
+
+                return adminUser;
             }
-
-            adminUser = new AdminUser
+            catch (Exception ex)
             {
-                Name = dto.Name,
-                Account = dto.Account,
-                Password = dto.Password,
-                Email = dto.Email,
-                RoleId = dto.RoleId,
-                Status = dto.Status,
-                Photo = dto.Photo,
-            };
-
-            await _context.AdminUser.AddAsync(adminUser);
-            await _context.SaveChangesAsync();
-
-            return adminUser;
+                _log.LogError(ex.Message);
+                throw;
+            }
         }
-
         public async Task<AdminUser> Update(UpdateAdminUserDto dto)
         {
             var adminUser = await _context.AdminUser.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
 
             if (adminUser == null)
             {
-                throw new Exception($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{dto.Id}");
             }
 
             if (!string.IsNullOrEmpty(dto.Name))
@@ -93,7 +122,23 @@ namespace admin_backend.Services
 
             _context.AdminUser.Update(adminUser);
 
-            await _context.SaveChangesAsync();
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                //取得IP
+                var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
+
+                //新增操作紀錄
+                await _context.OperationLog.AddAsync(new OperationLog
+                {
+                    AdminUserId = adminUser.Id,
+                    Type = ChangeTypeEnum.Add,
+                    Content = $"修改後台帳號:{adminUser.Name}/{adminUser.Account}",
+                    Ip = ipAddress.ToString(),
+                });
+
+                await _context.SaveChangesAsync();
+            }
 
             return adminUser;
         }

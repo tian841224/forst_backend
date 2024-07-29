@@ -32,7 +32,6 @@ namespace CommonLibrary.DTOs.AdminUser
         /// <summary>
         /// 照片
         /// </summary>
-        [Comment("照片")]
         public string? Photo { get; set; } 
 
         /// <summary>

@@ -37,6 +37,6 @@ namespace CommonLibrary.DTOs.Login
         /// <summary>
         /// Token參數
         /// </summary>
-        public List<Claim> Claims { get; set; } = new();
+        public ClaimDto Claims { get; set; } = new();
     }
 }

@@ -1,14 +1,16 @@
 using admin_backend.Services;
 using CommonLibrary.DTOs.Login;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace admin_backend.Controllers
 {
-        [ApiController]
-    [Route("[controller]/[action]")]
     /// <summary>
     /// 登入
     /// </summary>
+    [ApiController]
+    [Route("[controller]/[action]")]
+
     public class LoginController : ControllerBase
     {
         private readonly LoginServices _loginServices;
@@ -23,22 +25,33 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetCaptcha()
         {
             return Ok(await _loginServices.GetCaptchaAsync());
         }
-
 
         /// <summary>
         /// 登入
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginDto dto)
         {
             return Ok(await _loginServices.Login(dto));
+        }
+
+        /// <summary>
+        /// 更新Token
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> RefreshAdminUserToken(RefreshTokenDto dto)
+        {
+            return Ok(await _loginServices.RefreshAdminUserTokenAsync(dto));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CommonLibrary.DTOs;
+using CommonLibrary.Extensions;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -88,27 +89,44 @@ namespace CommonLibrary.Middleware
                 ErrorMsg = exception.Message,
             };
 
-            switch (exception)
+            string className = string.Empty;
+
+            if (exception is ApiException apiException)
             {
-                case ArgumentNullException _:
-                case ArgumentException _:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    break;
-                case UnauthorizedAccessException _:
-                    response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    break;
-                case NotImplementedException _:
-                    response.StatusCode = (int)HttpStatusCode.NotImplemented;
-                    break;
-                default:
-                    response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    break;
+                className = apiException.className;
+                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                _logger.LogInformation($"{className}-{exception.Message}");
+                var result = JsonSerializer.Serialize(errorResponse);
+                await context.Response.WriteAsync(result);
             }
+            else
+            {
+                switch (exception)
+                {
+                    case ArgumentNullException _:
+                    case ArgumentException _:
+                        response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        break;
+                    case UnauthorizedAccessException _:
+                        response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        break;
+                    case NotImplementedException _:
+                        response.StatusCode = (int)HttpStatusCode.NotImplemented;
+                        break;
+                    case ApiException _:
+                        response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        break;
+                    default:
+                        response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        break;
+                }
 
-            _logger.LogError(exception, "An unhandled exception has occurred.");
 
-            var result = JsonSerializer.Serialize(errorResponse);
-            await context.Response.WriteAsync(result);
+                _logger.LogError($"{className}-{exception.Message}");
+
+                var result = JsonSerializer.Serialize(errorResponse);
+                await context.Response.WriteAsync(result);
+            }
         }
     }
 }

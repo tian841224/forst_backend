@@ -23,7 +23,7 @@ namespace admin_backend.Controllers
         /// 取得郵寄信件設定
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Authorize]
         public async Task<IActionResult> Get()
         {

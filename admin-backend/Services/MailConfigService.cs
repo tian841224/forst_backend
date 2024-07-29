@@ -22,7 +22,7 @@ namespace admin_backend.Services
 
         public async Task<MailConfig> Get()
         {
-            var mailConfig = await _context.MailConfig.OrderByDescending(x => x.Id).LastOrDefaultAsync();
+            var mailConfig = await _context.MailConfig.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
             return mailConfig;
         }
 
@@ -38,19 +38,30 @@ namespace admin_backend.Services
                 Name = dto.Name,
             };
 
-            await _context.MailConfig.AddAsync(mailConfig);
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            //新增操作紀錄
-            if (await _context.SaveChangesAsync() > 0)
+            try
             {
-                await _operationLogService.Add(new AddOperationLogDto
-                {
-                    Type = ChangeTypeEnum.Add,
-                    Content = "修改郵寄信件設定",
-                });
-            }
+                await _context.MailConfig.AddAsync(mailConfig);
 
-            return mailConfig;
+                //新增操作紀錄
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    await _operationLogService.Add(new AddOperationLogDto
+                    {
+                        Type = ChangeTypeEnum.Add,
+                        Content = "修改郵寄信件設定",
+                    });
+                }
+                await transaction.CommitAsync();
+                return mailConfig;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _log.LogError(ex.Message);
+                throw;
+            }
         }
     }
 }

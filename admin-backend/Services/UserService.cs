@@ -70,19 +70,30 @@ namespace admin_backend.Services
                 Status = StatusEnum.Open,
             };
 
-            await _context.User.AddAsync(user);
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            //新增操作紀錄
-            if (await _context.SaveChangesAsync() > 0)
+            try
             {
-                await _operationLogService.Add(new AddOperationLogDto
-                {
-                    Type = ChangeTypeEnum.Add,
-                    Content = $"新增會員：{user.Id}/{user.Name}",
-                });
-            }
+                await _context.User.AddAsync(user);
 
-            return user;
+                //新增操作紀錄
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    await _operationLogService.Add(new AddOperationLogDto
+                    {
+                        Type = ChangeTypeEnum.Add,
+                        Content = $"新增會員：{user.Id}/{user.Name}",
+                    });
+                }
+                await transaction.CommitAsync();
+                return user;
+            }
+            catch(Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _log.LogError(ex.Message);
+                throw;
+            }
         }
 
         public async Task<User> Update(UpdateUserDto dto)
@@ -100,19 +111,30 @@ namespace admin_backend.Services
             if (dto.Status.HasValue)
                 user.Status = (StatusEnum)dto.Status;
 
-            _context.User.Update(user);
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            //新增操作紀錄
-            if (await _context.SaveChangesAsync() > 0)
+            try
             {
-                await _operationLogService.Add(new AddOperationLogDto
-                {
-                    Type = ChangeTypeEnum.Edit,
-                    Content = $"修改會員：{user.Id}/{user.Name}",
-                });
-            }
+                _context.User.Update(user);
 
-            return user;
+                //新增操作紀錄
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    await _operationLogService.Add(new AddOperationLogDto
+                    {
+                        Type = ChangeTypeEnum.Edit,
+                        Content = $"修改會員：{user.Id}/{user.Name}",
+                    });
+                }
+                await transaction.CommitAsync();
+                return user;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _log.LogError(ex.Message);
+                throw;
+            }
         }
     }
 }

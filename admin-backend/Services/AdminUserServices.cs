@@ -51,26 +51,29 @@ namespace admin_backend.Services
 
         public async Task<AdminUser> Add(AddAdminUserDto dto)
         {
+
+            var adminUser = await _context.AdminUser.Where(x => x.Account == dto.Account).FirstOrDefaultAsync();
+
+            if (adminUser != null)
+            {
+                throw new ApiException($"此帳號已註冊-{dto.Name}");
+            }
+
+            adminUser = new AdminUser
+            {
+                Name = dto.Name,
+                Account = dto.Account,
+                Password = dto.Password,
+                Email = dto.Email,
+                RoleId = dto.RoleId,
+                Status = dto.Status,
+                Photo = dto.Photo,
+            };
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
             try
             {
-                var adminUser = await _context.AdminUser.Where(x => x.Account == dto.Account).FirstOrDefaultAsync();
-
-                if (adminUser != null)
-                {
-                    throw new ApiException($"此帳號已註冊-{dto.Name}");
-                }
-
-                adminUser = new AdminUser
-                {
-                    Name = dto.Name,
-                    Account = dto.Account,
-                    Password = dto.Password,
-                    Email = dto.Email,
-                    RoleId = dto.RoleId,
-                    Status = dto.Status,
-                    Photo = dto.Photo,
-                };
-
                 await _context.AdminUser.AddAsync(adminUser);
 
                 //新增操作紀錄
@@ -90,11 +93,12 @@ namespace admin_backend.Services
 
                     await _context.SaveChangesAsync();
                 }
-
+                await transaction.CommitAsync();
                 return adminUser;
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 _log.LogError(ex.Message);
                 throw;
             }
@@ -120,27 +124,37 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.Password))
                 adminUser.Password = dto.Password;
 
-            _context.AdminUser.Update(adminUser);
-
-            //新增操作紀錄
-            if (await _context.SaveChangesAsync() > 0)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                //取得IP
-                var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
+                _context.AdminUser.Update(adminUser);
 
                 //新增操作紀錄
-                await _context.OperationLog.AddAsync(new OperationLog
+                if (await _context.SaveChangesAsync() > 0)
                 {
-                    AdminUserId = adminUser.Id,
-                    Type = ChangeTypeEnum.Add,
-                    Content = $"修改後台帳號:{adminUser.Name}/{adminUser.Account}",
-                    Ip = ipAddress.ToString(),
-                });
+                    //取得IP
+                    var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
 
-                await _context.SaveChangesAsync();
+                    //新增操作紀錄
+                    await _context.OperationLog.AddAsync(new OperationLog
+                    {
+                        AdminUserId = adminUser.Id,
+                        Type = ChangeTypeEnum.Add,
+                        Content = $"修改後台帳號:{adminUser.Name}/{adminUser.Account}",
+                        Ip = ipAddress.ToString(),
+                    });
+
+                    await _context.SaveChangesAsync();
+                }
+                await transaction.CommitAsync();
+                return adminUser;
             }
-
-            return adminUser;
+            catch(Exception ex) 
+            {
+                await transaction.RollbackAsync();
+                _log.LogError(ex.Message);
+                throw;
+            }
         }
     }
 }

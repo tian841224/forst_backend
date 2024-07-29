@@ -4,7 +4,6 @@ using CommonLibrary.DTOs.Role;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
-using CommonLibrary.Service;
 using Microsoft.EntityFrameworkCore;
 
 namespace admin_backend.Services
@@ -13,10 +12,13 @@ namespace admin_backend.Services
     {
         private readonly MysqlDbContext _context;
         private readonly OperationLogService _operationLogService;
-        public RoleServices(MysqlDbContext context,OperationLogService operationLogService)
+        private readonly ILogger<RoleServices> _log;
+
+        public RoleServices(MysqlDbContext context, OperationLogService operationLogService, ILogger<RoleServices> log)
         {
             _context = context;
             _operationLogService = operationLogService;
+            _log = log;
         }
 
         public async Task<List<Role>> Get(GetRoleDto dto)
@@ -50,19 +52,31 @@ namespace admin_backend.Services
                 Name = dto.Name,
             };
 
-            await _context.Role.AddAsync(role);
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            //新增操作紀錄
-            if (await _context.SaveChangesAsync() > 0)
+            try
             {
-                await _operationLogService.Add(new AddOperationLogDto
-                {
-                    Type = ChangeTypeEnum.Add,
-                    Content = $"新增角色：{role.Id}/{role.Name}",
-                });
-            }
+                _context.Role.Update(role);
 
-            return role;
+                //新增操作紀錄
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    await _operationLogService.Add(new AddOperationLogDto
+                    {
+                        Type = ChangeTypeEnum.Edit,
+                        Content = $"修改角色：{role.Id}/{role.Name}",
+                    });
+                }
+
+                await transaction.CommitAsync();
+                return role;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _log.LogError(ex.Message);
+                throw;
+            }
         }
 
         public async Task<Role> Update(UpdateRoleDto dto)
@@ -77,19 +91,31 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.Name))
                 role.Name = dto.Name;
 
-            _context.Role.Update(role);
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            //新增操作紀錄
-            if (await _context.SaveChangesAsync() > 0)
+            try
             {
-                await _operationLogService.Add(new AddOperationLogDto
-                {
-                    Type = ChangeTypeEnum.Edit,
-                    Content = $"修改角色：{role.Id}/{role.Name}",
-                });
-            }
+                _context.Role.Update(role);
 
-            return role;
+                //新增操作紀錄
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    await _operationLogService.Add(new AddOperationLogDto
+                    {
+                        Type = ChangeTypeEnum.Edit,
+                        Content = $"修改角色：{role.Id}/{role.Name}",
+                    });
+                }
+
+                await transaction.CommitAsync();
+                return role;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _log.LogError(ex.Message);
+                throw;
+            }
         }
 
         public async Task<Role> Delete(DeleteRoleDto dto)
@@ -101,19 +127,31 @@ namespace admin_backend.Services
                 throw new ApiException($"無此資料-{dto.Id}");
             }
 
-            _context.Role.Remove(role);
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            //新增操作紀錄
-            if (await _context.SaveChangesAsync() > 0)
+            try
             {
-                await _operationLogService.Add(new AddOperationLogDto
-                {
-                    Type = ChangeTypeEnum.Delete,
-                    Content = $"刪除角色：{role.Id}/{role.Name}",
-                });
-            }
+                _context.Role.Remove(role);
 
-            return role;
+                //新增操作紀錄
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    await _operationLogService.Add(new AddOperationLogDto
+                    {
+                        Type = ChangeTypeEnum.Delete,
+                        Content = $"刪除角色：{role.Id}/{role.Name}",
+                    });
+                }
+
+                await transaction.CommitAsync();
+                return role;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _log.LogError(ex.Message);
+                throw;
+            }
         }
     }
 }

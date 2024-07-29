@@ -73,27 +73,40 @@ namespace admin_backend.Services
                 }
             });
 
-            //更新登入時間
-            adminUser.LoginTime = DateTime.UtcNow;
-            _context.AdminUser.Update(adminUser);
-            await _context.SaveChangesAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            //新增操作紀錄
-            await _context.OperationLog.AddAsync(new OperationLog
+            try
             {
-                AdminUserId = adminUser.Id,
-                Type = ChangeTypeEnum.None,
-                Content = $"登入：{adminUser.Id}/{adminUser.Name}",
-            });
+                //更新登入時間
+                adminUser.LoginTime = DateTime.UtcNow;
+                _context.AdminUser.Update(adminUser);
+                await _context.SaveChangesAsync();
 
-            return new IdentityResultDto
+                //新增操作紀錄
+                await _context.OperationLog.AddAsync(new OperationLog
+                {
+                    AdminUserId = adminUser.Id,
+                    Type = ChangeTypeEnum.None,
+                    Content = $"登入：{adminUser.Id}/{adminUser.Name}",
+                });
+
+                await transaction.CommitAsync();
+
+                return new IdentityResultDto
+                {
+                    AccessToken = token,
+                    RefreshToken = refreshToken,
+                    Expires = (new DateTimeOffset(_jwtConfig.Expiration)).ToUnixTimeSeconds(),
+                    RoleId = role.Id,
+                    Account = adminUser.Account,
+                };
+            }
+            catch (Exception ex)
             {
-                AccessToken = token,
-                RefreshToken = refreshToken,
-                Expires = (new DateTimeOffset(_jwtConfig.Expiration)).ToUnixTimeSeconds(),
-                RoleId = role.Id,
-                Account = adminUser.Account,
-            };
+                await transaction.RollbackAsync();
+                _log.LogError(ex.Message);
+                throw;
+            }
         }
 
 

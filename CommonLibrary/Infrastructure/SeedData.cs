@@ -10,9 +10,9 @@ namespace CommonLibrary.Infrastructure
         {
 
             //新增預設角色
-            if (!context.Set<Role>().Any(u => u.Name == "admin"))
+            if (!context.Set<Role>().Any(u => u.Name == "Admin"))
             {
-                context.Role.Add(new Role { Name = "admin" });
+                context.Role.Add(new Role { Name = "Admin" });
                 await context.SaveChangesAsync();
             }
 

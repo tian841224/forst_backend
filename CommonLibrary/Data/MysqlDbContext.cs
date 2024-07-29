@@ -22,7 +22,7 @@ namespace CommonLibrary.Data
         public DbSet<User> User { get; set; }
         public DbSet<Documentation> Documentation { get; set; }
         public DbSet<CommonPest> CommonPest { get; set; }
-        //public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<RolePermission> RolePermission { get; set; }
         public DbSet<News> News { get; set; }
         public DbSet<DamageType> DamageType { get; set; }
         public DbSet<Log> Log { get; set; }

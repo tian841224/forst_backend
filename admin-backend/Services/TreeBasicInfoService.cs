@@ -15,10 +15,11 @@ namespace admin_backend.Services
         private readonly MysqlDbContext _context;
         private readonly OperationLogService _operationLogService;
 
-        public TreeBasicInfoService(ILogger<TreeBasicInfoService> log, MysqlDbContext context)
+        public TreeBasicInfoService(ILogger<TreeBasicInfoService> log, MysqlDbContext context, OperationLogService operationLogService)
         {
             _log = log;
             _context = context;
+            _operationLogService = operationLogService;
         }
 
         public async Task<List<TreeBasicInfo>> Get()
@@ -79,7 +80,7 @@ namespace admin_backend.Services
                 await _operationLogService.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
-                    Content = $"新增樹木基本資料：{treeBasicInfo.Name}",
+                    Content = $"修改樹木基本資料：{treeBasicInfo.Name}",
                 });
             };
             scope.Complete();
@@ -106,7 +107,7 @@ namespace admin_backend.Services
                 await _operationLogService.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
-                    Content = $"新增樹木基本資料：{treeBasicInfo.Name}",
+                    Content = $"刪除樹木基本資料：{treeBasicInfo.Name}",
                 });
             };
             scope.Complete();

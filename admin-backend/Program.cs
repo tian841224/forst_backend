@@ -1,6 +1,7 @@
 using admin_backend.Services;
 using CommonLibrary.Data;
 using CommonLibrary.DTOs;
+using CommonLibrary.Entities;
 using CommonLibrary.Extensions;
 using CommonLibrary.Infrastructure;
 using CommonLibrary.Middleware;
@@ -48,6 +49,7 @@ try
     builder.Services.AddScoped<TreeBasicInfoService>();
     builder.Services.AddScoped<DocumentationService>();
     builder.Services.AddScoped<ForestCompartmentLocationService>();
+    builder.Services.AddScoped<EpidemicSummaryService>();
     #endregion
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -16,16 +16,16 @@ namespace CommonLibrary.DTOs.Login
         [Required]
         public string Password { get; set; } = string.Empty;
 
-        /// <summary>
-        /// 驗證碼ID
-        /// </summary>
-        [Required]
-        public string CaptchaCode { get; set; } = string.Empty;
+        ///// <summary>
+        ///// 驗證碼ID
+        ///// </summary>
+        //[Required]
+        //public string CaptchaCode { get; set; } = string.Empty;
 
-        /// <summary>
-        /// 使用者輸入驗證碼
-        /// </summary>
-        [Required]
-        public string CaptchaUserInput { get; set; } = string.Empty;
+        ///// <summary>
+        ///// 使用者輸入驗證碼
+        ///// </summary>
+        //[Required]
+        //public string CaptchaUserInput { get; set; } = string.Empty;
     }
 }

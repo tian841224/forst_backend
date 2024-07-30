@@ -29,10 +29,10 @@ namespace CommonLibrary.DTOs.Login
         ///// </summary>
         //public string Role { get; set; } = string.Empty;
 
-        /// <summary>
-        /// 更新Tokem
-        /// </summary>
-        public string RefreshToken { get; set; } = string.Empty;
+        ///// <summary>
+        ///// 更新Tokem
+        ///// </summary>
+        //public string RefreshToken { get; set; } = string.Empty;
 
         /// <summary>
         /// Token參數

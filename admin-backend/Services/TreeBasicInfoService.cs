@@ -79,7 +79,7 @@ namespace admin_backend.Services
             {
                 await _operationLogService.Add(new AddOperationLogDto
                 {
-                    Type = ChangeTypeEnum.Add,
+                    Type = ChangeTypeEnum.Edit,
                     Content = $"修改樹木基本資料：{treeBasicInfo.Name}",
                 });
             };
@@ -106,7 +106,7 @@ namespace admin_backend.Services
             {
                 await _operationLogService.Add(new AddOperationLogDto
                 {
-                    Type = ChangeTypeEnum.Add,
+                    Type = ChangeTypeEnum.Delete,
                     Content = $"刪除樹木基本資料：{treeBasicInfo.Name}",
                 });
             };

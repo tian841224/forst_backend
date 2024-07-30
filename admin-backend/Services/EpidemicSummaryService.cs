@@ -44,7 +44,7 @@ namespace admin_backend.Services
                 await _operationLogService.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
-                    Content = $"修改疫情簡介{epidemicSummary.Title}",
+                    Content = $"新增疫情簡介{epidemicSummary.Title}",
                 });
             }
             scope.Complete();

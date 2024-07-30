@@ -8,6 +8,8 @@ namespace admin_backend.Controllers
     /// <summary>
     /// 會員註冊使用條款
     /// </summary>
+    [ApiController]
+    [Route("[controller]/[action]")]
     public class DocumentationController : ControllerBase
     {
         private readonly DocumentationService _documentationService;

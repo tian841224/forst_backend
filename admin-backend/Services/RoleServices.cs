@@ -47,7 +47,7 @@ namespace admin_backend.Services
 
             if (role != null)
             {
-                return role;
+                throw new ApiException($"此角色已註冊-{dto.Name}");
             }
 
             role = new Role
@@ -64,8 +64,8 @@ namespace admin_backend.Services
             {
                 await _operationLogService.Add(new AddOperationLogDto
                 {
-                    Type = ChangeTypeEnum.Edit,
-                    Content = $"修改角色：{role.Id}/{role.Name}",
+                    Type = ChangeTypeEnum.Add,
+                    Content = $"新增角色：{role.Id}/{role.Name}",
                 });
             }
 

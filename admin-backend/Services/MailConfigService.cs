@@ -48,7 +48,7 @@ namespace admin_backend.Services
             {
                 await _operationLogService.Add(new AddOperationLogDto
                 {
-                    Type = ChangeTypeEnum.Add,
+                    Type = ChangeTypeEnum.Edit,
                     Content = "修改郵寄信件設定",
                 });
             }

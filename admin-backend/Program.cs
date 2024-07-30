@@ -46,6 +46,7 @@ try
     builder.Services.AddScoped<OperationLogService>();
     builder.Services.AddScoped<RolePermissionService>();
     builder.Services.AddScoped<TreeBasicInfoService>();
+    builder.Services.AddScoped<DocumentationService>();
     #endregion
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

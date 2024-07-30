@@ -1,14 +1,13 @@
 ﻿using CommonLibrary.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CommonLibrary.Entities
 {
     /// <summary>
     /// 會員註冊使用條款
     /// </summary>
-    public class Documentation:DefaultEntity
+    public class Documentation : DefaultEntity
     {
         /// <summary>
         /// 使用條款類型

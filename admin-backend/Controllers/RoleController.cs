@@ -1,5 +1,6 @@
 ﻿using admin_backend.Services;
 using CommonLibrary.DTOs.Role;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace admin_backend.Controllers
@@ -23,8 +24,8 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Get(GetRoleDto dto)
         {
             return Ok(await _roleService.Get(dto));
@@ -36,7 +37,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Add(AddRoleDto dto)
         {
             return Ok(await _roleService.Add(dto));
@@ -47,8 +48,8 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [HttpPut]
+        [Authorize]
         public async Task<IActionResult> Update(UpdateRoleDto dto)
         {
             return Ok(await _roleService.Update(dto));
@@ -59,8 +60,8 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> Delete(DeleteRoleDto dto)
         {
             return Ok(await _roleService.Delete(dto));

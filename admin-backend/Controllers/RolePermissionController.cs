@@ -35,7 +35,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(UpdateRolePermissionDto dto)
         {

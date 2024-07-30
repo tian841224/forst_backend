@@ -1,5 +1,6 @@
 ﻿using admin_backend.Services;
 using CommonLibrary.DTOs.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace admin_backend.Controllers
@@ -24,7 +25,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Get(GetUserDto dto)
         {
             return Ok(await _userService.Get(dto));
@@ -36,7 +37,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Add(AddUserDto dto)
         {
             return Ok(await _userService.Add(dto));
@@ -47,8 +48,8 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [HttpPut]
+        [Authorize]
         public async Task<IActionResult> Update(UpdateUserDto dto)
         {
             return Ok(await _userService.Update(dto));

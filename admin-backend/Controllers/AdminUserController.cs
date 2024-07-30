@@ -24,7 +24,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Authorize]
         public async Task<IActionResult> Get(GetAdminUserDto dto)
         {
@@ -48,7 +48,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(UpdateAdminUserDto dto)
         {

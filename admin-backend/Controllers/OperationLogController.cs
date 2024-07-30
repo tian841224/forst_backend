@@ -1,5 +1,4 @@
 ﻿using admin_backend.Services;
-using CommonLibrary.DTOs.AdminUser;
 using CommonLibrary.DTOs.OperationLog;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

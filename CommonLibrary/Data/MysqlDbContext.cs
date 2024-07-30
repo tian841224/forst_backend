@@ -26,5 +26,8 @@ namespace CommonLibrary.Data
         public DbSet<News> News { get; set; }
         public DbSet<DamageType> DamageType { get; set; }
         public DbSet<Log> Log { get; set; }
+        public DbSet<TreeBasicInfo> TreeBasicInfo { get; set; }
+        public DbSet<ForestCompartmentLocation> ForestCompartmentLocation { get; set; }
+
     }
 }

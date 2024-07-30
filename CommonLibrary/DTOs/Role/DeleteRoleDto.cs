@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CommonLibrary.DTOs.RolePermission;
+using System.ComponentModel.DataAnnotations;
 
 namespace CommonLibrary.DTOs.Role
 {
@@ -6,5 +7,7 @@ namespace CommonLibrary.DTOs.Role
     {
         [Required]
         public int Id { get; set; }
+
+        public List<DeleteRolePermissionDto> RolePermission { get; set; }
     }
 }

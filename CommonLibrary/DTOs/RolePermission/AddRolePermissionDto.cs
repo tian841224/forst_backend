@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CommonLibrary.DTOs.RolePermission
 {
@@ -9,6 +7,7 @@ namespace CommonLibrary.DTOs.RolePermission
         /// <summary>
         /// 選單名稱
         /// </summary>
+        [Required]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
@@ -19,26 +18,31 @@ namespace CommonLibrary.DTOs.RolePermission
         /// <summary>
         /// 檢視
         /// </summary>
+        [Required]
         public bool View { get; set; }
 
         /// <summary>
         /// 新增
         /// </summary>
+        [Required]
         public bool Add { get; set; }
 
         /// <summary>
         /// 指派
         /// </summary>
+        [Required]
         public bool Sign { get; set; }
 
         /// <summary>
         /// 編輯
         /// </summary>
+        [Required]
         public bool Edit { get; set; }
 
         /// <summary>
         /// 刪除
         /// </summary>
+        [Required]
         public bool Delete { get; set; }
     }
 }

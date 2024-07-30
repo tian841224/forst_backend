@@ -1,6 +1,7 @@
 ﻿using CommonLibrary.Data;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.DTOs.Role;
+using CommonLibrary.DTOs.RolePermission;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
@@ -12,13 +13,15 @@ namespace admin_backend.Services
     {
         private readonly MysqlDbContext _context;
         private readonly OperationLogService _operationLogService;
+        private readonly RolePermissionService _rolePermissionService;
         private readonly ILogger<RoleServices> _log;
 
-        public RoleServices(MysqlDbContext context, OperationLogService operationLogService, ILogger<RoleServices> log)
+        public RoleServices(MysqlDbContext context, OperationLogService operationLogService, ILogger<RoleServices> log, RolePermissionService rolePermissionService)
         {
             _context = context;
             _operationLogService = operationLogService;
             _log = log;
+            _rolePermissionService = rolePermissionService;
         }
 
         public async Task<List<Role>> Get(GetRoleDto dto)
@@ -56,7 +59,7 @@ namespace admin_backend.Services
 
             try
             {
-                _context.Role.Update(role);
+                _context.Role.Add(role);
 
                 //新增操作紀錄
                 if (await _context.SaveChangesAsync() > 0)
@@ -68,7 +71,12 @@ namespace admin_backend.Services
                     });
                 }
 
+                //新增身分權限
+                dto.RolePermission.ForEach(item => item.RoleId = role.Id);
+                await _rolePermissionService.Add(dto.RolePermission);
+
                 await transaction.CommitAsync();
+
                 return role;
             }
             catch (Exception ex)
@@ -108,6 +116,11 @@ namespace admin_backend.Services
                 }
 
                 await transaction.CommitAsync();
+
+                //修改身分權限
+                dto.RolePermission.ForEach(item => item.RoleId = role.Id);
+                await _rolePermissionService.Update(dto.RolePermission);
+
                 return role;
             }
             catch (Exception ex)
@@ -142,6 +155,9 @@ namespace admin_backend.Services
                         Content = $"刪除角色：{role.Id}/{role.Name}",
                     });
                 }
+
+                //移除身分權限
+                await _rolePermissionService.Delete(dto.RolePermission);
 
                 await transaction.CommitAsync();
                 return role;

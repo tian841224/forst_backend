@@ -37,7 +37,6 @@ try
 
     #region ª`¤J
     builder.Services.AddControllers();
-    builder.Services.AddScoped<RedisService>();
     builder.Services.AddScoped<UserService>();
     builder.Services.AddScoped<AdminUserServices>();
     builder.Services.AddScoped<RoleServices>();
@@ -135,11 +134,13 @@ try
     app.UseMiddleware<ExceptionHandling>();
 
     // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
+    //if (app.Environment.IsDevelopment())
+    //{
+
+    //}
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
 
     app.UseHttpsRedirection();
 

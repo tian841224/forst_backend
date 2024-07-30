@@ -28,6 +28,7 @@ namespace CommonLibrary.Data
         public DbSet<Log> Log { get; set; }
         public DbSet<TreeBasicInfo> TreeBasicInfo { get; set; }
         public DbSet<ForestCompartmentLocation> ForestCompartmentLocation { get; set; }
+        public DbSet<ForestDiseasePublications> ForestDiseasePublications { get; set; }
 
     }
 }

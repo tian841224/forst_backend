@@ -3,6 +3,7 @@ using System;
 using CommonLibrary.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CommonLibrary.Migrations
 {
     [DbContext(typeof(MysqlDbContext))]
-    partial class MysqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240730125659_AddForestDiseasePublications")]
+    partial class AddForestDiseasePublications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

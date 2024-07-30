@@ -4,6 +4,7 @@ using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Transactions;
 
 namespace admin_backend.Services
 {
@@ -38,30 +39,21 @@ namespace admin_backend.Services
                 Name = dto.Name,
             };
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            try
+            await _context.MailConfig.AddAsync(mailConfig);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
             {
-                await _context.MailConfig.AddAsync(mailConfig);
-
-                //新增操作紀錄
-                if (await _context.SaveChangesAsync() > 0)
+                await _operationLogService.Add(new AddOperationLogDto
                 {
-                    await _operationLogService.Add(new AddOperationLogDto
-                    {
-                        Type = ChangeTypeEnum.Add,
-                        Content = "修改郵寄信件設定",
-                    });
-                }
-                await transaction.CommitAsync();
-                return mailConfig;
+                    Type = ChangeTypeEnum.Add,
+                    Content = "修改郵寄信件設定",
+                });
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _log.LogError(ex.Message);
-                throw;
-            }
+            scope.Complete();
+            return mailConfig;
         }
     }
 }

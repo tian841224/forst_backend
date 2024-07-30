@@ -6,6 +6,7 @@ using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Transactions;
 
 namespace admin_backend.Services
 {
@@ -29,8 +30,7 @@ namespace admin_backend.Services
 
             if (rolePermission != null)
             {
-                throw new ApiException($"此身分權限已存在-{dto.Name}");
-
+                return rolePermission;
             }
 
             rolePermission = new RolePermission
@@ -44,35 +44,28 @@ namespace admin_backend.Services
                 Delete = dto.Delete
             };
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            try
+            await _context.RolePermission.AddAsync(rolePermission);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
             {
-                await _context.RolePermission.AddAsync(rolePermission);
-
-                //新增操作紀錄
-                if (await _context.SaveChangesAsync() > 0)
+                await _operationLogService.Add(new AddOperationLogDto
                 {
-                    await _operationLogService.Add(new AddOperationLogDto
-                    {
-                        Type = ChangeTypeEnum.Add,
-                        Content = $"新增身分權限：{rolePermission.Id}/{rolePermission.Name}",
-                    });
-                };
-                await transaction.CommitAsync();
-                return rolePermission;
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _log.LogError(ex.Message);
-                throw;
-            }
+                    Type = ChangeTypeEnum.Add,
+                    Content = $"新增身分權限：{rolePermission.Id}/{rolePermission.Name}",
+                });
+            };
+            scope.Complete();
+            return rolePermission;
         }
 
         public async Task<List<RolePermission>> Add(List<AddRolePermissionDto> dto)
         {
             var result = new List<RolePermission>();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
             foreach (var value in dto)
             {
                 var rolePermission = await _context.RolePermission.Where(x => x.Name == value.Name).FirstOrDefaultAsync();
@@ -105,6 +98,7 @@ namespace admin_backend.Services
                 };
                 result.Add(rolePermission);
             }
+            scope.Complete();
             return result;
         }
 
@@ -135,35 +129,27 @@ namespace admin_backend.Services
             if (dto.Delete.HasValue)
                 rolePermission.Delete = dto.Delete.Value;
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            try
+            _context.RolePermission.Update(rolePermission);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
             {
-                _context.RolePermission.Update(rolePermission);
-
-                //新增操作紀錄
-                if (await _context.SaveChangesAsync() > 0)
+                await _operationLogService.Add(new AddOperationLogDto
                 {
-                    await _operationLogService.Add(new AddOperationLogDto
-                    {
-                        Type = ChangeTypeEnum.Edit,
-                        Content = $"修改身分權限：{rolePermission.Id}/{rolePermission.Name}",
-                    });
-                }
-                await transaction.CommitAsync();
-                return rolePermission;
+                    Type = ChangeTypeEnum.Edit,
+                    Content = $"修改身分權限：{rolePermission.Id}/{rolePermission.Name}",
+                });
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _log.LogError(ex.Message);
-                throw;
-            }
+            scope.Complete();
+            return rolePermission;
         }
 
         public async Task<List<RolePermission>> Update(List<UpdateRolePermissionDto> dto)
         {
             var result = new List<RolePermission>();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             foreach (var value in dto)
             {
@@ -215,6 +201,7 @@ namespace admin_backend.Services
                     }
                 }
             }
+            scope.Complete();
             return result;
         }
 
@@ -227,10 +214,37 @@ namespace admin_backend.Services
                 throw new ApiException($"此ID不存在-{dto.Id}");
             }
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            try
+            _context.RolePermission.Remove(rolePermission);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
             {
+                await _operationLogService.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Delete,
+                    Content = $"移除身分權限：{rolePermission.Id}/{rolePermission.Name}",
+                });
+            };
+            scope.Complete();
+            return rolePermission;
+        }
+
+        public async Task<List<RolePermission>> Delete(List<DeleteRolePermissionDto> dto)
+        {
+            var result = new List<RolePermission>();
+
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            foreach (var value in dto)
+            {
+                var rolePermission = await _context.RolePermission.Where(x => x.Id == value.Id).FirstOrDefaultAsync();
+
+                if (rolePermission == null)
+                {
+                    continue;
+                }
                 _context.RolePermission.Remove(rolePermission);
 
                 //新增操作紀錄
@@ -242,56 +256,9 @@ namespace admin_backend.Services
                         Content = $"移除身分權限：{rolePermission.Id}/{rolePermission.Name}",
                     });
                 };
-                await transaction.CommitAsync();
-                return rolePermission;
+                result.Add(rolePermission);
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _log.LogError(ex.Message);
-                throw;
-            }
-        }
-
-        public async Task<List<RolePermission>> Delete(List<DeleteRolePermissionDto> dto)
-        {
-            var result = new List<RolePermission>();
-
-            foreach (var value in dto)
-            {
-                var rolePermission = await _context.RolePermission.Where(x => x.Id == value.Id).FirstOrDefaultAsync();
-
-                if (rolePermission == null)
-                {
-                    continue;
-                }
-
-                using var transaction = await _context.Database.BeginTransactionAsync();
-
-                try
-                {
-                    _context.RolePermission.Remove(rolePermission);
-
-                    //新增操作紀錄
-                    if (await _context.SaveChangesAsync() > 0)
-                    {
-                        await _operationLogService.Add(new AddOperationLogDto
-                        {
-                            Type = ChangeTypeEnum.Delete,
-                            Content = $"移除身分權限：{rolePermission.Id}/{rolePermission.Name}",
-                        });
-                    };
-                    await transaction.CommitAsync();
-                    result.Add(rolePermission);
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    _log.LogError(ex.Message);
-                    throw;
-                }
-            }
-
+            scope.Complete();
             return result;
         }
     }

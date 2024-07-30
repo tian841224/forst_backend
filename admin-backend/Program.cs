@@ -47,6 +47,7 @@ try
     builder.Services.AddScoped<RolePermissionService>();
     builder.Services.AddScoped<TreeBasicInfoService>();
     builder.Services.AddScoped<DocumentationService>();
+    builder.Services.AddScoped<ForestCompartmentLocationService>();
     #endregion
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

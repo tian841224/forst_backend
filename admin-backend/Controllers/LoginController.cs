@@ -21,17 +21,6 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得驗證碼
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetCaptcha()
-        {
-            return Ok(await _loginServices.GetCaptchaAsync());
-        }
-
-        /// <summary>
         /// 登入
         /// </summary>
         /// <returns></returns>
@@ -40,18 +29,6 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Login(LoginDto dto)
         {
             return Ok(await _loginServices.Login(dto));
-        }
-
-        /// <summary>
-        /// 更新Token
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> RefreshAdminUserToken(RefreshTokenDto dto)
-        {
-            return Ok(await _loginServices.RefreshAdminUserTokenAsync(dto));
         }
     }
 }

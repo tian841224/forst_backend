@@ -50,6 +50,8 @@ try
     builder.Services.AddScoped<DocumentationService>();
     builder.Services.AddScoped<ForestCompartmentLocationService>();
     builder.Services.AddScoped<EpidemicSummaryService>();
+    builder.Services.AddScoped<DamageClassService>();
+    builder.Services.AddScoped<DamageTypeService>();
     #endregion
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -129,6 +131,24 @@ try
 
     builder.Services.AddHttpContextAccessor();
 
+    builder.Services.AddCors(options =>
+    {
+        //options.AddDefaultPolicy(
+        //    policy =>
+        //    {
+        //        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        //    });
+        options.AddDefaultPolicy(policy =>
+        {
+            policy.WithOrigins("http://localhost:8080",
+                                "http://localhost:3000",
+                                "https://forest-admin-hyyvhv2yda-de.a.run.app",
+                                "https://forest-client-hyyvhv2yda-de.a.run.app")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+    });
     var app = builder.Build();
 
     await builder.MigrateDbContextAsync<MysqlDbContext>(async (context, services) =>
@@ -148,7 +168,7 @@ try
     app.UseSwaggerUI();
 
     app.UseHttpsRedirection();
-
+    app.UseCors();
     app.UseAuthentication();
     app.UseAuthorization();
 

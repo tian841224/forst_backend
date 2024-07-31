@@ -56,14 +56,14 @@ namespace admin_backend.Services
             return damageClasses;
         }
 
-        public async Task<DamageClass> Update(int Id, UpdateDamageClassDto dto)
+        public async Task<DamageClass> Update(UpdateDamageClassDto dto)
         {
 
-            var damageClasses = await _context.DamageClass.Where(x => x.Id == Id).FirstOrDefaultAsync();
+            var damageClasses = await _context.DamageClass.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
 
             if (damageClasses == null)
             {
-                throw new ApiException($"無此資料-{Id}");
+                throw new ApiException($"無此資料-{dto.Id}");
             }
 
             if (!string.IsNullOrEmpty(dto.Name))

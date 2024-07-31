@@ -20,7 +20,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得樹木基本資料
+        /// 取得危害種類
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -32,7 +32,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得全部樹木基本資料
+        /// 取得全部危害種類
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -43,7 +43,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 新增樹木基本資料
+        /// 新增危害種類
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -57,18 +57,17 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 更新危害種類
         /// </summary>
-        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut("{id}")]
+        [HttpPut]
         [Authorize]
-        public async Task<IActionResult> Update(int id, UpdateDamageClassDto dto)
+        public async Task<IActionResult> Update(UpdateDamageClassDto dto)
         {
-            return Ok(await _damageClassService.Update(id,dto));
+            return Ok(await _damageClassService.Update(dto));
         }
 
         /// <summary>
-        /// 刪除樹木基本資料
+        /// 刪除危害種類
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

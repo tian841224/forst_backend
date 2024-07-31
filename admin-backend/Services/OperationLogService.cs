@@ -68,18 +68,21 @@ namespace admin_backend.Services
             var operationLog = await query.ToListAsync();
             foreach (var x in operationLog)
             {
-                var name = (await _adminUserServices.Get(new GetAdminUserDto { Id = x.AdminUserId })).FirstOrDefault().Name;
-
-                result.Add(new GetOperationLogResponseDto
+                var adminUser = (await _adminUserServices.Get(new GetAdminUserDto { Id = x.AdminUserId })).FirstOrDefault();
+                if (adminUser != null)
                 {
-                    Id = x.Id,
-                    AdminUserId = x.AdminUserId,
-                    AdminUserIdName = name,
-                    Type = x.Type.GetDisplayName(),
-                    Content = x.Content,
-                    Ip = x.Ip,
-                    CreateTime = x.CreateTime,
-                });
+                    var name = adminUser.Name;
+                    result.Add(new GetOperationLogResponseDto
+                    {
+                        Id = x.Id,
+                        AdminUserId = x.AdminUserId,
+                        AdminUserIdName = name,
+                        Type = x.Type.GetDisplayName(),
+                        Content = x.Content,
+                        Ip = x.Ip,
+                        CreateTime = x.CreateTime,
+                    });
+                }
             }
 
             return result;
@@ -88,7 +91,7 @@ namespace admin_backend.Services
         public async Task Add(AddOperationLogDto dto)
         {
             //取得IP
-            var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
+            var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
             //取得Jwt Token資訊
             var JwtClaims = _httpContextAccessor.HttpContext?.User?.Claims.ToList();
 
@@ -102,7 +105,7 @@ namespace admin_backend.Services
                 AdminUserId = AdminUserId,
                 Type = dto.Type,
                 Content = dto.Content,
-                Ip = ipAddress.ToString(),
+                Ip = ipAddress!.ToString() ?? string.Empty,
             });
 
             await _context.SaveChangesAsync();

@@ -22,15 +22,16 @@ namespace admin_backend.Services
             _operationLogService = operationLogService;
         }
 
-        public async Task<List<ForestCompartmentLocation>> Get()
+        public async Task<List<ForestCompartmentLocation>> Get(int? Id = null)
         {
-            var forestCompartmentLocations = await _context.ForestCompartmentLocation.ToListAsync();
-            return forestCompartmentLocations;
+            if (Id.HasValue)
+                return await _context.ForestCompartmentLocation.Where(x => x.Id == Id).ToListAsync();
+            else
+                return await _context.ForestCompartmentLocation.ToListAsync();
         }
 
         public async Task<ForestCompartmentLocation> Add(AddForestCompartmentLocationDto dto)
         {
-
             var forestCompartmentLocation = new ForestCompartmentLocation
             {
                 Postion = dto.Postion,
@@ -54,14 +55,14 @@ namespace admin_backend.Services
             return forestCompartmentLocation;
         }
 
-        public async Task<ForestCompartmentLocation> Update(UpdateForestCompartmentLocationDto dto)
+        public async Task<ForestCompartmentLocation> Update(int Id, UpdateForestCompartmentLocationDto dto)
         {
 
-            var forestCompartmentLocation = await _context.ForestCompartmentLocation.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+            var forestCompartmentLocation = await _context.ForestCompartmentLocation.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (forestCompartmentLocation == null)
             {
-                throw new ApiException($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{Id}");
             }
 
             if (!string.IsNullOrEmpty(dto.Postion))
@@ -87,14 +88,14 @@ namespace admin_backend.Services
             return forestCompartmentLocation;
         }
 
-        public async Task<ForestCompartmentLocation> Delete(DeleteForestCompartmentLocationDto dto)
+        public async Task<ForestCompartmentLocation> Delete(int Id)
         {
 
-            var forestCompartmentLocation = await _context.ForestCompartmentLocation.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+            var forestCompartmentLocation = await _context.ForestCompartmentLocation.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (forestCompartmentLocation == null)
             {
-                throw new ApiException($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{Id}");
             }
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);

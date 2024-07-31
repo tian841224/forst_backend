@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace admin_backend.Controllers
 {
     /// <summary>
-    /// 身分
+    /// 角色管理
     /// </summary>
     [ApiController]
     [Route("[controller]/[action]")]
@@ -20,11 +20,11 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得身分
+        /// 取得角色
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Authorize]
         public async Task<IActionResult> Get(GetRoleDto dto)
         {
@@ -32,7 +32,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 新增身分
+        /// 新增角色
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -44,27 +44,28 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 更新身分
+        /// 更新角色
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(UpdateRoleDto dto)
+        public async Task<IActionResult> Update(int id ,UpdateRoleDto dto)
         {
-            return Ok(await _roleService.Update(dto));
+            return Ok(await _roleService.Update(id,dto));
         }
 
         /// <summary>
-        /// 刪除身分
+        /// 刪除角色
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> Delete(DeleteRoleDto dto)
+        public async Task<IActionResult> Delete(int id)
         {
-            return Ok(await _roleService.Delete(dto));
+            return Ok(await _roleService.Delete(id));
         }
     }
 }

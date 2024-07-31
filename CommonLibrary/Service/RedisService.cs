@@ -21,7 +21,7 @@ namespace CommonLibrary.Service
         {
             redisKey = $"queueList_{DateTime.Now.ToString("MMdd")}";
             _configuration = configuration;
-            _connection = ConnectionMultiplexer.Connect(_configuration.GetConnectionString("Redis"));
+            _connection = ConnectionMultiplexer.Connect(_configuration.GetConnectionString("Redis") ?? string.Empty);
             _redisDb = new Lazy<IDatabase>(() => _connection.GetDatabase());
             _log = log;
         }

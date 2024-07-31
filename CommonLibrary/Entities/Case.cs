@@ -160,9 +160,9 @@ namespace CommonLibrary.Entities
         public string Photo { get; set; } = string.Empty;
 
         [ForeignKey("AdminUserId")]
-        public virtual AdminUser AdminUser { get; set; } 
+        public virtual AdminUser AdminUser { get; set; } = null!;
 
         [ForeignKey("TreeBasicInfoId")]
-        public virtual TreeBasicInfo TreeBasicInfo { get; set; }
+        public virtual TreeBasicInfo TreeBasicInfo { get; set; } = null!;
     }
 }

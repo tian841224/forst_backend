@@ -23,6 +23,10 @@ namespace admin_backend.Services
         {
             IQueryable<AdminUser> query = _context.AdminUser.AsQueryable();
 
+            if (dto.Id.HasValue)
+            {
+                query = query.Where(x => x.Id == dto.Id);
+            }
 
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
@@ -33,7 +37,6 @@ namespace admin_backend.Services
                     x.Email.ToLower().Contains(keyword) ||
                     x.Name.ToLower().Contains(keyword)
                 );
-
             }
 
             if (dto.RoleId.HasValue)
@@ -67,7 +70,7 @@ namespace admin_backend.Services
                 Email = dto.Email,
                 RoleId = dto.RoleId,
                 Status = dto.Status,
-                Photo = dto.Photo,
+                Photo = dto.Photo ?? string.Empty,
             };
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -80,7 +83,7 @@ namespace admin_backend.Services
                 if (await _context.SaveChangesAsync() > 0)
                 {
                     //取得IP
-                    var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
+                    var ipAddress = _httpContextAccessor.HttpContext!.Connection.RemoteIpAddress!;
 
                     //新增操作紀錄
                     await _context.OperationLog.AddAsync(new OperationLog
@@ -103,13 +106,13 @@ namespace admin_backend.Services
                 throw;
             }
         }
-        public async Task<AdminUser> Update(UpdateAdminUserDto dto)
+        public async Task<AdminUser> Update(int Id, UpdateAdminUserDto dto)
         {
-            var adminUser = await _context.AdminUser.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+            var adminUser = await _context.AdminUser.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (adminUser == null)
             {
-                throw new ApiException($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{Id}");
             }
 
             if (!string.IsNullOrEmpty(dto.Name))
@@ -133,7 +136,7 @@ namespace admin_backend.Services
                 if (await _context.SaveChangesAsync() > 0)
                 {
                     //取得IP
-                    var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
+                    var ipAddress = _httpContextAccessor.HttpContext!.Connection.RemoteIpAddress!;
 
                     //新增操作紀錄
                     await _context.OperationLog.AddAsync(new OperationLog
@@ -149,7 +152,7 @@ namespace admin_backend.Services
                 await transaction.CommitAsync();
                 return adminUser;
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
                 _log.LogError(ex.Message);

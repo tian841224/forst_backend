@@ -78,13 +78,13 @@ namespace admin_backend.Services
             return role;
         }
 
-        public async Task<Role> Update(UpdateRoleDto dto)
+        public async Task<Role> Update(int Id,UpdateRoleDto dto)
         {
-            var role = await _context.Role.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+            var role = await _context.Role.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (role == null)
             {
-                throw new ApiException($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{Id}");
             }
 
             if (!string.IsNullOrEmpty(dto.Name))
@@ -113,13 +113,13 @@ namespace admin_backend.Services
             return role;
         }
 
-        public async Task<Role> Delete(DeleteRoleDto dto)
+        public async Task<Role> Delete(int Id)
         {
-            var role = await _context.Role.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+            var role = await _context.Role.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (role == null)
             {
-                throw new ApiException($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{Id}");
             }
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);

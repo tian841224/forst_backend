@@ -39,6 +39,6 @@ namespace CommonLibrary.Entities
         public string Ip { get; set; } = string.Empty;
 
         [ForeignKey("AdminUserId")]
-        public virtual AdminUser AdminUser { get; set; }
+        public virtual AdminUser AdminUser { get; set; } = null!;
     }
 }

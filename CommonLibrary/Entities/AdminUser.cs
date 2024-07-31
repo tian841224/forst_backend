@@ -69,6 +69,6 @@ namespace CommonLibrary.Entities
         public DateTime LoginTime { get; set; } 
 
         [ForeignKey("RoleId")]
-        public virtual Role Role { get; set; } 
+        public virtual Role Role { get; set; } = null!;
     }
 }

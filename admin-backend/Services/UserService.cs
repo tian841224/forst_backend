@@ -96,13 +96,13 @@ namespace admin_backend.Services
             }
         }
 
-        public async Task<User> Update(UpdateUserDto dto)
+        public async Task<User> Update(int Id,UpdateUserDto dto)
         {
-            var user = await _context.User.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+            var user = await _context.User.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (user == null)
             {
-                throw new ApiException($"無此使用者-{dto.Id}");
+                throw new ApiException($"無此使用者-{Id}");
             }
 
             if (!string.IsNullOrEmpty(dto.Name))

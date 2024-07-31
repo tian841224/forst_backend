@@ -46,13 +46,14 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 修改會員
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(UpdateUserDto dto)
+        public async Task<IActionResult> Update(int id,UpdateUserDto dto)
         {
-            return Ok(await _userService.Update(dto));
+            return Ok(await _userService.Update(id,dto));
         }
 
     }

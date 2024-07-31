@@ -4,8 +4,6 @@ namespace CommonLibrary.DTOs.User
 {
     public class UpdateUserDto
     {
-        public int Id { get; set; }
-
         /// <summary>
         /// 使用者名稱
         /// </summary>

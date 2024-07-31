@@ -15,6 +15,6 @@ namespace CommonLibrary.Entities
         [Required]
         public string Name { get; set; } = string.Empty;
 
-        public ICollection<AdminUser> AdminUser { get; set; } 
+        public ICollection<AdminUser> AdminUser { get; set; } = null!;
     }
 }

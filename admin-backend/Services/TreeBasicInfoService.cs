@@ -5,6 +5,7 @@ using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Transactions;
 
 namespace admin_backend.Services
@@ -22,10 +23,13 @@ namespace admin_backend.Services
             _operationLogService = operationLogService;
         }
 
-        public async Task<List<TreeBasicInfo>> Get()
+        public async Task<List<TreeBasicInfo>> Get(int? id = null)
         {
-            var treeBasicInfos = await _context.TreeBasicInfo.ToListAsync();
-            return treeBasicInfos;
+            if (id != null)
+                return await _context.TreeBasicInfo.Where(x => x.Id == id).ToListAsync();
+
+            else 
+                return await _context.TreeBasicInfo.ToListAsync();
         }
 
         public async Task<TreeBasicInfo> Add(AddTreeBasicInfoDto dto)

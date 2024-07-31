@@ -6,9 +6,6 @@ namespace CommonLibrary.DTOs.AdminUser
 {
     public class UpdateAdminUserDto
     {
-        [Required]
-        public int Id { get; set; }
-
         /// <summary>
         /// 姓名
         /// </summary>

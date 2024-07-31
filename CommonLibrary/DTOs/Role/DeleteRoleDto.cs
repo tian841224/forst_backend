@@ -8,6 +8,6 @@ namespace CommonLibrary.DTOs.Role
         [Required]
         public int Id { get; set; }
 
-        public List<DeleteRolePermissionDto> RolePermission { get; set; }
+        public List<DeleteRolePermissionDto> RolePermission { get; set; } = null!;
     }
 }

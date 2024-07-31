@@ -75,9 +75,9 @@ namespace CommonLibrary.Entities
         public DateTime UnpublishDate { get; set; }
 
         [ForeignKey("DamageClassId")]
-        public virtual DamageClass DamageClass { get; set; } 
+        public virtual DamageClass DamageClass { get; set; } = null!;
 
         [ForeignKey("DamageTypeId")]
-        public virtual DamageType DamageType { get; set; }
+        public virtual DamageType DamageType { get; set; } = null!;
     }
 }

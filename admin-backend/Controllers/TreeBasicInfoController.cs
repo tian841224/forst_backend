@@ -20,7 +20,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得樹木基本資料
+        /// 取得全部樹木基本資料
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -28,6 +28,17 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Get()
         {
             return Ok(await _treeBasicInfoService.Get());
+        }
+
+        /// <summary>
+        /// 取得樹木基本資料
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Get(int id)
+        {
+            return Ok(await _treeBasicInfoService.Get(id));
         }
 
         /// <summary>

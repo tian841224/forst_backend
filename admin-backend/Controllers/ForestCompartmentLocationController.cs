@@ -18,8 +18,22 @@ namespace admin_backend.Controllers
         {
             _forestCompartmentLocationService = forestCompartmentLocationService;
         }
+
+
         /// <summary>
-        /// 林班位置
+        /// 取得林班位置
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Get(int id)
+        {
+            return Ok(await _forestCompartmentLocationService.Get(id));
+        }
+
+        /// <summary>
+        /// 取得全部林班位置
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -44,25 +58,26 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 更新林班位置
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(UpdateForestCompartmentLocationDto dto)
+        public async Task<IActionResult> Update(int id ,UpdateForestCompartmentLocationDto dto)
         {
-            return Ok(await _forestCompartmentLocationService.Update(dto));
+            return Ok(await _forestCompartmentLocationService.Update(id,dto));
         }
 
         /// <summary>
         /// 刪除樹木基本資料
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> Delete(DeleteForestCompartmentLocationDto dto)
+        public async Task<IActionResult> Delete(int id)
         {
-            return Ok(await _forestCompartmentLocationService.Delete(dto));
+            return Ok(await _forestCompartmentLocationService.Delete(id));
         }
     }
 }

@@ -23,8 +23,7 @@ namespace admin_backend.Services
 
         public async Task<Documentation> Get()
         {
-            var documentation = await _context.Documentation.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
-            return documentation;
+            return await _context.Documentation.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new Documentation();
         }
 
         public async Task<Documentation> Add(AddDocumentationDto dto)

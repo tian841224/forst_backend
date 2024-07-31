@@ -24,7 +24,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Authorize]
         public async Task<IActionResult> Get(GetAdminUserDto dto)
         {
@@ -47,12 +47,13 @@ namespace admin_backend.Controllers
         /// 更新後台帳號
         /// </summary>
         /// <param name="dto"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update(UpdateAdminUserDto dto)
+        public async Task<IActionResult> Update(int id, UpdateAdminUserDto dto)
         {
-            return Ok(await _adminUserServices.Update(dto));
+            return Ok(await _adminUserServices.Update(id, dto));
         }
     }
 }

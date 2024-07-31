@@ -23,8 +23,7 @@ namespace admin_backend.Services
 
         public async Task<MailConfig> Get()
         {
-            var mailConfig = await _context.MailConfig.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
-            return mailConfig;
+            return await _context.MailConfig.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new MailConfig();
         }
 
         public async Task<MailConfig> Add(AddMailConfigDto dto)

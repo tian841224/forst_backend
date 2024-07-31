@@ -1,12 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace CommonLibrary.DTOs.ForestCompartmentLocation
+﻿namespace CommonLibrary.DTOs.ForestCompartmentLocation
 {
     public class UpdateForestCompartmentLocationDto
     {
-        [Required]
-        public int Id { get; set; }
-
         /// <summary>
         /// 位置
         /// </summary>

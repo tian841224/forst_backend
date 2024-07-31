@@ -22,8 +22,7 @@ namespace admin_backend.Services
 
         public async Task<EpidemicSummary> Get()
         {
-            var epidemicSummary = await _context.EpidemicSummary.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
-            return epidemicSummary;
+            return await _context.EpidemicSummary.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new EpidemicSummary();
         }
 
         public async Task<EpidemicSummary> Add(AddEpidemicSummaryDto dto)

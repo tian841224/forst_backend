@@ -6,9 +6,9 @@ namespace CommonLibrary.DTOs.Role
     public class AddRoleDto
     {
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [Required]
-        public  List<AddRolePermissionDto> RolePermission { get; set; }
+        public  List<AddRolePermissionDto> RolePermission { get; set; } = null!;
     }
 }

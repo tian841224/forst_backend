@@ -152,20 +152,20 @@ namespace admin_backend.Services
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             foreach (var value in dto)
-            {
+            {;
                 var rolePermission = await _context.RolePermission.Where(x => x.Id == value.Id).FirstOrDefaultAsync();
 
                 if (rolePermission == null)
                 {
                     await Add(new AddRolePermissionDto
                     {
-                        Name = value.Name,
+                        Name = value.Name ?? string.Empty,
                         RoleId = value.RoleId,
-                        View = value.View.Value,
-                        Add = value.Add.Value,
-                        Sign = value.Sign.Value,
-                        Edit = value.Edit.Value,
-                        Delete = value.Delete.Value,
+                        View = value.View ?? false,
+                        Add = value.Add ?? false,
+                        Sign = value.Sign ?? false,
+                        Edit = value.Edit ?? false,
+                        Delete = value.Delete ?? false,
                     });
                 }
                 else

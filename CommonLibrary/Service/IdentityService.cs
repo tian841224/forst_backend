@@ -43,13 +43,13 @@ namespace CommonLibrary.Service
             {
                 claimsDto = new ClaimDto
                 {
-                    RoleId = JwtClaims.FirstOrDefault(c => c.Type == "RoleId")?.Value,
-                    RoleNane = JwtClaims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value,
-                    UserId = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.Id)?.Value,
-                    UserNane = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value,
-                    Account = JwtClaims.FirstOrDefault(c => c.Type == "Account")?.Value,
-                    Email = JwtClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
-                    ReferenceTokenId = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.ReferenceTokenId)?.Value,
+                    RoleId = JwtClaims.FirstOrDefault(c => c.Type == "RoleId")?.Value ?? string.Empty,
+                    RoleNane = JwtClaims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? string.Empty,
+                    UserId = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.Id)?.Value ?? string.Empty,
+                    UserNane = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value ?? string.Empty ,
+                    Account = JwtClaims.FirstOrDefault(c => c.Type == "Account")?.Value ?? string.Empty,
+                    Email = JwtClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? string.Empty,
+                    ReferenceTokenId = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.ReferenceTokenId)?.Value ?? string.Empty,
                 };
             }
             return claimsDto;

@@ -5,7 +5,6 @@ using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Transactions;
 
 namespace admin_backend.Services
@@ -28,7 +27,7 @@ namespace admin_backend.Services
             if (id != null)
                 return await _context.TreeBasicInfo.Where(x => x.Id == id).ToListAsync();
 
-            else 
+            else
                 return await _context.TreeBasicInfo.ToListAsync();
         }
 

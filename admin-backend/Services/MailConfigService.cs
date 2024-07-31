@@ -34,7 +34,7 @@ namespace admin_backend.Services
                 Port = dto.Port,
                 Encrypted = dto.Encrypted,
                 Account = dto.Account,
-                Password = dto.Password,
+                Password = dto.pKey,
                 Name = dto.Name,
             };
 

@@ -19,7 +19,7 @@ namespace CommonLibrary.DTOs.AdminUser
         /// <summary>
         /// 密碼
         /// </summary>
-        public string? Password { get; set; }
+        public string? pKey { get; set; }
 
         /// <summary>
         /// 信箱

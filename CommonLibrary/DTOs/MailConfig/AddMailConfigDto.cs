@@ -33,7 +33,7 @@ namespace CommonLibrary.DTOs.MailConfig
         /// 寄信密碼
         /// </summary>
         [Required]
-        public string Password { get; set; } = string.Empty;
+        public string pKey { get; set; } = string.Empty;
 
         /// <summary>
         /// 顯示名稱

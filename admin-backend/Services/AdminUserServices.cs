@@ -124,8 +124,8 @@ namespace admin_backend.Services
             if (dto.Status.HasValue)
                 adminUser.Status = (StatusEnum)dto.Status;
 
-            if (!string.IsNullOrEmpty(dto.Password))
-                adminUser.Password = dto.Password;
+            if (!string.IsNullOrEmpty(dto.pKey))
+                adminUser.Password = dto.pKey;
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try

@@ -34,7 +34,7 @@ namespace admin_backend.Services
 
         public async Task<IdentityResultDto> Login(LoginDto dto)
         {
-            var adminUser = await _context.AdminUser.Where(x => x.Account == dto.Account && x.Password == dto.Password).FirstOrDefaultAsync();
+            var adminUser = await _context.AdminUser.Where(x => x.Account == dto.Account && x.Password == dto.pKey).FirstOrDefaultAsync();
 
             if (adminUser == null)
             {

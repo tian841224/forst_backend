@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CommonLibrary.DTOs.DamageClass
 {
-    public class UpdateDamageClassDto
+    public class UpdateDamageClassDto : BasicDto
     {
         /// <summary>
         /// 危害種類

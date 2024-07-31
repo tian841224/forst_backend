@@ -21,13 +21,13 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 取得身分權限
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="Roleid">角色ID</param>
         /// <returns></returns>
         [HttpGet("{id}")]
         [Authorize]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(int Roleid)
         {
-            return Ok(await _rolePermissionService.Get(id));
+            return Ok(await _rolePermissionService.Get(Roleid));
         }
 
         /// <summary>

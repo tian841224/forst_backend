@@ -29,7 +29,7 @@ namespace admin_backend.Services
         {
             IQueryable<RolePermission> query = _context.RolePermission.AsQueryable();
 
-            query = query.Where(x => x.Id == Id);
+            query = query.Where(x => x.RoleId == Id);
 
             return await query.ToListAsync();
         }

@@ -91,14 +91,14 @@ namespace admin_backend.Services
             return treeBasicInfo;
         }
 
-        public async Task<TreeBasicInfo> Delete(DeleteTreeBasicInfoDto dto)
+        public async Task<TreeBasicInfo> Delete(int Id)
         {
 
-            var treeBasicInfo = await _context.TreeBasicInfo.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+            var treeBasicInfo = await _context.TreeBasicInfo.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (treeBasicInfo == null)
             {
-                throw new ApiException($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{Id}");
             }
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);

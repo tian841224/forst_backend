@@ -205,61 +205,61 @@ namespace admin_backend.Services
             return result;
         }
 
-        public async Task<RolePermission> Delete(DeleteRolePermissionDto dto)
-        {
-            var rolePermission = await _context.RolePermission.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+        //public async Task<RolePermission> Delete(DeleteRolePermissionDto dto)
+        //{
+        //    var rolePermission = await _context.RolePermission.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
 
-            if (rolePermission == null)
-            {
-                throw new ApiException($"此ID不存在-{dto.Id}");
-            }
+        //    if (rolePermission == null)
+        //    {
+        //        throw new ApiException($"此ID不存在-{dto.Id}");
+        //    }
 
-            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        //    using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            _context.RolePermission.Remove(rolePermission);
+        //    _context.RolePermission.Remove(rolePermission);
 
-            //新增操作紀錄
-            if (await _context.SaveChangesAsync() > 0)
-            {
-                await _operationLogService.Add(new AddOperationLogDto
-                {
-                    Type = ChangeTypeEnum.Delete,
-                    Content = $"移除身分權限：{rolePermission.Id}/{rolePermission.Name}",
-                });
-            };
-            scope.Complete();
-            return rolePermission;
-        }
+        //    //新增操作紀錄
+        //    if (await _context.SaveChangesAsync() > 0)
+        //    {
+        //        await _operationLogService.Add(new AddOperationLogDto
+        //        {
+        //            Type = ChangeTypeEnum.Delete,
+        //            Content = $"移除身分權限：{rolePermission.Id}/{rolePermission.Name}",
+        //        });
+        //    };
+        //    scope.Complete();
+        //    return rolePermission;
+        //}
 
-        public async Task<List<RolePermission>> Delete(List<DeleteRolePermissionDto> dto)
-        {
-            var result = new List<RolePermission>();
+        //public async Task<List<RolePermission>> Delete(List<DeleteRolePermissionDto> dto)
+        //{
+        //    var result = new List<RolePermission>();
 
-            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        //    using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            foreach (var value in dto)
-            {
-                var rolePermission = await _context.RolePermission.Where(x => x.Id == value.Id).FirstOrDefaultAsync();
+        //    foreach (var value in dto)
+        //    {
+        //        var rolePermission = await _context.RolePermission.Where(x => x.Id == value.Id).FirstOrDefaultAsync();
 
-                if (rolePermission == null)
-                {
-                    continue;
-                }
-                _context.RolePermission.Remove(rolePermission);
+        //        if (rolePermission == null)
+        //        {
+        //            continue;
+        //        }
+        //        _context.RolePermission.Remove(rolePermission);
 
-                //新增操作紀錄
-                if (await _context.SaveChangesAsync() > 0)
-                {
-                    await _operationLogService.Add(new AddOperationLogDto
-                    {
-                        Type = ChangeTypeEnum.Delete,
-                        Content = $"移除身分權限：{rolePermission.Id}/{rolePermission.Name}",
-                    });
-                };
-                result.Add(rolePermission);
-            }
-            scope.Complete();
-            return result;
-        }
+        //        //新增操作紀錄
+        //        if (await _context.SaveChangesAsync() > 0)
+        //        {
+        //            await _operationLogService.Add(new AddOperationLogDto
+        //            {
+        //                Type = ChangeTypeEnum.Delete,
+        //                Content = $"移除身分權限：{rolePermission.Id}/{rolePermission.Name}",
+        //            });
+        //        };
+        //        result.Add(rolePermission);
+        //    }
+        //    scope.Complete();
+        //    return result;
+        //}
     }
 }

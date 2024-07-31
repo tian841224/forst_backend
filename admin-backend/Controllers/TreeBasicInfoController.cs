@@ -68,13 +68,13 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 刪除樹木基本資料
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> Delete(DeleteTreeBasicInfoDto dto)
+        public async Task<IActionResult> Delete(int id)
         {
-            return Ok(await _treeBasicInfoService.Delete(dto));
+            return Ok(await _treeBasicInfoService.Delete(id));
         }
     }
 }

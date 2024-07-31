@@ -1,5 +1,6 @@
 ﻿using CommonLibrary.Data;
 using CommonLibrary.DTOs.OperationLog;
+using CommonLibrary.DTOs.Role;
 using CommonLibrary.DTOs.RolePermission;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
@@ -24,6 +25,14 @@ namespace admin_backend.Services
             _log = log;
         }
 
+        public async Task<List<RolePermission>> Get(int Id)
+        {
+            IQueryable<RolePermission> query = _context.RolePermission.AsQueryable();
+
+            query = query.Where(x => x.Id == Id);
+
+            return await query.ToListAsync();
+        }
         public async Task<RolePermission> Add(AddRolePermissionDto dto)
         {
             var rolePermission = await _context.RolePermission.Where(x => x.Name == dto.Name).FirstOrDefaultAsync();

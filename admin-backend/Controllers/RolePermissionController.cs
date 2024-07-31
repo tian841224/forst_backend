@@ -19,13 +19,25 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
+        /// 取得身分權限
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Get(int id)
+        {
+            return Ok(await _rolePermissionService.Get(id));
+        }
+
+        /// <summary>
         /// 新增身分權限
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Add(AddRolePermissionDto dto)
+        [Authorize]
+        public async Task<IActionResult> Add(List<AddRolePermissionDto> dto)
         {
             return Ok(await _rolePermissionService.Add(dto));
         }
@@ -36,7 +48,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Update(UpdateRolePermissionDto dto)
         {
             return Ok(await _rolePermissionService.Update(dto));

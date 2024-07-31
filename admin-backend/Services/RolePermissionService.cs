@@ -1,6 +1,5 @@
 ﻿using CommonLibrary.Data;
 using CommonLibrary.DTOs.OperationLog;
-using CommonLibrary.DTOs.Role;
 using CommonLibrary.DTOs.RolePermission;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
@@ -70,12 +69,12 @@ namespace admin_backend.Services
             return rolePermission;
         }
 
-        public async Task<List<RolePermission>> Add(List<AddRolePermissionDto> dto)
+        public async Task<List<RolePermission>> Add(AddRolePermissionRequestDto dto)
         {
             var result = new List<RolePermission>();
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            foreach (var value in dto)
+            foreach (var value in dto.Permissions)
             {
                 var rolePermission = await _context.RolePermission.Where(x => x.Name == value.Name).FirstOrDefaultAsync();
 
@@ -86,8 +85,8 @@ namespace admin_backend.Services
 
                 rolePermission = new RolePermission
                 {
+                    RoleId = dto.RoleId,
                     Name = value.Name,
-                    RoleId = value.RoleId,
                     View = value.View,
                     Add = value.Add,
                     Sign = value.Sign,
@@ -161,7 +160,8 @@ namespace admin_backend.Services
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             foreach (var value in dto)
-            {;
+            {
+                ;
                 var rolePermission = await _context.RolePermission.Where(x => x.Id == value.Id).FirstOrDefaultAsync();
 
                 if (rolePermission == null)

@@ -19,31 +19,31 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得身分權限
+        /// 取得角色權限
         /// </summary>
-        /// <param name="Roleid">角色ID</param>
+        /// <param name="id">角色ID</param>
         /// <returns></returns>
         [HttpGet("{id}")]
         [Authorize]
-        public async Task<IActionResult> Get(int Roleid)
+        public async Task<IActionResult> Get(int id)
         {
-            return Ok(await _rolePermissionService.Get(Roleid));
+            return Ok(await _rolePermissionService.Get(id));
         }
 
         /// <summary>
-        /// 新增身分權限
+        /// 新增角色權限
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Add(List<AddRolePermissionDto> dto)
+        public async Task<IActionResult> Add(AddRolePermissionRequestDto dto)
         {
             return Ok(await _rolePermissionService.Add(dto));
         }
 
         /// <summary>
-        /// 修改身分權限
+        /// 修改角色權限
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>

@@ -165,7 +165,7 @@ namespace admin_backend.Services
 
                 if (rolePermission == null)
                 {
-                    await Add(new AddRolePermissionDto
+                    result.Add(await Add(new AddRolePermissionDto
                     {
                         Name = value.Name ?? string.Empty,
                         RoleId = dto.RoleId,
@@ -174,7 +174,7 @@ namespace admin_backend.Services
                         Sign = value.Sign,
                         Edit = value.Edit,
                         Delete = value.Delete,
-                    });
+                    }));
                 }
                 else
                 {
@@ -196,6 +196,8 @@ namespace admin_backend.Services
                             Content = $"修改身分權限：{rolePermission.Id}/{rolePermission.Name}",
                         });
                     }
+
+                    result.Add(rolePermission);
                 }
             }
             scope.Complete();

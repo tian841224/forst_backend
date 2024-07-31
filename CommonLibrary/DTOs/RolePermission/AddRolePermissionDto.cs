@@ -13,6 +13,7 @@ namespace CommonLibrary.DTOs.RolePermission
         /// <summary>
         /// 角色管理ID
         /// </summary>
+        [Required]
         public int RoleId { get; set; }
 
         /// <summary>

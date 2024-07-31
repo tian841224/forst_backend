@@ -7,8 +7,8 @@ namespace CommonLibrary.DTOs.RolePermission
         [Required]
         public int Id { get; set; }
 
-        [Required]
-        public int RoleId { get; set; }
+        //[Required]
+        //public int RoleId { get; set; }
 
         /// <summary>
         /// 選單名稱

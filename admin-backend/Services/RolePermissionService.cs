@@ -154,14 +154,13 @@ namespace admin_backend.Services
             return rolePermission;
         }
 
-        public async Task<List<RolePermission>> Update(List<UpdateRolePermissionDto> dto)
+        public async Task<List<RolePermission>> Update(UpdateRolePermissionRequestDto dto)
         {
             var result = new List<RolePermission>();
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            foreach (var value in dto)
+            foreach (var value in dto.Permissions)
             {
-                ;
                 var rolePermission = await _context.RolePermission.Where(x => x.Id == value.Id).FirstOrDefaultAsync();
 
                 if (rolePermission == null)
@@ -169,33 +168,22 @@ namespace admin_backend.Services
                     await Add(new AddRolePermissionDto
                     {
                         Name = value.Name ?? string.Empty,
-                        RoleId = value.RoleId,
-                        View = value.View ?? false,
-                        Add = value.Add ?? false,
-                        Sign = value.Sign ?? false,
-                        Edit = value.Edit ?? false,
-                        Delete = value.Delete ?? false,
+                        RoleId = dto.RoleId,
+                        View = value.View,
+                        Add = value.Add,
+                        Sign = value.Sign,
+                        Edit = value.Edit,
+                        Delete = value.Delete,
                     });
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(value.Name))
-                        rolePermission.Name = value.Name;
-
-                    if (value.View.HasValue)
-                        rolePermission.View = value.View.Value;
-
-                    if (value.Add.HasValue)
-                        rolePermission.Add = value.Add.Value;
-
-                    if (value.Sign.HasValue)
-                        rolePermission.Sign = value.Sign.Value;
-
-                    if (value.Edit.HasValue)
-                        rolePermission.Edit = value.Edit.Value;
-
-                    if (value.Delete.HasValue)
-                        rolePermission.Delete = value.Delete.Value;
+                        rolePermission.Name = value.Name ?? string.Empty;
+                        rolePermission.View = value.View;
+                        rolePermission.Add = value.Add;
+                        rolePermission.Sign = value.Sign;
+                        rolePermission.Edit = value.Edit;
+                        rolePermission.Delete = value.Delete;
 
                     _context.RolePermission.Update(rolePermission);
 

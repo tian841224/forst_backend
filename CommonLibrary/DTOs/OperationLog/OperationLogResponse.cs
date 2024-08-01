@@ -1,6 +1,6 @@
 ﻿namespace CommonLibrary.DTOs.OperationLog
 {
-    public class OperationLogResponse : BasicResponseDto
+    public class OperationLogResponse : DefaultResponseDto
     {
         /// <summary>
         /// 使用者ID

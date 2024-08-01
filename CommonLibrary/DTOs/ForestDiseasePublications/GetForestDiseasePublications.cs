@@ -2,7 +2,7 @@
 
 namespace CommonLibrary.DTOs.ForestDiseasePublications
 {
-    public class GetForestDiseasePublications : BasicResponseDto
+    public class GetForestDiseasePublications : DefaultResponseDto
     {
         /// <summary>
         /// "出版品類型 林業叢刊 = 1, 相關摺頁 = 2"

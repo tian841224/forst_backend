@@ -2,7 +2,7 @@
 
 namespace CommonLibrary.DTOs.MailConfig
 {
-    public class MailConfigResponse : BasicResponseDto
+    public class MailConfigResponse : DefaultResponseDto
     {
         /// <summary>
         /// 主機

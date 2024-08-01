@@ -34,7 +34,7 @@ namespace CommonLibrary.DTOs.AdminUser
         /// <summary>
         /// 角色名稱
         /// </summary>
-        public string RoleName { get; set; }
+        public string RoleName { get; set; } = string.Empty;
 
         /// <summary>
         /// 狀態 0 = 關閉, 1 = 開啟

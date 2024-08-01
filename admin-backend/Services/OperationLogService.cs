@@ -80,13 +80,11 @@ namespace admin_backend.Services
                     var name = adminUser.Name;
                     result.Add(new OperationLogResponse
                     {
-                        Id = x.Id,
                         AdminUserId = x.AdminUserId,
                         AdminUserIdName = name,
                         Type = x.Type.GetDisplayName(),
                         Content = x.Content,
                         Ip = x.Ip,
-                        CreateTime = x.CreateTime,
                     });
                 }
             }

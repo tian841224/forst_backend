@@ -12,3 +12,4 @@ admin-backend/bin/
 client-backend/bin/
 CommonLibrary/bin/
 admin-backend/Files/
+admin-backend/Properties/PublishProfiles/IISProfile.pubxml.user

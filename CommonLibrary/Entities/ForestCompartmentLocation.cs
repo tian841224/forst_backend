@@ -6,7 +6,7 @@ namespace CommonLibrary.Entities
     /// <summary>
     /// 林班位置
     /// </summary>
-    public class ForestCompartmentLocation : DefaultEntity
+    public class ForestCompartmentLocation :  SortDefaultEntity
     {
         /// <summary>
         /// 位置

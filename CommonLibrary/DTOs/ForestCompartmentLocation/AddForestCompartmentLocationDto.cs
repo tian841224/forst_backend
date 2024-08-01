@@ -2,7 +2,7 @@
 
 namespace CommonLibrary.DTOs.ForestCompartmentLocation
 {
-    public class AddForestCompartmentLocationDto
+    public class AddForestCompartmentLocationDto : SortDto
     {
         /// <summary>
         /// 位置

@@ -1,4 +1,6 @@
 ﻿using admin_backend.Interfaces;
+using admin_backend.Services;
+using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.ForestCompartmentLocation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +23,7 @@ namespace admin_backend.Controllers
 
 
         /// <summary>
-        /// 取得林班位置
+        /// 取得單筆林班位置
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -41,6 +43,18 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Get()
         {
             return Ok(await _forestCompartmentLocationService.Get());
+        }
+
+        /// <summary>
+        /// 取得林班位置
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Get(GetForestCompartmentLocationDto dto)
+        {
+            return Ok(await _forestCompartmentLocationService.Get(dto));
         }
 
         /// <summary>
@@ -66,6 +80,18 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Update(int id, UpdateForestCompartmentLocationDto dto)
         {
             return Ok(await _forestCompartmentLocationService.Update(id, dto));
+        }
+
+        /// <summary>
+        /// 更新林班位置排序
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> UpdateSort(List<SortBasicDto> dto)
+        {
+            return Ok(await _forestCompartmentLocationService.UpdateSort(dto));
         }
 
         /// <summary>

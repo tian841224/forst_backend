@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Data;
+﻿using AutoMapper;
+using CommonLibrary.Data;
 using CommonLibrary.DTOs.Documentation;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
@@ -11,22 +12,30 @@ namespace admin_backend.Services
     public class DocumentationService
     {
         private readonly ILogger<DocumentationService> _log;
+        private readonly IMapper _mapper;
         private readonly MysqlDbContext _context;
         private readonly OperationLogService _operationLogService;
 
-        public DocumentationService(ILogger<DocumentationService> log, MysqlDbContext context, OperationLogService operationLogService)
+        public DocumentationService(ILogger<DocumentationService> log, MysqlDbContext context, OperationLogService operationLogService, IMapper mapper)
         {
             _log = log;
             _context = context;
             _operationLogService = operationLogService;
+            _mapper = mapper;
         }
 
-        public async Task<Documentation> Get()
+        public async Task<List<DocumentationResponse>> Get()
         {
-            return await _context.Documentation.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new Documentation();
-        }
+            var result = new List<DocumentationResponse>();
+            var consentForm = await _context.Documentation.Where(x => x.Type == DocumentationEnum.ConsentForm).OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new Documentation { Type = DocumentationEnum.ConsentForm, Content = null };
+            var userGuide = await _context.Documentation.Where(x => x.Type == DocumentationEnum.UserGuide).OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new Documentation { Type = DocumentationEnum.ConsentForm, Content = null };
 
-        public async Task<Documentation> Add(AddDocumentationDto dto)
+            result.Add(_mapper.Map<DocumentationResponse>(consentForm));
+            result.Add(_mapper.Map<DocumentationResponse>(userGuide));
+
+            return result;
+        }
+        public async Task<DocumentationResponse> Add(AddDocumentationDto dto)
         {
 
             var documentation = new Documentation
@@ -49,7 +58,7 @@ namespace admin_backend.Services
                 });
             };
             scope.Complete();
-            return documentation;
+            return _mapper.Map<DocumentationResponse>(documentation);
         }
     }
 }

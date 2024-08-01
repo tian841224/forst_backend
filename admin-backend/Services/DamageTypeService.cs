@@ -1,4 +1,6 @@
-﻿using CommonLibrary.Data;
+﻿using AutoMapper;
+using CommonLibrary.Data;
+using CommonLibrary.DTOs.DamageClass;
 using CommonLibrary.DTOs.DamageType;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
@@ -12,26 +14,31 @@ namespace admin_backend.Services
     public class DamageTypeService
     {
         private readonly ILogger<DamageTypeService> _log;
+        private readonly IMapper _mapper;
         private readonly MysqlDbContext _context;
         private readonly OperationLogService _operationLogService;
-        public DamageTypeService(ILogger<DamageTypeService> log, MysqlDbContext context, OperationLogService operationLogService)
+        public DamageTypeService(ILogger<DamageTypeService> log, MysqlDbContext context, OperationLogService operationLogService,IMapper mapper)
         {
             _log = log;
             _context = context;
             _operationLogService = operationLogService;
+            _mapper = mapper;
         }
 
-        public async Task<List<DamageType>> Get(int? Id = null)
+        public async Task<List<DamageTypeResponse>> Get(int? Id = null)
         {
+            var damageTypes = new List<DamageType>();
+
             if (Id.HasValue)
-                return await _context.DamageType.Where(x => x.Id == Id).ToListAsync();
+                damageTypes = await _context.DamageType.Where(x => x.Id == Id).ToListAsync();
             else
-                return await _context.DamageType.ToListAsync();
+                damageTypes = await _context.DamageType.ToListAsync();
+
+            return _mapper.Map<List<DamageTypeResponse>>(damageTypes);
         }
 
-        public async Task<DamageType> Add(AddDamageTypeDto dto)
+        public async Task<DamageTypeResponse> Add(AddDamageTypeDto dto)
         {
-
             var damageType = new DamageType
             {
                 Name = dto.Name,
@@ -52,10 +59,10 @@ namespace admin_backend.Services
                 });
             };
             scope.Complete();
-            return damageType;
+            return _mapper.Map<DamageTypeResponse>(damageType);
         }
 
-        public async Task<DamageType> Update(UpdateDamageTypeDto dto)
+        public async Task<DamageTypeResponse> Update(UpdateDamageTypeDto dto)
         {
 
             var damageType = await _context.DamageType.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
@@ -85,10 +92,10 @@ namespace admin_backend.Services
                 });
             };
             scope.Complete();
-            return damageType;
+            return _mapper.Map<DamageTypeResponse>(damageType);
         }
 
-        public async Task<DamageType> Delete(int Id)
+        public async Task<DamageTypeResponse> Delete(int Id)
         {
 
             var damageType = await _context.DamageType.Where(x => x.Id == Id).FirstOrDefaultAsync();
@@ -112,7 +119,7 @@ namespace admin_backend.Services
                 });
             };
             scope.Complete();
-            return damageType;
+            return _mapper.Map<DamageTypeResponse>(damageType);
         }
     }
 }

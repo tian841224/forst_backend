@@ -1,3 +1,4 @@
+using AutoMapper;
 using CommonLibrary.Data;
 using CommonLibrary.DTOs.AdminUser;
 using CommonLibrary.Entities;
@@ -14,15 +15,17 @@ namespace admin_backend.Services
         private readonly ILogger<AdminUserServices> _log;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IdentityService _identityService;
-        public AdminUserServices(MysqlDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<AdminUserServices> log, IdentityService identityService)
+        private readonly IMapper _mapper;
+        public AdminUserServices(MysqlDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<AdminUserServices> log, IdentityService identityService, IMapper mapper)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _log = log;
             _identityService = identityService;
+            _mapper = mapper;
         }
 
-        public async Task<AdminUser> Get()
+        public async Task<AdminUserResponse> Get()
         {
             //¨ú±oIP
             var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
@@ -35,10 +38,12 @@ namespace admin_backend.Services
 
             var adminUserList  = await Get(new GetAdminUserDto { Id = AdminUserId });
 
-            return adminUserList.FirstOrDefault() ?? new AdminUser();
+            var adminUser = adminUserList.FirstOrDefault() ?? new AdminUserResponse();
+
+            return _mapper.Map<AdminUserResponse>(adminUser);
         }
 
-        public async Task<List<AdminUser>> Get(GetAdminUserDto dto)
+        public async Task<List<AdminUserResponse>> Get(GetAdminUserDto dto)
         {
             IQueryable<AdminUser> query = _context.AdminUser.AsQueryable();
 
@@ -68,7 +73,7 @@ namespace admin_backend.Services
                 query = query.Where(x => x.Status == dto.Status);
             }
 
-            return await query.ToListAsync();
+            return _mapper.Map<List<AdminUserResponse>>(await query.ToListAsync());
         }
 
         public async Task<AdminUser> Add(AddAdminUserDto dto)

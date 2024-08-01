@@ -43,6 +43,17 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
+        /// 取得全部危害種類
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetByType(int TypeId)
+        {
+            return Ok(await _damageClassService.Get(TypeId));
+        }
+
+        /// <summary>
         /// 新增危害種類
         /// </summary>
         /// <param name="dto"></param>

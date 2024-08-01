@@ -1,4 +1,4 @@
-﻿using admin_backend.Services;
+﻿using admin_backend.Interfaces;
 using CommonLibrary.DTOs.ForestCompartmentLocation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +12,9 @@ namespace admin_backend.Controllers
     [Route("[controller]/[action]")]
     public class ForestCompartmentLocationController : Controller
     {
-        private readonly ForestCompartmentLocationService _forestCompartmentLocationService;
+        private readonly IForestCompartmentLocationService _forestCompartmentLocationService;
 
-        public ForestCompartmentLocationController(ForestCompartmentLocationService forestCompartmentLocationService)
+        public ForestCompartmentLocationController(IForestCompartmentLocationService forestCompartmentLocationService)
         {
             _forestCompartmentLocationService = forestCompartmentLocationService;
         }
@@ -63,9 +63,9 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(int id ,UpdateForestCompartmentLocationDto dto)
+        public async Task<IActionResult> Update(int id, UpdateForestCompartmentLocationDto dto)
         {
-            return Ok(await _forestCompartmentLocationService.Update(id,dto));
+            return Ok(await _forestCompartmentLocationService.Update(id, dto));
         }
 
         /// <summary>

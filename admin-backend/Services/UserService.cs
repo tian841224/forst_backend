@@ -1,4 +1,6 @@
-﻿using CommonLibrary.Data;
+﻿using admin_backend.Interfaces;
+using AutoMapper;
+using CommonLibrary.Data;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.DTOs.User;
 using CommonLibrary.Entities;
@@ -6,24 +8,29 @@ using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        private readonly MysqlDbContext _context;
-        private readonly OperationLogService _operationLogService;
         private readonly ILogger<UserService> _log;
+        private readonly IMapper _mapper;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
+        private readonly Lazy<IOperationLogService> _operationLogService;
 
-        public UserService(MysqlDbContext context,OperationLogService operationLogService, ILogger<UserService> log)
+        public UserService(ILogger<UserService> log, IMapper mapper, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService)
         {
-            _context = context;
-            _operationLogService = operationLogService;
             _log = log;
+            _mapper = mapper;
+            _contextFactory = contextFactory;
+            _operationLogService = operationLogService;
         }
 
-        public async Task<List<User>> Get(GetUserDto dto)
+        public async Task<List<UserResponse>> Get(GetUserDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             IQueryable<User> query = _context.User.AsQueryable();
 
             if (dto.Id.HasValue)
@@ -51,11 +58,13 @@ namespace admin_backend.Services
                 query = query.Where(x => x.LoginTime == dto.LoginTime);
             }
 
-            return await query.ToListAsync();
+            return _mapper.Map<List<UserResponse>>(await query.ToListAsync());
         }
 
-        public async Task<User> Add(AddUserDto dto)
+        public async Task<UserResponse> Add(AddUserDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var user = await _context.User.Where(x => x.Account == dto.Account).FirstOrDefaultAsync();
 
             if (user != null)
@@ -70,34 +79,27 @@ namespace admin_backend.Services
                 Status = StatusEnum.Open,
             };
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            try
+            await _context.User.AddAsync(user);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
             {
-                await _context.User.AddAsync(user);
-
-                //新增操作紀錄
-                if (await _context.SaveChangesAsync() > 0)
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
-                    await _operationLogService.Add(new AddOperationLogDto
-                    {
-                        Type = ChangeTypeEnum.Add,
-                        Content = $"新增會員：{user.Id}/{user.Name}",
-                    });
-                }
-                await transaction.CommitAsync();
-                return user;
+                    Type = ChangeTypeEnum.Add,
+                    Content = $"新增會員：{user.Id}/{user.Name}",
+                });
             }
-            catch(Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _log.LogError(ex.Message);
-                throw;
-            }
+            scope.Complete();
+            return _mapper.Map<UserResponse>(user);
         }
 
-        public async Task<User> Update(int Id,UpdateUserDto dto)
+        public async Task<UserResponse> Update(int Id, UpdateUserDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var user = await _context.User.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (user == null)
@@ -111,30 +113,21 @@ namespace admin_backend.Services
             if (dto.Status.HasValue)
                 user.Status = (StatusEnum)dto.Status;
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            try
+            _context.User.Update(user);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
             {
-                _context.User.Update(user);
-
-                //新增操作紀錄
-                if (await _context.SaveChangesAsync() > 0)
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
-                    await _operationLogService.Add(new AddOperationLogDto
-                    {
-                        Type = ChangeTypeEnum.Edit,
-                        Content = $"修改會員：{user.Id}/{user.Name}",
-                    });
-                }
-                await transaction.CommitAsync();
-                return user;
+                    Type = ChangeTypeEnum.Edit,
+                    Content = $"修改會員：{user.Id}/{user.Name}",
+                });
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _log.LogError(ex.Message);
-                throw;
-            }
+            scope.Complete();
+            return _mapper.Map<UserResponse>(user);
         }
     }
 }

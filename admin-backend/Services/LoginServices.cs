@@ -1,39 +1,40 @@
-﻿using CommonLibrary.Data;
+﻿using admin_backend.Interfaces;
+using CommonLibrary.Data;
 using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.Login;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
-using CommonLibrary.Service;
+using CommonLibrary.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Data;
 
 namespace admin_backend.Services
 {
-    public class LoginServices
+    public class LoginServices: ILoginServices
     {
         private readonly ILogger<LoginServices> _log;
         private readonly JwtConfig _jwtConfig;
-        private readonly MysqlDbContext _context;
-        private readonly IdentityService _identityService;
-        private readonly OperationLogService _operationLogService;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
+        private readonly Lazy<IIdentityService> _identityService;
         private const string ADMIN_USER_REFRESH_TOKEN_KEY_PRE = "ADMIN_USER_REFRESH_TOKEN_KEY_PRE:";
         private const string ADMIN_USER_ID_FROM_REFRESH_TOKEN_PRE = "ADMIN_USER_ID_FROM_REFRESH_TOKEN_PRE:";
         private const string CAPTCHA_CODE_PRE = "CAPTCHA_CODE_PRE:";
 
 
-        public LoginServices(MysqlDbContext context, IOptions<JwtConfig> jwtConfig, ILogger<LoginServices> log, IdentityService identityService, OperationLogService operationLogService)
+        public LoginServices(IDbContextFactory<MysqlDbContext> contextFactory, IOptions<JwtConfig> jwtConfig, ILogger<LoginServices> log, Lazy<IIdentityService> identityService)
         {
             _jwtConfig = jwtConfig.Value;
             _log = log;
-            _context = context;
+            _contextFactory = contextFactory;
             _identityService = identityService;
-            _operationLogService = operationLogService;
         }
 
         public async Task<IdentityResultDto> Login(LoginDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var adminUser = await _context.AdminUser.Where(x => x.Account == dto.Account && x.Password == dto.pKey).FirstOrDefaultAsync();
 
             if (adminUser == null)
@@ -55,7 +56,7 @@ namespace admin_backend.Services
             //var refreshToken = Guid.NewGuid().ToString();
 
             //取得Token
-            var token = _identityService.GenerateToken(new GenerateTokenDto
+            var token = _identityService.Value.GenerateToken(new GenerateTokenDto
             {
                 Id = adminUser.Id,
                 //RefreshToken = refreshToken,

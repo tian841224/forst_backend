@@ -27,9 +27,14 @@ namespace CommonLibrary.DTOs.AdminUser
         public string Photo { get; set; } = string.Empty;
 
         /// <summary>
-        /// 角色
+        /// 角色ID
         /// </summary>
         public int RoleId { get; set; }
+
+        /// <summary>
+        /// 角色名稱
+        /// </summary>
+        public string RoleName { get; set; }
 
         /// <summary>
         /// 狀態 0 = 關閉, 1 = 開啟

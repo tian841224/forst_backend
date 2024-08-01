@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using admin_backend.Interfaces;
+using AutoMapper;
 using CommonLibrary.Data;
 using CommonLibrary.DTOs.DamageClass;
 using CommonLibrary.DTOs.OperationLog;
@@ -10,22 +11,24 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class DamageClassService
+    public class DamageClassService: IDamageClassService
     {
         private readonly ILogger<DamageClassService> _log;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly IMapper _mapper;
-        private readonly MysqlDbContext _context;
-        private readonly OperationLogService _operationLogService;
-        public DamageClassService(ILogger<DamageClassService> log, MysqlDbContext context, OperationLogService operationLogService, IMapper mapper)
+        private readonly IOperationLogService _operationLogService;
+        public DamageClassService(ILogger<DamageClassService> log, IDbContextFactory<MysqlDbContext> contextFactory, IOperationLogService operationLogService, IMapper mapper)
         {
             _log = log;
-            _context = context;
-            _operationLogService = operationLogService;
+            _contextFactory = contextFactory;
             _mapper = mapper;
+            _operationLogService = operationLogService;
         }
 
         public async Task<List<DamageClassResponse>> Get(int? Id = null)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var damageClassList = new List<DamageClass>();
 
             if (Id.HasValue)
@@ -38,6 +41,8 @@ namespace admin_backend.Services
 
         public async Task<List<DamageClassResponse>> Get(int TypeId)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var damageClassList = new List<DamageClass>();
 
             damageClassList = await _context.DamageClass.Where(x => x.DamageTypeId == TypeId).ToListAsync();
@@ -47,6 +52,7 @@ namespace admin_backend.Services
 
         public async Task<DamageClassResponse> Add(AddDamageClassDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
 
             var damageClasses = new DamageClass 
             {
@@ -74,6 +80,7 @@ namespace admin_backend.Services
 
         public async Task<DamageClassResponse> Update(UpdateDamageClassDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
 
             var damageClasses = await _context.DamageClass.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
 
@@ -110,6 +117,7 @@ namespace admin_backend.Services
 
         public async Task<DamageClassResponse> Delete(int Id)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
 
             var damageClasses = await _context.DamageClass.Where(x => x.Id == Id).FirstOrDefaultAsync();
 

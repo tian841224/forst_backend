@@ -1,4 +1,6 @@
-﻿using CommonLibrary.Data;
+﻿using admin_backend.Interfaces;
+using AutoMapper;
+using CommonLibrary.Data;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.DTOs.Role;
 using CommonLibrary.Entities;
@@ -9,23 +11,27 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class RoleServices
+    public class RoleService : IRoleService
     {
-        private readonly ILogger<RoleServices> _log;
-        private readonly MysqlDbContext _context;
-        private readonly OperationLogService _operationLogService;
-        private readonly RolePermissionService _rolePermissionService;
+        private readonly ILogger<RoleService> _log;
+        private readonly IMapper _mapper;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
+        private readonly Lazy<IOperationLogService> _operationLogService;
+        private readonly IRolePermissionService _rolePermissionService;
 
-        public RoleServices(MysqlDbContext context, OperationLogService operationLogService, ILogger<RoleServices> log, RolePermissionService rolePermissionService)
+        public RoleService(Lazy<IOperationLogService> operationLogService, IMapper mapper, IDbContextFactory<MysqlDbContext> contextFactory, ILogger<RoleService> log, IRolePermissionService rolePermissionService)
         {
-            _context = context;
-            _operationLogService = operationLogService;
             _log = log;
+            _mapper = mapper;
+            _contextFactory = contextFactory;
+            _operationLogService = operationLogService;
             _rolePermissionService = rolePermissionService;
         }
 
-        public async Task<List<Role>> Get(GetRoleDto dto)
+        public async Task<List<RoleResponse>> Get(GetRoleDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             IQueryable<Role> query = _context.Role.AsQueryable();
 
             if (dto.Id.HasValue)
@@ -38,11 +44,13 @@ namespace admin_backend.Services
                 query = query.Where(x => x.Name == dto.Name);
             }
 
-            return await query.ToListAsync();
+            return _mapper.Map<List<RoleResponse>>(await query.ToListAsync());
         }
 
-        public async Task<Role> Add(AddRoleDto dto)
+        public async Task<RoleResponse> Add(AddRoleDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var role = await _context.Role.Where(x => x.Name == dto.Name).FirstOrDefaultAsync();
 
             if (role != null)
@@ -62,7 +70,7 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
                     Content = $"新增角色：{role.Id}/{role.Name}",
@@ -75,11 +83,13 @@ namespace admin_backend.Services
 
             scope.Complete();
 
-            return role;
+            return _mapper.Map<RoleResponse>(role);
         }
 
-        public async Task<Role> Update(int Id,UpdateRoleDto dto)
+        public async Task<RoleResponse> Update(int Id, UpdateRoleDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var role = await _context.Role.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (role == null)
@@ -97,7 +107,7 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Edit,
                     Content = $"修改角色：{role.Id}/{role.Name}",
@@ -110,11 +120,13 @@ namespace admin_backend.Services
 
             scope.Complete();
 
-            return role;
+            return _mapper.Map<RoleResponse>(role);
         }
 
-        public async Task<Role> Delete(int Id)
+        public async Task<RoleResponse> Delete(int Id)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var role = await _context.Role.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (role == null)
@@ -129,7 +141,7 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Delete,
                     Content = $"刪除角色：{role.Id}/{role.Name}",
@@ -140,7 +152,7 @@ namespace admin_backend.Services
             //await _rolePermissionService.Delete(dto.RolePermission);
 
             scope.Complete();
-            return role;
+            return _mapper.Map<RoleResponse>(role);
         }
     }
 }

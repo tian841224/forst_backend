@@ -1,13 +1,14 @@
+using admin_backend.Interfaces;
 using admin_backend.Services;
-using AutoMapper;
 using CommonLibrary.Data;
 using CommonLibrary.DTOs;
-using CommonLibrary.Entities;
 using CommonLibrary.Extensions;
 using CommonLibrary.Infrastructure;
+using CommonLibrary.Interface;
 using CommonLibrary.Middleware;
 using CommonLibrary.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog;
@@ -22,13 +23,10 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    IHostBuilder hostBuilder = builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
-    {
-        var env = hostingContext.HostingEnvironment;
-        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-              .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
-        config.AddEnvironmentVariables();
-    }); 
+    var env = builder.Environment;
+    builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                          .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+    builder.Configuration.AddEnvironmentVariables();
 
     //加入NLog
     builder.Logging.ClearProviders();
@@ -38,9 +36,13 @@ try
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     if (connectionString != null)
     {
-        builder.Services.AddMySqlDbContext(connectionString);
+        builder.Services.AddDbContextFactory<MysqlDbContext>(options =>
+        options.UseMySQL(connectionString));
     }
-    else throw new Exception("未設定DefaultConnection");
+    else
+    {
+        throw new Exception("未設定DefaultConnection");
+    }
 
     var jwtConfigSection = builder.Configuration.GetSection(nameof(JwtConfig));
     builder.Services.Configure<JwtConfig>(jwtConfigSection);
@@ -48,22 +50,39 @@ try
     builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
     #region 注入
-    builder.Services.AddScoped<FileService>();
     builder.Services.AddScoped<UserService>();
-    builder.Services.AddScoped<AdminUserServices>();
-    builder.Services.AddScoped<RoleServices>();
-    builder.Services.AddScoped<LoginServices>();
-    builder.Services.AddScoped<IdentityService>();
-    builder.Services.AddScoped<MailConfigService>();
-    builder.Services.AddScoped<OperationLogService>();
-    builder.Services.AddScoped<RolePermissionService>();
-    builder.Services.AddScoped<TreeBasicInfoService>();
-    builder.Services.AddScoped<DocumentationService>();
-    builder.Services.AddScoped<ForestCompartmentLocationService>();
-    builder.Services.AddScoped<EpidemicSummaryService>();
-    builder.Services.AddScoped<DamageClassService>();
-    builder.Services.AddScoped<DamageTypeService>();
-    builder.Services.AddScoped<ForestDiseasePublicationsService>();
+    builder.Services.AddScoped<IAdminUserServices, AdminUserServices>();
+    builder.Services.AddScoped<IDamageClassService,DamageClassService>();
+    builder.Services.AddScoped<IDamageTypeService,DamageTypeService>();
+    builder.Services.AddScoped<IDocumentationService,DocumentationService>();
+    builder.Services.AddScoped<IEpidemicSummaryService,EpidemicSummaryService>();
+    builder.Services.AddScoped<IForestCompartmentLocationService,ForestCompartmentLocationService>();
+    builder.Services.AddScoped<ILoginServices,LoginServices>();
+    builder.Services.AddScoped<IMailConfigService,MailConfigService>();
+    builder.Services.AddScoped<IOperationLogService, OperationLogService>();
+    //延遲載入
+    builder.Services.AddScoped(provider =>
+        new Lazy<IOperationLogService>(() => provider.GetRequiredService<IOperationLogService>()));
+    builder.Services.AddScoped<IRoleService,RoleService>();
+    builder.Services.AddScoped<IRolePermissionService, RolePermissionService>();
+    builder.Services.AddScoped<ITreeBasicInfoService,TreeBasicInfoService>();
+    builder.Services.AddScoped<IForestDiseasePublicationsService,ForestDiseasePublicationsService>();
+    builder.Services.AddScoped<IUserService, UserService>();
+
+
+    /*----- 類別庫服務 -----*/
+
+    //身分認證服務
+    builder.Services.AddScoped<IIdentityService, IdentityService>();
+    //延遲載入
+    builder.Services.AddScoped(provider =>
+        new Lazy<IIdentityService>(() => provider.GetRequiredService<IIdentityService>()));
+
+    //檔案處理服務
+    builder.Services.AddScoped<IFileService,FileService>();
+    //延遲載入
+    builder.Services.AddScoped(provider =>
+        new Lazy<IFileService>(() => provider.GetRequiredService<IFileService>()));
     #endregion
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

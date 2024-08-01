@@ -1,4 +1,5 @@
-﻿using admin_backend.Services;
+﻿using admin_backend.Interfaces;
+using admin_backend.Services;
 using CommonLibrary.DTOs.DamageClass;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,9 @@ namespace admin_backend.Controllers
     [Route("[controller]/[action]")]
     public class DamageClassController : ControllerBase
     {
-        private readonly DamageClassService _damageClassService;
+        private readonly IDamageClassService _damageClassService;
 
-        public DamageClassController(DamageClassService damageClassService)
+        public DamageClassController(IDamageClassService damageClassService)
         {
             _damageClassService = damageClassService;
         }

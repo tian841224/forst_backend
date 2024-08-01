@@ -1,4 +1,5 @@
-﻿using admin_backend.Services;
+﻿using admin_backend.Interfaces;
+using admin_backend.Services;
 using CommonLibrary.DTOs.Role;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,9 @@ namespace admin_backend.Controllers
     [Route("[controller]/[action]")]
     public class RoleController : ControllerBase
     {
-        private readonly RoleServices _roleService;
+        private readonly IRoleService _roleService;
 
-        public RoleController(RoleServices roleService)
+        public RoleController(IRoleService roleService)
         {
             _roleService = roleService;
         }

@@ -1,4 +1,6 @@
-﻿using CommonLibrary.Data;
+﻿using admin_backend.Interfaces;
+using AutoMapper;
+using CommonLibrary.Data;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.DTOs.TreeBasicInfo;
 using CommonLibrary.Entities;
@@ -9,30 +11,39 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class TreeBasicInfoService
+    public class TreeBasicInfoService : ITreeBasicInfoService
     {
         private readonly ILogger<TreeBasicInfoService> _log;
-        private readonly MysqlDbContext _context;
-        private readonly OperationLogService _operationLogService;
+        private readonly IMapper _mapper;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
+        private readonly Lazy<IOperationLogService> _operationLogService;
 
-        public TreeBasicInfoService(ILogger<TreeBasicInfoService> log, MysqlDbContext context, OperationLogService operationLogService)
+        public TreeBasicInfoService(ILogger<TreeBasicInfoService> log, IMapper mapper, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService)
         {
             _log = log;
-            _context = context;
+            _mapper = mapper;
+            _contextFactory = contextFactory;
             _operationLogService = operationLogService;
         }
 
-        public async Task<List<TreeBasicInfo>> Get(int? id = null)
+        public async Task<List<TreeBasicInfoResponse>> Get(int? id = null)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            var treeBasicInfo = new List<TreeBasicInfo>();
+
             if (id != null)
-                return await _context.TreeBasicInfo.Where(x => x.Id == id).ToListAsync();
+                treeBasicInfo = await _context.TreeBasicInfo.Where(x => x.Id == id).ToListAsync();
 
             else
-                return await _context.TreeBasicInfo.ToListAsync();
+                treeBasicInfo = await _context.TreeBasicInfo.ToListAsync();
+
+            return _mapper.Map<List<TreeBasicInfoResponse>>(treeBasicInfo);
+
         }
 
-        public async Task<TreeBasicInfo> Add(AddTreeBasicInfoDto dto)
+        public async Task<TreeBasicInfoResponse> Add(AddTreeBasicInfoDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
 
             var treeBasicInfo = new TreeBasicInfo
             {
@@ -47,18 +58,19 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
                     Content = $"新增樹木基本資料：{treeBasicInfo.Name}",
                 });
             };
             scope.Complete();
-            return treeBasicInfo;
+            return _mapper.Map<TreeBasicInfoResponse>(treeBasicInfo);
         }
 
-        public async Task<TreeBasicInfo> Update(int Id,UpdateTreeBasicInfoDto dto)
+        public async Task<TreeBasicInfoResponse> Update(int Id, UpdateTreeBasicInfoDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
 
             var treeBasicInfo = await _context.TreeBasicInfo.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
@@ -75,23 +87,25 @@ namespace admin_backend.Services
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-             _context.TreeBasicInfo.Update(treeBasicInfo);
+            _context.TreeBasicInfo.Update(treeBasicInfo);
 
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Edit,
                     Content = $"修改樹木基本資料：{treeBasicInfo.Name}",
                 });
             };
             scope.Complete();
-            return treeBasicInfo;
+            return _mapper.Map<TreeBasicInfoResponse>(treeBasicInfo);
         }
 
-        public async Task<TreeBasicInfo> Delete(int Id)
+        public async Task<TreeBasicInfoResponse> Delete(int Id)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
 
             var treeBasicInfo = await _context.TreeBasicInfo.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
@@ -107,14 +121,14 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Delete,
                     Content = $"刪除樹木基本資料：{treeBasicInfo.Name}",
                 });
             };
             scope.Complete();
-            return treeBasicInfo;
+            return _mapper.Map<TreeBasicInfoResponse>(treeBasicInfo);
         }
     }
 }

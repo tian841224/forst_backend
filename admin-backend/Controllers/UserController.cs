@@ -1,4 +1,4 @@
-﻿using admin_backend.Services;
+﻿using admin_backend.Interfaces;
 using CommonLibrary.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +12,9 @@ namespace admin_backend.Controllers
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UserController(UserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
         }
@@ -51,9 +51,9 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(int id,UpdateUserDto dto)
+        public async Task<IActionResult> Update(int id, UpdateUserDto dto)
         {
-            return Ok(await _userService.Update(id,dto));
+            return Ok(await _userService.Update(id, dto));
         }
 
     }

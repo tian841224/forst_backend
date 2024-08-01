@@ -1,3 +1,4 @@
+using admin_backend.Interfaces;
 using admin_backend.Services;
 using CommonLibrary.DTOs.Login;
 using Microsoft.AspNetCore.Authorization;
@@ -13,9 +14,9 @@ namespace admin_backend.Controllers
 
     public class LoginController : ControllerBase
     {
-        private readonly LoginServices _loginServices;
+        private readonly ILoginServices _loginServices;
 
-        public LoginController(LoginServices loginServices)
+        public LoginController(ILoginServices loginServices)
         {
             _loginServices = loginServices;
         }

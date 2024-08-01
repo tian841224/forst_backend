@@ -1,6 +1,5 @@
 ﻿using CommonLibrary.Enums;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace CommonLibrary.DTOs.AdminUser
 {
@@ -29,7 +28,7 @@ namespace CommonLibrary.DTOs.AdminUser
         /// <summary>
         /// 照片
         /// </summary>
-        public string? Photo { get; set; } 
+        public IFormFile? Photo { get; set; }
 
         /// <summary>
         /// 角色

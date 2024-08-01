@@ -1,4 +1,4 @@
-using admin_backend.Services;
+using admin_backend.Interfaces;
 using CommonLibrary.DTOs.AdminUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +12,9 @@ namespace admin_backend.Controllers
     [Route("[controller]/[action]")]
     public class AdminUserController : ControllerBase
     {
-        private readonly AdminUserServices _adminUserServices;
+        private readonly IAdminUserServices _adminUserServices;
 
-        public AdminUserController(AdminUserServices adminUserServices)
+        public AdminUserController(IAdminUserServices adminUserServices)
         {
             _adminUserServices = adminUserServices;
         }
@@ -49,7 +49,7 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Add(AddAdminUserDto dto)
+        public async Task<IActionResult> Add([FromForm] AddAdminUserDto dto)
         {
             return Ok(await _adminUserServices.Add(dto));
         }
@@ -62,7 +62,7 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update(int id, UpdateAdminUserDto dto)
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateAdminUserDto dto)
         {
             return Ok(await _adminUserServices.Update(id, dto));
         }

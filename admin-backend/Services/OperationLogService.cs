@@ -1,34 +1,40 @@
-﻿using CommonLibrary.Data;
+﻿using admin_backend.Interfaces;
+using AutoMapper;
+using CommonLibrary.Data;
 using CommonLibrary.DTOs.AdminUser;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
-using CommonLibrary.Service;
+using CommonLibrary.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
 
 namespace admin_backend.Services
 {
-    public class OperationLogService
+    public class OperationLogService : IOperationLogService
     {
         private readonly ILogger<OperationLogService> _log;
-        private readonly MysqlDbContext _context;
-        private readonly AdminUserServices _adminUserServices;
+        private readonly IMapper _mapper;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
+        private readonly IAdminUserServices _adminUserServices;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IdentityService _identityService;
+        private readonly Lazy<IIdentityService> _identityService;
 
-        public OperationLogService(ILogger<OperationLogService> log, MysqlDbContext context, AdminUserServices adminUserServices, IHttpContextAccessor httpContextAccessor, IdentityService identityService)
+        public OperationLogService(ILogger<OperationLogService> log, IMapper mapper, IDbContextFactory<MysqlDbContext> contextFactory, IAdminUserServices adminUserServices, IHttpContextAccessor httpContextAccessor, Lazy<IIdentityService> identityService)
         {
             _log = log;
-            _context = context;
+            _mapper = mapper;
+            _contextFactory = contextFactory;
             _adminUserServices = adminUserServices;
             _httpContextAccessor = httpContextAccessor;
             _identityService = identityService;
         }
 
-        public async Task<List<GetOperationLogResponseDto>> Get(GetOperationLogDto dto)
+        public async Task<List<OperationLogResponse>> Get(GetOperationLogDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             IQueryable<OperationLog> query = _context.OperationLog.AsQueryable();
-            var result = new List<GetOperationLogResponseDto>();
+            var result = new List<OperationLogResponse>();
 
             if (dto.RoleId.HasValue)
             {
@@ -72,7 +78,7 @@ namespace admin_backend.Services
                 if (adminUser != null)
                 {
                     var name = adminUser.Name;
-                    result.Add(new GetOperationLogResponseDto
+                    result.Add(new OperationLogResponse
                     {
                         Id = x.Id,
                         AdminUserId = x.AdminUserId,
@@ -84,18 +90,19 @@ namespace admin_backend.Services
                     });
                 }
             }
-
-            return result;
+            return _mapper.Map<List<OperationLogResponse>>(result);
         }
 
         public async Task Add(AddOperationLogDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             //取得IP
             var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
             //取得Jwt Token資訊
             var JwtClaims = _httpContextAccessor.HttpContext?.User?.Claims.ToList();
 
-            var claimsDto = _identityService.GetUser();
+            var claimsDto = _identityService.Value.GetUser();
 
             int.TryParse(claimsDto.UserId, out int AdminUserId);
 

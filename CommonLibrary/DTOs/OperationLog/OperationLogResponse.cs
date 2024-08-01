@@ -1,11 +1,7 @@
-﻿using CommonLibrary.Enums;
-
-namespace CommonLibrary.DTOs.OperationLog
+﻿namespace CommonLibrary.DTOs.OperationLog
 {
-    public class GetOperationLogResponseDto
+    public class OperationLogResponse : BasicResponseDto
     {
-        public int Id { get; set; }
-
         /// <summary>
         /// 使用者ID
         /// </summary>
@@ -30,16 +26,5 @@ namespace CommonLibrary.DTOs.OperationLog
         /// IP
         /// </summary>
         public string Ip { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 建立日期
-        /// </summary>
-        public DateTime CreateTime { get; set; }
-
-        /// <summary>
-        /// 更新時間
-        /// </summary>
-        public DateTime UpdateTime { get; set; }
-
     }
 }

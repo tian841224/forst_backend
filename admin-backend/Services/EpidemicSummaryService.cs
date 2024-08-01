@@ -1,4 +1,6 @@
-﻿using CommonLibrary.Data;
+﻿using admin_backend.Interfaces;
+using AutoMapper;
+using CommonLibrary.Data;
 using CommonLibrary.DTOs.EpidemicSummary;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
@@ -8,25 +10,32 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class EpidemicSummaryService
+    public class EpidemicSummaryService: IEpidemicSummaryService
     {
         private readonly ILogger<EpidemicSummaryService> _log;
-        private readonly MysqlDbContext _context;
-        private readonly OperationLogService _operationLogService;
-        public EpidemicSummaryService(ILogger<EpidemicSummaryService> log, MysqlDbContext context, OperationLogService operationLogService)
+        private readonly IMapper _mapper;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
+        private readonly Lazy<IOperationLogService> _operationLogService;
+        public EpidemicSummaryService(ILogger<EpidemicSummaryService> log, IDbContextFactory<MysqlDbContext> contextFactory , Lazy<IOperationLogService> operationLogService, IMapper mapper)
         {
             _log = log;
-            _context = context;
+            _contextFactory = contextFactory;
             _operationLogService = operationLogService;
+            _mapper = mapper;
         }
 
-        public async Task<EpidemicSummary> Get()
+        public async Task<EpidemicSummaryResponse> Get()
         {
-            return await _context.EpidemicSummary.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new EpidemicSummary();
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            var epidemicSummary = await _context.EpidemicSummary.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new EpidemicSummary { Title = null, Content = null};
+            return _mapper.Map<EpidemicSummaryResponse>(epidemicSummary);
         }
 
-        public async Task<EpidemicSummary> Add(AddEpidemicSummaryDto dto)
+        public async Task<EpidemicSummaryResponse> Add(AddEpidemicSummaryDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var epidemicSummary = new EpidemicSummary
             {
                 Title = dto.Title,
@@ -40,14 +49,14 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
                     Content = $"新增疫情簡介{epidemicSummary.Title}",
                 });
             }
             scope.Complete();
-            return epidemicSummary;
+            return _mapper.Map<EpidemicSummaryResponse>(epidemicSummary);
         }
     }
 }

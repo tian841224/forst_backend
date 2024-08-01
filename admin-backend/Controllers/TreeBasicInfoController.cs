@@ -1,4 +1,4 @@
-﻿using admin_backend.Services;
+﻿using admin_backend.Interfaces;
 using CommonLibrary.DTOs.TreeBasicInfo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +12,9 @@ namespace admin_backend.Controllers
     [Route("[controller]/[action]")]
     public class TreeBasicInfoController : ControllerBase
     {
-        private readonly TreeBasicInfoService _treeBasicInfoService;
+        private readonly ITreeBasicInfoService _treeBasicInfoService;
 
-        public TreeBasicInfoController(TreeBasicInfoService treeBasicInfoService)
+        public TreeBasicInfoController(ITreeBasicInfoService treeBasicInfoService)
         {
             _treeBasicInfoService = treeBasicInfoService;
         }
@@ -61,9 +61,9 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(int id,UpdateTreeBasicInfoDto dto)
+        public async Task<IActionResult> Update(int id, UpdateTreeBasicInfoDto dto)
         {
-            return Ok(await _treeBasicInfoService.Update(id,dto));
+            return Ok(await _treeBasicInfoService.Update(id, dto));
         }
 
         /// <summary>

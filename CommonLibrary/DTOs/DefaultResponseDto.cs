@@ -1,12 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CommonLibrary.Extensions;
 using System.Text.Json.Serialization;
-using CommonLibrary.Extensions;
 
 namespace CommonLibrary.DTOs
 {
     public class DefaultResponseDto
     {
-        [Key]
         public int Id { get; protected set; }
 
         /// <summary>

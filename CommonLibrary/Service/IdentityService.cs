@@ -1,19 +1,19 @@
 ﻿using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.Login;
-using System.Security.Claims;
+using CommonLibrary.Interface;
+using IdentityModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SkiaSharp;
 using System.IdentityModel.Tokens.Jwt;
-using IdentityModel;
+using System.Security.Claims;
 
 namespace CommonLibrary.Service
 {
     /// <summary>
-    /// 認證
+    /// 身分認證
     /// </summary>
-    public class IdentityService
+    public class IdentityService : IIdentityService
     {
         private const string ADMIN_USER_REFRESH_TOKEN_KEY_PRE = "ADMIN_USER_REFRESH_TOKEN_KEY_PRE:";
         private const string ADMIN_USER_ID_FROM_REFRESH_TOKEN_PRE = "ADMIN_USER_ID_FROM_REFRESH_TOKEN_PRE:";
@@ -46,7 +46,7 @@ namespace CommonLibrary.Service
                     RoleId = JwtClaims.FirstOrDefault(c => c.Type == "RoleId")?.Value ?? string.Empty,
                     RoleNane = JwtClaims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? string.Empty,
                     UserId = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.Id)?.Value ?? string.Empty,
-                    UserNane = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value ?? string.Empty ,
+                    UserNane = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value ?? string.Empty,
                     Account = JwtClaims.FirstOrDefault(c => c.Type == "Account")?.Value ?? string.Empty,
                     Email = JwtClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? string.Empty,
                     ReferenceTokenId = JwtClaims.FirstOrDefault(c => c.Type == JwtClaimTypes.ReferenceTokenId)?.Value ?? string.Empty,

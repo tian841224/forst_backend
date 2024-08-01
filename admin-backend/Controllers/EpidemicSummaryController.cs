@@ -1,4 +1,4 @@
-﻿using admin_backend.Services;
+﻿using admin_backend.Interfaces;
 using CommonLibrary.DTOs.EpidemicSummary;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +12,8 @@ namespace admin_backend.Controllers
     [Route("[controller]/[action]")]
     public class EpidemicSummaryController : ControllerBase
     {
-        private readonly EpidemicSummaryService _epidemicSummaryService;
-        public EpidemicSummaryController(EpidemicSummaryService epidemicSummaryService)
+        private readonly IEpidemicSummaryService _epidemicSummaryService;
+        public EpidemicSummaryController(IEpidemicSummaryService epidemicSummaryService)
         {
             _epidemicSummaryService = epidemicSummaryService;
         }

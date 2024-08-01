@@ -1,6 +1,6 @@
-﻿using AutoMapper;
+﻿using admin_backend.Interfaces;
+using AutoMapper;
 using CommonLibrary.Data;
-using CommonLibrary.DTOs.DamageClass;
 using CommonLibrary.DTOs.DamageType;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
@@ -11,22 +11,24 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class DamageTypeService
+    public class DamageTypeService: IDamageTypeService
     {
         private readonly ILogger<DamageTypeService> _log;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly IMapper _mapper;
-        private readonly MysqlDbContext _context;
-        private readonly OperationLogService _operationLogService;
-        public DamageTypeService(ILogger<DamageTypeService> log, MysqlDbContext context, OperationLogService operationLogService,IMapper mapper)
+        private readonly Lazy<IOperationLogService> _operationLogService;
+        public DamageTypeService(ILogger<DamageTypeService> log, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService, IMapper mapper)
         {
             _log = log;
-            _context = context;
+            _contextFactory = contextFactory;
             _operationLogService = operationLogService;
             _mapper = mapper;
         }
 
         public async Task<List<DamageTypeResponse>> Get(int? Id = null)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var damageTypes = new List<DamageType>();
 
             if (Id.HasValue)
@@ -39,6 +41,8 @@ namespace admin_backend.Services
 
         public async Task<DamageTypeResponse> Add(AddDamageTypeDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var damageType = new DamageType
             {
                 Name = dto.Name,
@@ -52,7 +56,7 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
                     Content = $"新增危害類型：{damageType.Name}",
@@ -64,6 +68,7 @@ namespace admin_backend.Services
 
         public async Task<DamageTypeResponse> Update(UpdateDamageTypeDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
 
             var damageType = await _context.DamageType.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
 
@@ -85,7 +90,7 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Edit,
                     Content = $"修改危害類型：{damageType.Name}",
@@ -97,6 +102,7 @@ namespace admin_backend.Services
 
         public async Task<DamageTypeResponse> Delete(int Id)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
 
             var damageType = await _context.DamageType.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
@@ -112,7 +118,7 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Delete,
                     Content = $"刪除危害類型：{damageType.Name}",

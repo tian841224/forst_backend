@@ -1,4 +1,5 @@
 ﻿using CommonLibrary.DTOs.File;
+using CommonLibrary.Interface;
 using Humanizer;
 using Microsoft.AspNetCore.Http;
 
@@ -7,7 +8,7 @@ namespace CommonLibrary.Service
     /// <summary>
     /// 檔案處理
     /// </summary>
-    public class FileService
+    public class FileService: IFileService
     {
         private readonly string _fileUploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Files");
 

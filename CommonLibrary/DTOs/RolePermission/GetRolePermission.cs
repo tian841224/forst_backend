@@ -9,7 +9,7 @@
 
         public List<Permission> Permissions { get; set; } = new List<Permission>();
 
-        public class Permission : BasicResponseDto
+        public class Permission : DefaultResponseDto
         {
             /// <summary>
             /// 選單名稱

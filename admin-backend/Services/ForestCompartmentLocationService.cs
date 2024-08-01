@@ -1,4 +1,6 @@
-﻿using CommonLibrary.Data;
+﻿using admin_backend.Interfaces;
+using AutoMapper;
+using CommonLibrary.Data;
 using CommonLibrary.DTOs.ForestCompartmentLocation;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
@@ -9,29 +11,38 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class ForestCompartmentLocationService
+    public class ForestCompartmentLocationService: IForestCompartmentLocationService
     {
         private readonly ILogger<ForestCompartmentLocationService> _log;
-        private readonly MysqlDbContext _context;
-        private readonly OperationLogService _operationLogService;
+        private readonly IMapper _mapper;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
+        private readonly Lazy<IOperationLogService> _operationLogService;
 
-        public ForestCompartmentLocationService(ILogger<ForestCompartmentLocationService> log, MysqlDbContext context, OperationLogService operationLogService)
+        public ForestCompartmentLocationService(ILogger<ForestCompartmentLocationService> log, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService, IMapper mapper)
         {
             _log = log;
-            _context = context;
+            _contextFactory = contextFactory;
             _operationLogService = operationLogService;
+            _mapper = mapper;
         }
 
-        public async Task<List<ForestCompartmentLocation>> Get(int? Id = null)
+        public async Task<List<ForestCompartmentLocationResponse>> Get(int? Id = null)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            var forestCompartmentLocation = new List<ForestCompartmentLocation>();
             if (Id.HasValue)
-                return await _context.ForestCompartmentLocation.Where(x => x.Id == Id).ToListAsync();
+                forestCompartmentLocation = await _context.ForestCompartmentLocation.Where(x => x.Id == Id).ToListAsync();
             else
-                return await _context.ForestCompartmentLocation.ToListAsync();
+                forestCompartmentLocation = await _context.ForestCompartmentLocation.ToListAsync();
+
+            return _mapper.Map<List<ForestCompartmentLocationResponse>>(forestCompartmentLocation);
         }
 
-        public async Task<ForestCompartmentLocation> Add(AddForestCompartmentLocationDto dto)
+        public async Task<ForestCompartmentLocationResponse> Add(AddForestCompartmentLocationDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var forestCompartmentLocation = new ForestCompartmentLocation
             {
                 Postion = dto.Postion,
@@ -45,18 +56,20 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
                     Content = $"新增林班位置：{forestCompartmentLocation.AffiliatedUnit}",
                 });
             };
             scope.Complete();
-            return forestCompartmentLocation;
+            return _mapper.Map<ForestCompartmentLocationResponse>(forestCompartmentLocation);
         }
 
-        public async Task<ForestCompartmentLocation> Update(int Id, UpdateForestCompartmentLocationDto dto)
+        public async Task<ForestCompartmentLocationResponse> Update(int Id, UpdateForestCompartmentLocationDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
 
             var forestCompartmentLocation = await _context.ForestCompartmentLocation.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
@@ -78,18 +91,20 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Edit,
                     Content = $"修改林班位置：{forestCompartmentLocation.AffiliatedUnit}",
                 });
             };
             scope.Complete();
-            return forestCompartmentLocation;
+            return _mapper.Map<ForestCompartmentLocationResponse>(forestCompartmentLocation);
         }
 
-        public async Task<ForestCompartmentLocation> Delete(int Id)
+        public async Task<ForestCompartmentLocationResponse> Delete(int Id)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
 
             var forestCompartmentLocation = await _context.ForestCompartmentLocation.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
@@ -105,14 +120,14 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Delete,
                     Content = $"移除林班位置：{forestCompartmentLocation.AffiliatedUnit}",
                 });
             };
             scope.Complete();
-            return forestCompartmentLocation;
+            return _mapper.Map<ForestCompartmentLocationResponse>(forestCompartmentLocation);
         }
     }
 }

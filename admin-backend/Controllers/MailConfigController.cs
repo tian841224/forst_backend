@@ -1,4 +1,4 @@
-﻿using admin_backend.Services;
+﻿using admin_backend.Interfaces;
 using CommonLibrary.DTOs.MailConfig;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +12,9 @@ namespace admin_backend.Controllers
     [Route("[controller]/[action]")]
     public class MailConfigController : ControllerBase
     {
-        private readonly MailConfigService _mailConfigService;
+        private readonly IMailConfigService _mailConfigService;
 
-        public MailConfigController(MailConfigService mailConfigService)
+        public MailConfigController(IMailConfigService mailConfigService)
         {
             _mailConfigService = mailConfigService;
         }

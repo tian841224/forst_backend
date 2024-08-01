@@ -1,4 +1,4 @@
-﻿using admin_backend.Services;
+﻿using admin_backend.Interfaces;
 using CommonLibrary.DTOs.Documentation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +12,8 @@ namespace admin_backend.Controllers
     [Route("[controller]/[action]")]
     public class DocumentationController : ControllerBase
     {
-        private readonly DocumentationService _documentationService;
-        public DocumentationController(DocumentationService documentationService)
+        private readonly IDocumentationService _documentationService;
+        public DocumentationController(IDocumentationService documentationService)
         {
             _documentationService = documentationService;
         }

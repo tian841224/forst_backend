@@ -1,4 +1,5 @@
-﻿using admin_backend.Services;
+﻿using admin_backend.Interfaces;
+using admin_backend.Services;
 using CommonLibrary.DTOs.RolePermission;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +13,8 @@ namespace admin_backend.Controllers
     [Route("[controller]/[action]")]
     public class RolePermissionController : Controller
     {
-        private readonly RolePermissionService _rolePermissionService;
-        public RolePermissionController(RolePermissionService rolePermissionService)
+        private readonly IRolePermissionService _rolePermissionService;
+        public RolePermissionController(IRolePermissionService rolePermissionService)
         {
             _rolePermissionService = rolePermissionService;
         }

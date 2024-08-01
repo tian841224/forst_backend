@@ -1,8 +1,6 @@
 ﻿using CommonLibrary.Enums;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CommonLibrary.Entities
 {

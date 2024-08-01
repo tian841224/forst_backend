@@ -1,4 +1,5 @@
-﻿using admin_backend.Services;
+﻿using admin_backend.Interfaces;
+using admin_backend.Services;
 using CommonLibrary.DTOs.OperationLog;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,9 @@ namespace admin_backend.Controllers
     public class OperationLogController : ControllerBase
     {
 
-        private readonly OperationLogService _operationLogService;
+        private readonly IOperationLogService _operationLogService;
 
-        public OperationLogController(OperationLogService operationLogService)
+        public OperationLogController(IOperationLogService operationLogService)
         {
             _operationLogService = operationLogService;
         }

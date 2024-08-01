@@ -1,4 +1,6 @@
-﻿using CommonLibrary.Data;
+﻿using admin_backend.Interfaces;
+using AutoMapper;
+using CommonLibrary.Data;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.DTOs.RolePermission;
 using CommonLibrary.Entities;
@@ -10,48 +12,64 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class RolePermissionService
+    public class RolePermissionService : IRolePermissionService
     {
-        private readonly MysqlDbContext _context;
-        private readonly OperationLogService _operationLogService;
         private readonly ILogger<RolePermissionService> _log;
+        private readonly IMapper _mapper;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
+        private readonly Lazy<IOperationLogService> _operationLogService;
 
-
-        public RolePermissionService(MysqlDbContext context, OperationLogService operationLogService, ILogger<RolePermissionService> log)
+        public RolePermissionService(IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IOperationLogService> operationLogService, ILogger<RolePermissionService> log)
         {
-            _context = context;
-            _operationLogService = operationLogService;
             _log = log;
+            _mapper = mapper;
+            _contextFactory = contextFactory;
+            _operationLogService = operationLogService;
         }
 
-        public async Task<GetRolePermission> Get(int Id)
+        public async Task<RolePermissionResponse> Get(int Id)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             IQueryable<RolePermission> query = _context.RolePermission.AsQueryable();
 
             query = query.Where(x => x.RoleId == Id);
 
-            return new GetRolePermission
-            {
-                RoleId = Id,
-                Permissions = await query.Select(x => new GetRolePermission.Permission
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    View = x.View,
-                    Add = x.Add,
-                    Sign = x.Sign,
-                    Edit = x.Edit,
-                    Delete = x.Delete
-                }).ToListAsync()
-            };
+            return _mapper.Map<RolePermissionResponse>(await query.ToArrayAsync());
+
+
+            //return new RolePermissionResponse
+            //{
+            //    RoleId = Id,
+            //    Permissions = await query.Select(x => new RolePermissionResponse.Permission
+            //    {
+            //        Name = x.Name,
+            //        View = x.View,
+            //        Add = x.Add,
+            //        Sign = x.Sign,
+            //        Edit = x.Edit,
+            //        Delete = x.Delete
+            //    }).ToListAsync()
+            //};
         }
-        public async Task<RolePermission> Add(AddRolePermissionDto dto)
+        public async Task<RolePermissionResponse> Add(AddRolePermissionDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var rolePermission = await _context.RolePermission.Where(x => x.RoleId == dto.RoleId && x.Name == dto.Name).FirstOrDefaultAsync();
 
             if (rolePermission != null)
             {
-                return rolePermission;
+                await Update(new UpdateRolePermissionDto 
+                {
+                    Id = rolePermission.Id,
+                    Name = rolePermission.Name,
+                    View = rolePermission.View,
+                    Add = rolePermission.Add,
+                    Sign = rolePermission.Sign,
+                    Edit = rolePermission.Edit,
+                    Delete = rolePermission.Delete
+                });
             }
 
             rolePermission = new RolePermission
@@ -72,59 +90,66 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
                     Content = $"新增身分權限：{rolePermission.Id}/{rolePermission.Name}",
                 });
             };
             scope.Complete();
-            return rolePermission;
+            return _mapper.Map<RolePermissionResponse>(rolePermission);
         }
 
-        public async Task<List<RolePermission>> Add(AddRolePermissionRequestDto dto)
+        #region AddList
+        //public async Task<List<RolePermission>> Add(AddRolePermissionRequestDto dto)
+        //{
+        //    await using var _context = await _contextFactory.CreateDbContextAsync();
+
+        //    var result = new List<RolePermission>();
+        //    using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        //    foreach (var value in dto.Permissions)
+        //    {
+        //        var rolePermission = await _context.RolePermission.Where(x => x.Name == value.Name).FirstOrDefaultAsync();
+
+        //        if (rolePermission != null)
+        //        {
+        //            continue;
+        //        }
+
+        //        rolePermission = new RolePermission
+        //        {
+        //            RoleId = dto.RoleId,
+        //            Name = value.Name,
+        //            View = value.View,
+        //            Add = value.Add,
+        //            Sign = value.Sign,
+        //            Edit = value.Edit,
+        //            Delete = value.Delete
+        //        };
+        //        await _context.RolePermission.AddAsync(rolePermission);
+
+        //        //新增操作紀錄
+        //        if (await _context.SaveChangesAsync() > 0)
+        //        {
+        //            await _operationLogService.Value.Add(new AddOperationLogDto
+        //            {
+        //                Type = ChangeTypeEnum.Add,
+        //                Content = $"新增身分權限：{rolePermission.Id}/{rolePermission.Name}",
+        //            });
+        //        };
+        //        result.Add(rolePermission);
+        //    }
+        //    scope.Complete();
+        //    return result;
+        //}
+        #endregion
+
+        #region UpdateList
+        public async Task<RolePermissionResponse> Update(UpdateRolePermissionDto dto)
         {
-            var result = new List<RolePermission>();
-            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            foreach (var value in dto.Permissions)
-            {
-                var rolePermission = await _context.RolePermission.Where(x => x.Name == value.Name).FirstOrDefaultAsync();
-
-                if (rolePermission != null)
-                {
-                    continue;
-                }
-
-                rolePermission = new RolePermission
-                {
-                    RoleId = dto.RoleId,
-                    Name = value.Name,
-                    View = value.View,
-                    Add = value.Add,
-                    Sign = value.Sign,
-                    Edit = value.Edit,
-                    Delete = value.Delete
-                };
-                await _context.RolePermission.AddAsync(rolePermission);
-
-                //新增操作紀錄
-                if (await _context.SaveChangesAsync() > 0)
-                {
-                    await _operationLogService.Add(new AddOperationLogDto
-                    {
-                        Type = ChangeTypeEnum.Add,
-                        Content = $"新增身分權限：{rolePermission.Id}/{rolePermission.Name}",
-                    });
-                };
-                result.Add(rolePermission);
-            }
-            scope.Complete();
-            return result;
-        }
-
-        public async Task<RolePermission> Update(UpdateRolePermissionDto dto)
-        {
             var rolePermission = await _context.RolePermission.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
 
             if (rolePermission == null)
@@ -157,19 +182,22 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Edit,
                     Content = $"修改身分權限：{rolePermission.Id}/{rolePermission.Name}",
                 });
             }
             scope.Complete();
-            return rolePermission;
+            return _mapper.Map<RolePermissionResponse>(rolePermission);
         }
+        #endregion
 
-        public async Task<List<RolePermission>> Update(UpdateRolePermissionRequestDto dto)
+        public async Task<List<RolePermissionResponse>> Update(UpdateRolePermissionRequestDto dto)
         {
-            var result = new List<RolePermission>();
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            var result = new List<RolePermissionResponse>();
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             foreach (var value in dto.Permissions)
@@ -203,20 +231,21 @@ namespace admin_backend.Services
                     //新增操作紀錄
                     if (await _context.SaveChangesAsync() > 0)
                     {
-                        await _operationLogService.Add(new AddOperationLogDto
+                        await _operationLogService.Value.Add(new AddOperationLogDto
                         {
                             Type = ChangeTypeEnum.Edit,
                             Content = $"修改身分權限：{rolePermission.Id}/{rolePermission.Name}",
                         });
                     }
 
-                    result.Add(rolePermission);
+                    result.Add(_mapper.Map<RolePermissionResponse>(rolePermission));
                 }
             }
             scope.Complete();
             return result;
         }
 
+        #region Delete
         //public async Task<RolePermission> Delete(DeleteRolePermissionDto dto)
         //{
         //    var rolePermission = await _context.RolePermission.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
@@ -273,5 +302,6 @@ namespace admin_backend.Services
         //    scope.Complete();
         //    return result;
         //}
+        #endregion
     }
 }

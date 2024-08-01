@@ -1,28 +1,37 @@
+using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.Data;
 using CommonLibrary.DTOs.AdminUser;
+using CommonLibrary.DTOs.File;
+using CommonLibrary.DTOs.Role;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
-using CommonLibrary.Service;
+using CommonLibrary.Interface;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace admin_backend.Services
 {
-    public class AdminUserServices
+    public class AdminUserServices : IAdminUserServices
     {
-        private readonly MysqlDbContext _context;
         private readonly ILogger<AdminUserServices> _log;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IdentityService _identityService;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly IMapper _mapper;
-        public AdminUserServices(MysqlDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<AdminUserServices> log, IdentityService identityService, IMapper mapper)
+        private readonly Lazy<IIdentityService> _identityService;
+        private readonly Lazy<IFileService> _fileService;
+        private readonly IRoleService _roleService;
+
+        public AdminUserServices(IDbContextFactory<MysqlDbContext> contextFactory, IHttpContextAccessor httpContextAccessor, ILogger<AdminUserServices> log, Lazy<IIdentityService> identityService, IMapper mapper, Lazy<IFileService> fileService, IRoleService roleService)
         {
-            _context = context;
+            _contextFactory = contextFactory;
             _httpContextAccessor = httpContextAccessor;
             _log = log;
             _identityService = identityService;
             _mapper = mapper;
+            _fileService = fileService;
+            _roleService = roleService;
         }
 
         public async Task<AdminUserResponse> Get()
@@ -32,19 +41,23 @@ namespace admin_backend.Services
             //取得Jwt Token資訊
             var JwtClaims = _httpContextAccessor.HttpContext?.User?.Claims.ToList();
 
-            var claimsDto = _identityService.GetUser();
+            var claimsDto = _identityService.Value.GetUser();
 
             int.TryParse(claimsDto.UserId, out int AdminUserId);
 
-            var adminUserList  = await Get(new GetAdminUserDto { Id = AdminUserId });
+            var adminUser = (await Get(new GetAdminUserDto { Id = AdminUserId })).FirstOrDefault() ?? new AdminUserResponse();
 
-            var adminUser = adminUserList.FirstOrDefault() ?? new AdminUserResponse();
+            //取得權限名稱
+            var role = (await _roleService.Get(new GetRoleDto { Id = adminUser.RoleId })).FirstOrDefault() ?? new Role();
+            adminUser.RoleName = role.Name;
 
             return _mapper.Map<AdminUserResponse>(adminUser);
         }
 
         public async Task<List<AdminUserResponse>> Get(GetAdminUserDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             IQueryable<AdminUser> query = _context.AdminUser.AsQueryable();
 
             if (dto.Id.HasValue)
@@ -73,17 +86,52 @@ namespace admin_backend.Services
                 query = query.Where(x => x.Status == dto.Status);
             }
 
-            return _mapper.Map<List<AdminUserResponse>>(await query.ToListAsync());
+            var adminUserList = await query.ToListAsync();
+            var adminUserResponse = _mapper.Map<List<AdminUserResponse>>(await query.ToListAsync());
+
+            var tasks = adminUserResponse.Select(async x =>
+            {
+                // 照片處理
+                if (!string.IsNullOrEmpty(x.Photo))
+                {
+                    var fileDto = JsonSerializer.Deserialize<FileUploadDto>(x.Photo);
+                    if (fileDto != null)
+                    {
+                        string file = await _fileService.Value.FileToBase64(fileDto.FilePath);
+                        x.Photo = file;
+                    }
+                }
+
+                // 取得權限名稱
+                var role = (await _roleService.Get(new GetRoleDto { Id = x.RoleId })).FirstOrDefault() ?? new Role();
+                x.RoleName = role.Name;
+
+                // 如果需要處理其他屬性，可以在這裡添加
+            });
+
+            // 等待所有任務完成
+            await Task.WhenAll(tasks);
+
+            return _mapper.Map<List<AdminUserResponse>>(adminUserResponse);
         }
 
         public async Task<AdminUser> Add(AddAdminUserDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
 
             var adminUser = await _context.AdminUser.Where(x => x.Account == dto.Account).FirstOrDefaultAsync();
 
             if (adminUser != null)
             {
                 throw new ApiException($"此帳號已註冊-{dto.Name}");
+            }
+
+            var file = string.Empty;
+            if (dto.Photo != null)
+            {
+                //上傳檔案
+                var fileUploadDto = await _fileService.Value.UploadFile(dto.Photo);
+                file = JsonSerializer.Serialize(fileUploadDto);
             }
 
             adminUser = new AdminUser
@@ -94,7 +142,7 @@ namespace admin_backend.Services
                 Email = dto.Email,
                 RoleId = dto.RoleId,
                 Status = dto.Status,
-                Photo = dto.Photo ?? string.Empty,
+                Photo = file,
             };
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -132,6 +180,8 @@ namespace admin_backend.Services
         }
         public async Task<AdminUser> Update(int Id, UpdateAdminUserDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var adminUser = await _context.AdminUser.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (adminUser == null)
@@ -150,6 +200,14 @@ namespace admin_backend.Services
 
             if (!string.IsNullOrEmpty(dto.pKey))
                 adminUser.Password = dto.pKey;
+
+            if (dto.Photo != null)
+            {
+                //上傳檔案
+                var fileUploadDto = await _fileService.Value.UploadFile(dto.Photo);
+                var file = JsonSerializer.Serialize(fileUploadDto);
+                adminUser.Photo = file;
+            }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try

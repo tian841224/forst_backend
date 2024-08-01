@@ -1,4 +1,6 @@
-﻿using CommonLibrary.Data;
+﻿using admin_backend.Interfaces;
+using AutoMapper;
+using CommonLibrary.Data;
 using CommonLibrary.DTOs.MailConfig;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
@@ -8,26 +10,32 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class MailConfigService
+    public class MailConfigService : IMailConfigService
     {
         private readonly ILogger<MailConfigService> _log;
-        private readonly MysqlDbContext _context;
-        private readonly OperationLogService _operationLogService;
+        private readonly IMapper _mapper;
+        private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
+        private readonly Lazy<IOperationLogService> _operationLogService;
 
-        public MailConfigService(ILogger<MailConfigService> log, MysqlDbContext context, OperationLogService operationLogService)
+        public MailConfigService(ILogger<MailConfigService> log, IMapper mapper, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService)
         {
             _log = log;
-            _context = context;
+            _mapper = mapper;
+            _contextFactory = contextFactory;
             _operationLogService = operationLogService;
         }
 
-        public async Task<MailConfig> Get()
+        public async Task<MailConfigResponse> Get()
         {
-            return await _context.MailConfig.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new MailConfig();
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            var mailConfig = await _context.MailConfig.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new MailConfig();
+            return _mapper.Map<MailConfigResponse>(mailConfig);
         }
 
-        public async Task<MailConfig> Add(AddMailConfigDto dto)
+        public async Task<MailConfigResponse> Add(AddMailConfigDto dto)
         {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var mailConfig = new MailConfig
             {
                 Host = dto.Host,
@@ -45,14 +53,14 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Edit,
                     Content = "修改郵寄信件設定",
                 });
             }
             scope.Complete();
-            return mailConfig;
+            return _mapper.Map<MailConfigResponse>(mailConfig);
         }
     }
 }

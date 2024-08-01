@@ -6,7 +6,7 @@ namespace CommonLibrary.Entities
     /// <summary>
     /// 樹木基本資料
     /// </summary>
-    public class TreeBasicInfo : DefaultEntity
+    public class TreeBasicInfo : SortDefaultEntity
     {
         /// <summary>
         /// 學名

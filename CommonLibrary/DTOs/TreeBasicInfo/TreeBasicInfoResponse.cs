@@ -1,6 +1,6 @@
 ﻿namespace CommonLibrary.DTOs.TreeBasicInfo
 {
-    public class TreeBasicInfoResponse : DefaultResponseDto
+    public class TreeBasicInfoResponse : SortDefaultResponseDto
     {
         /// <summary>
         /// 學名

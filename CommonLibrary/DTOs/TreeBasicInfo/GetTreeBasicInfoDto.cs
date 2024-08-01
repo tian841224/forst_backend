@@ -1,6 +1,6 @@
-﻿namespace CommonLibrary.DTOs.ForestCompartmentLocation
+﻿namespace CommonLibrary.DTOs.TreeBasicInfo
 {
-    public class GetForestCompartmentLocationDto
+    public class GetTreeBasicInfoDto
     {
         /// <summary>
         /// 關鍵字

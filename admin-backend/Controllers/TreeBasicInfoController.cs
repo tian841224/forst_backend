@@ -1,4 +1,5 @@
 ﻿using admin_backend.Interfaces;
+using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.TreeBasicInfo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,17 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
+        /// 取得單筆樹木基本資料
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Get(int id)
+        {
+            return Ok(await _treeBasicInfoService.Get(id));
+        }
+
+        /// <summary>
         /// 取得全部樹木基本資料
         /// </summary>
         /// <returns></returns>
@@ -34,11 +46,11 @@ namespace admin_backend.Controllers
         /// 取得樹木基本資料
         /// </summary>
         /// <returns></returns>
-        [HttpGet("{id}")]
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(GetTreeBasicInfoDto dto)
         {
-            return Ok(await _treeBasicInfoService.Get(id));
+            return Ok(await _treeBasicInfoService.Get(dto));
         }
 
         /// <summary>
@@ -64,6 +76,18 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Update(int id, UpdateTreeBasicInfoDto dto)
         {
             return Ok(await _treeBasicInfoService.Update(id, dto));
+        }
+
+        /// <summary>
+        /// 更新樹木基本資料排序
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> UpdateSort(List<SortBasicDto> dto)
+        {
+            return Ok(await _treeBasicInfoService.UpdateSort(dto));
         }
 
         /// <summary>

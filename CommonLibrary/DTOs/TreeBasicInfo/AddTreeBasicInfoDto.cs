@@ -2,7 +2,7 @@
 
 namespace CommonLibrary.DTOs.TreeBasicInfo
 {
-    public class AddTreeBasicInfoDto
+    public class AddTreeBasicInfoDto:SortDto
     {
         /// <summary>
         /// 學名

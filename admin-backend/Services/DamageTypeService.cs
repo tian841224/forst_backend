@@ -73,7 +73,7 @@ namespace admin_backend.Services
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            await _context.DamageType.AddAsync(damageType);
+            await _context.DamageType.Update(damageType);
 
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)

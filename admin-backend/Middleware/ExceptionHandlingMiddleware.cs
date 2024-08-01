@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs;
+﻿using CommonLibrary.DTOs.Common;
 using CommonLibrary.Extensions;
 using System.Net;
 using System.Text;

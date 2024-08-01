@@ -7,7 +7,7 @@ namespace CommonLibrary.Entities
     /// <summary>
     /// 林木疫情出版品
     /// </summary>
-    public class ForestDiseasePublications : DefaultEntity
+    public class ForestDiseasePublications : SortDefaultEntity
     {
         /// <summary>
         /// 出版品類型

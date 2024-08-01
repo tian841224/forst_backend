@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CommonLibrary.DTOs.ForestDiseasePublications
 {
-    public class AddForestDiseasePublicationsDto
+    public class AddForestDiseasePublicationsDto : SortDto
     {
         /// <summary>
         /// 出版品類型 林業叢刊 = 1, 相關摺頁 = 2

@@ -1,7 +1,7 @@
 ﻿using admin_backend.Interfaces;
-using admin_backend.Services;
+using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.ForestDiseasePublications;
-using Humanizer;
+using CommonLibrary.DTOs.TreeBasicInfo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +21,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得林木疫情出版品
+        /// 取得單筆林木疫情出版品
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -41,6 +41,18 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Get()
         {
             return Ok(await _forestDiseasePublicationsService.Get());
+        }
+
+        /// <summary>
+        /// 取得林木疫情出版品
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Get(GetForestDiseasePublicationsDto dto)
+        {
+            return Ok(await _forestDiseasePublicationsService.Get(dto));
         }
 
         /// <summary>
@@ -66,6 +78,18 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Update(int id, UpdateForestDiseasePublicationsDto dto)
         {
             return Ok(await _forestDiseasePublicationsService.Update(id, dto));
+        }
+
+        /// <summary>
+        /// 更新林木疫情出版品排序
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> UpdateSort(List<SortBasicDto> dto)
+        {
+            return Ok(await _forestDiseasePublicationsService.UpdateSort(dto));
         }
 
         /// <summary>

@@ -1,13 +1,16 @@
 ﻿using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.Data;
+using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.File;
 using CommonLibrary.DTOs.ForestDiseasePublications;
 using CommonLibrary.DTOs.OperationLog;
+using CommonLibrary.DTOs.TreeBasicInfo;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interface;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
@@ -48,6 +51,7 @@ namespace admin_backend.Services
 
             foreach (var item in list)
             {
+                if (string.IsNullOrEmpty(item.File)) continue;
                 var fileDto = JsonSerializer.Deserialize<FileUploadDto>(item.File);
                 var file = string.Empty;
                 if (fileDto != null)
@@ -55,6 +59,34 @@ namespace admin_backend.Services
             }
 
             return _mapper.Map<List<ForestDiseasePublicationsResponse>>(list);
+        }
+
+        public async Task<List<ForestDiseasePublicationsResponse>> Get(GetForestDiseasePublicationsDto dto)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            IQueryable<ForestDiseasePublications> query = _context.ForestDiseasePublications.AsQueryable();
+
+            var forestDiseasePublications = new List<ForestDiseasePublications>();
+
+
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                string keyword = dto.Keyword.ToLower();
+                query = query.Where(x =>
+                    x.Unit.ToLower().Contains(keyword) ||
+                    x.Name.ToLower().Contains(keyword) ||
+                    x.Author.ToLower().Contains(keyword) ||
+                    x.Id.ToString().Contains(keyword)
+                );
+            }
+
+            if (dto.Status.HasValue) 
+            {
+                query = query.Where(x => x.Status == dto.Status.Value);
+            }
+
+            forestDiseasePublications = await query.ToListAsync();
+            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(forestDiseasePublications);
         }
 
         public async Task<ForestDiseasePublicationsResponse> Add(AddForestDiseasePublicationsDto dto)
@@ -88,6 +120,7 @@ namespace admin_backend.Services
                     File = file,
                     Type = dto.Type,
                     Status = dto.Status,
+                    Sort = dto.Sort,
                 };
             }
             else
@@ -107,6 +140,7 @@ namespace admin_backend.Services
                     Author = Authors,
                     Type = dto.Type,
                     Status = dto.Status,
+                    Sort= dto.Sort,
                 };
             }
 
@@ -175,6 +209,41 @@ namespace admin_backend.Services
             }
             scope.Complete();
             return _mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications);
+        }
+
+
+        public async Task<List<ForestDiseasePublicationsResponse>> UpdateSort(List<SortBasicDto> dto)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            var result = new List<ForestDiseasePublicationsResponse>();
+
+            foreach (var value in dto)
+            {
+                var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.Id == value.Id).FirstOrDefaultAsync();
+                if (forestDiseasePublications == null) continue;
+
+                if (value.Sort.HasValue)
+                    forestDiseasePublications.Sort = value.Sort.Value;
+
+                _context.ForestDiseasePublications.Update(forestDiseasePublications);
+
+                //新增操作紀錄
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    await _operationLogService.Value.Add(new AddOperationLogDto
+                    {
+                        Type = ChangeTypeEnum.Edit,
+                        Content = $"修改林班位置排序：{forestDiseasePublications.Id}/{forestDiseasePublications.Sort}",
+                    });
+                };
+
+                result.Add(_mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications));
+            }
+
+            scope.Complete();
+            return result;
         }
 
         public async Task<ForestDiseasePublicationsResponse> Delete(int Id)

@@ -1,6 +1,7 @@
 ﻿using CommonLibrary.Enums;
 using System.Text.Json.Serialization;
 using CommonLibrary.Extensions;
+using CommonLibrary.DTOs.Common;
 
 namespace CommonLibrary.DTOs.User
 {

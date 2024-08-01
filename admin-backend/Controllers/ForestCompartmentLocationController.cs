@@ -1,6 +1,6 @@
 ﻿using admin_backend.Interfaces;
 using admin_backend.Services;
-using CommonLibrary.DTOs;
+using CommonLibrary.DTOs.Common;
 using CommonLibrary.DTOs.ForestCompartmentLocation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

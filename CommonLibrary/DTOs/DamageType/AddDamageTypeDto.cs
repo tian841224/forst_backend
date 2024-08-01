@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Enums;
+﻿using CommonLibrary.DTOs.Common;
+using CommonLibrary.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace CommonLibrary.DTOs.DamageType

@@ -1,7 +1,7 @@
 ﻿using CommonLibrary.Extensions;
 using System.Text.Json.Serialization;
 
-namespace CommonLibrary.DTOs
+namespace CommonLibrary.DTOs.Common
 {
     public class DefaultResponseDto
     {

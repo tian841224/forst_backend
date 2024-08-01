@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using CommonLibrary.DTOs.Common;
 
 namespace CommonLibrary.DTOs.TreeBasicInfo
 {

@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Enums;
+﻿using CommonLibrary.DTOs.Common;
+using CommonLibrary.Enums;
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 

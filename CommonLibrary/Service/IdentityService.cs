@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs;
+﻿using CommonLibrary.DTOs.Common;
 using CommonLibrary.DTOs.Login;
 using CommonLibrary.Interface;
 using IdentityModel;

@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Enums;
+﻿using CommonLibrary.DTOs.Common;
+using CommonLibrary.Enums;
 
 namespace CommonLibrary.DTOs.Documentation
 {

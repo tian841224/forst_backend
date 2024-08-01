@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using CommonLibrary.Extensions;
 
-namespace CommonLibrary.DTOs
+namespace CommonLibrary.DTOs.Common
 {
     public class SortDefaultResponseDto
     {

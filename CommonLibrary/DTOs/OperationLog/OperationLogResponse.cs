@@ -1,4 +1,6 @@
-﻿namespace CommonLibrary.DTOs.OperationLog
+﻿using CommonLibrary.DTOs.Common;
+
+namespace CommonLibrary.DTOs.OperationLog
 {
     public class OperationLogResponse : DefaultResponseDto
     {

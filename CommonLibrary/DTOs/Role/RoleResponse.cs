@@ -1,4 +1,6 @@
-﻿namespace CommonLibrary.DTOs.Role
+﻿using CommonLibrary.DTOs.Common;
+
+namespace CommonLibrary.DTOs.Role
 {
     public class RoleResponse : DefaultResponseDto
     {

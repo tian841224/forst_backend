@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using CommonLibrary.DTOs.Common;
 
 namespace CommonLibrary.DTOs.Login
 {

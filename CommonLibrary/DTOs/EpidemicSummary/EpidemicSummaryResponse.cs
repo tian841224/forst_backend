@@ -1,4 +1,6 @@
-﻿namespace CommonLibrary.DTOs.EpidemicSummary
+﻿using CommonLibrary.DTOs.Common;
+
+namespace CommonLibrary.DTOs.EpidemicSummary
 {
     public class EpidemicSummaryResponse : DefaultResponseDto
     {

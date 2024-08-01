@@ -1,5 +1,6 @@
-﻿using CommonLibrary.Enums;
-using CommonLibrary.Extensions; 
+﻿using CommonLibrary.DTOs.Common;
+using CommonLibrary.Enums;
+using CommonLibrary.Extensions;
 using System.Text.Json.Serialization;
 
 namespace CommonLibrary.DTOs.AdminUser

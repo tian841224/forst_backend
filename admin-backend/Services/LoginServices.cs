@@ -1,6 +1,6 @@
 ﻿using admin_backend.Interfaces;
 using CommonLibrary.Data;
-using CommonLibrary.DTOs;
+using CommonLibrary.DTOs.Common;
 using CommonLibrary.DTOs.Login;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
@@ -12,7 +12,7 @@ using System.Data;
 
 namespace admin_backend.Services
 {
-    public class LoginServices: ILoginServices
+    public class LoginServices : ILoginServices
     {
         private readonly ILogger<LoginServices> _log;
         private readonly JwtConfig _jwtConfig;
@@ -104,6 +104,11 @@ namespace admin_backend.Services
                 _log.LogError(ex.Message);
                 throw;
             }
+        }
+
+        public async Task ResetPassword(ResetPasswordDto dto)
+        {
+
         }
 
         //public async Task<CaptchaDto> GetCaptchaAsync()

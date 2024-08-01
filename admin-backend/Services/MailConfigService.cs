@@ -1,11 +1,14 @@
 ﻿using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.Data;
+using CommonLibrary.DTOs.Common;
 using CommonLibrary.DTOs.MailConfig;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
+using CommonLibrary.Interface;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
 using System.Transactions;
 
 namespace admin_backend.Services
@@ -16,13 +19,15 @@ namespace admin_backend.Services
         private readonly IMapper _mapper;
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly Lazy<IOperationLogService> _operationLogService;
+        private readonly Lazy<IEmailService> _emailService;
 
-        public MailConfigService(ILogger<MailConfigService> log, IMapper mapper, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService)
+        public MailConfigService(ILogger<MailConfigService> log, IMapper mapper, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService, Lazy<IEmailService> emailService)
         {
             _log = log;
             _mapper = mapper;
             _contextFactory = contextFactory;
             _operationLogService = operationLogService;
+            _emailService = emailService;
         }
 
         public async Task<MailConfigResponse> Get()
@@ -61,6 +66,28 @@ namespace admin_backend.Services
             }
             scope.Complete();
             return _mapper.Map<MailConfigResponse>(mailConfig);
+        }
+
+        public async Task TestSendEmail(string email)
+        {
+            var emailConfig = await Get();
+
+            _emailService.Value.SendEmail(new SendEmailDto
+            {
+                Host = emailConfig.Host,
+                Port = emailConfig.Port,
+                Account = emailConfig.Account,
+                Password = emailConfig.Password,
+                EnableSsl = emailConfig.Encrypted == EncryptedEnum.SSL,
+                MailMessage = new MailMessage
+                {
+                    From = new MailAddress($"{emailConfig.Account}@{emailConfig.Host}", emailConfig.Name),
+                    Subject = "測試郵件",
+                    Body = "此信件為郵寄信件設定",
+                    IsBodyHtml = true,
+                },
+                Recipient = email,
+            });
         }
     }
 }

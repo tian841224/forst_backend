@@ -1,5 +1,5 @@
 ﻿using admin_backend.Interfaces;
-using CommonLibrary.DTOs;
+using CommonLibrary.DTOs.Common;
 using CommonLibrary.DTOs.TreeBasicInfo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

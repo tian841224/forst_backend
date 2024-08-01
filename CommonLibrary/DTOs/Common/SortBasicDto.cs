@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace CommonLibrary.DTOs
+namespace CommonLibrary.DTOs.Common
 {
     public class SortBasicDto
     {

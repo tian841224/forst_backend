@@ -1,4 +1,6 @@
-﻿namespace CommonLibrary.DTOs.ForestCompartmentLocation
+﻿using CommonLibrary.DTOs.Common;
+
+namespace CommonLibrary.DTOs.ForestCompartmentLocation
 {
     public class ForestCompartmentLocationResponse : SortDefaultResponseDto
     {

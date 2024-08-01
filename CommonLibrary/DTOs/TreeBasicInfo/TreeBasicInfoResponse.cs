@@ -1,4 +1,6 @@
-﻿namespace CommonLibrary.DTOs.TreeBasicInfo
+﻿using CommonLibrary.DTOs.Common;
+
+namespace CommonLibrary.DTOs.TreeBasicInfo
 {
     public class TreeBasicInfoResponse : SortDefaultResponseDto
     {

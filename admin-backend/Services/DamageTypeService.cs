@@ -1,7 +1,7 @@
 ﻿using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.Data;
-using CommonLibrary.DTOs;
+using CommonLibrary.DTOs.Common;
 using CommonLibrary.DTOs.DamageType;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;

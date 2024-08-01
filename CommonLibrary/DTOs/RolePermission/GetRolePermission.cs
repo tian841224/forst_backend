@@ -1,4 +1,6 @@
-﻿namespace CommonLibrary.DTOs.RolePermission
+﻿using CommonLibrary.DTOs.Common;
+
+namespace CommonLibrary.DTOs.RolePermission
 {
     public class GetRolePermission
     {

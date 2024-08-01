@@ -1,7 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace CommonLibrary.DTOs
+namespace CommonLibrary.DTOs.Common
 {
     public class JwtConfig
     {

@@ -43,7 +43,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得全部危害種類
+        /// 取得危害類型全部危害種類
         /// </summary>
         /// <returns></returns>
         [HttpGet]

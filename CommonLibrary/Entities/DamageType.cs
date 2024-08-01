@@ -7,7 +7,7 @@ namespace CommonLibrary.Entities
     /// <summary>
     /// 危害類型
     /// </summary>
-    public class DamageType : DefaultEntity
+    public class DamageType : SortDefaultEntity
     {
         /// <summary>
         /// 危害類型

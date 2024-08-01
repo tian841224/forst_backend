@@ -192,6 +192,9 @@ namespace admin_backend.Services
                 throw new ApiException($"無此資料-{Id}");
             }
 
+            //取得IP
+            var ipAddress = _httpContextAccessor.HttpContext!.Connection.RemoteIpAddress!;
+
             if (!string.IsNullOrEmpty(dto.Name))
                 adminUser.Name = dto.Name;
 
@@ -201,8 +204,23 @@ namespace admin_backend.Services
             if (dto.Status.HasValue)
                 adminUser.Status = (StatusEnum)dto.Status;
 
-            if (!string.IsNullOrEmpty(dto.pKey))
+            if (!string.IsNullOrEmpty(dto.OldKey) && !string.IsNullOrEmpty(dto.pKey))
+            {
+                if (adminUser.Password != dto.OldKey)
+                {
+                    //新增操作紀錄
+                    await _context.OperationLog.AddAsync(new OperationLog
+                    {
+                        AdminUserId = adminUser.Id,
+                        Type = ChangeTypeEnum.Edit,
+                        Content = $"修改後台帳號密碼-輸入錯誤:{adminUser.Name}/{adminUser.Account}",
+                        Ip = ipAddress.ToString(),
+                    });
+                    throw new ApiException($"原密碼輸入錯誤-{Id}");
+                }
+
                 adminUser.Password = dto.pKey;
+            }
 
             if (dto.Photo != null)
             {
@@ -220,14 +238,11 @@ namespace admin_backend.Services
                 //新增操作紀錄
                 if (await _context.SaveChangesAsync() > 0)
                 {
-                    //取得IP
-                    var ipAddress = _httpContextAccessor.HttpContext!.Connection.RemoteIpAddress!;
-
                     //新增操作紀錄
                     await _context.OperationLog.AddAsync(new OperationLog
                     {
                         AdminUserId = adminUser.Id,
-                        Type = ChangeTypeEnum.Add,
+                        Type = ChangeTypeEnum.Edit,
                         Content = $"修改後台帳號:{adminUser.Name}/{adminUser.Account}",
                         Ip = ipAddress.ToString(),
                     });

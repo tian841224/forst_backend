@@ -16,6 +16,11 @@ namespace CommonLibrary.DTOs.AdminUser
         //public string? Account { get; set; }
 
         /// <summary>
+        /// 舊密碼
+        /// </summary>
+        public string? OldKey { get; set; }
+
+        /// <summary>
         /// 密碼
         /// </summary>
         public string? pKey { get; set; }

@@ -41,5 +41,18 @@ namespace admin_backend.Controllers
         {
             return Ok(await _mailConfigService.Add(dto));
         }
+
+        /// <summary>
+        /// 收件測試
+        /// </summary>
+        /// <param name="email">收信email</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> TestSendEmail(string email)
+        {
+            await _mailConfigService.TestSendEmail(email);
+            return Ok();
+        }
     }
 }

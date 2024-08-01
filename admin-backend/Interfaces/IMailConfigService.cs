@@ -6,5 +6,6 @@ namespace admin_backend.Interfaces
     {
         Task<MailConfigResponse> Get();
         Task<MailConfigResponse> Add(AddMailConfigDto dto);
+        Task TestSendEmail(string email);
     }
 }

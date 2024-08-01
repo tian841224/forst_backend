@@ -11,3 +11,4 @@ client-backend/Properties/launchSettings.json
 admin-backend/bin/
 client-backend/bin/
 CommonLibrary/bin/
+admin-backend/Files/

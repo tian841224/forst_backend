@@ -1,12 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace CommonLibrary.DTOs.TreeBasicInfo
+﻿namespace CommonLibrary.DTOs.TreeBasicInfo
 {
     public class UpdateTreeBasicInfoDto
     {
-        [Required]
-        public int Id { get; set; }
-
         /// <summary>
         /// 學名
         /// </summary>

@@ -73,7 +73,7 @@ namespace admin_backend.Services
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            await _context.ForestCompartmentLocation.AddAsync(forestCompartmentLocation);
+            _context.ForestCompartmentLocation.Update(forestCompartmentLocation);
 
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)

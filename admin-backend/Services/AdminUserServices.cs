@@ -3,6 +3,7 @@ using CommonLibrary.DTOs.AdminUser;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
+using CommonLibrary.Service;
 using Microsoft.EntityFrameworkCore;
 
 namespace admin_backend.Services
@@ -12,11 +13,29 @@ namespace admin_backend.Services
         private readonly MysqlDbContext _context;
         private readonly ILogger<AdminUserServices> _log;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public AdminUserServices(MysqlDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<AdminUserServices> log)
+        private readonly IdentityService _identityService;
+        public AdminUserServices(MysqlDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<AdminUserServices> log, IdentityService identityService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _log = log;
+            _identityService = identityService;
+        }
+
+        public async Task<AdminUser> Get()
+        {
+            //取得IP
+            var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
+            //取得Jwt Token資訊
+            var JwtClaims = _httpContextAccessor.HttpContext?.User?.Claims.ToList();
+
+            var claimsDto = _identityService.GetUser();
+
+            int.TryParse(claimsDto.UserId, out int AdminUserId);
+
+            var adminUserList  = await Get(new GetAdminUserDto { Id = AdminUserId });
+
+            return adminUserList.FirstOrDefault() ?? new AdminUser();
         }
 
         public async Task<List<AdminUser>> Get(GetAdminUserDto dto)

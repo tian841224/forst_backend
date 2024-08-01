@@ -32,6 +32,17 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
+        /// 取得個人資料
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetPerson()
+        {
+            return Ok(await _adminUserServices.Get());
+        }
+
+        /// <summary>
         /// 新增後台帳號
         /// </summary>
         /// <param name="dto"></param>

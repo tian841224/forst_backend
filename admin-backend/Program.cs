@@ -1,7 +1,7 @@
 using admin_backend.Interfaces;
 using admin_backend.Services;
 using CommonLibrary.Data;
-using CommonLibrary.DTOs;
+using CommonLibrary.DTOs.Common;
 using CommonLibrary.Extensions;
 using CommonLibrary.Infrastructure;
 using CommonLibrary.Interface;
@@ -83,6 +83,12 @@ try
     //©µ¿ð¸ü¤J
     builder.Services.AddScoped(provider =>
         new Lazy<IFileService>(() => provider.GetRequiredService<IFileService>()));
+
+    //Email
+    builder.Services.AddScoped<IEmailService, EmailService>();
+    //©µ¿ð¸ü¤J
+    builder.Services.AddScoped(provider =>
+        new Lazy<IEmailService>(() => provider.GetRequiredService<IEmailService>()));
     #endregion
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

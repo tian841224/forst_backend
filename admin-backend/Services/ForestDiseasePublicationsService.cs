@@ -5,12 +5,10 @@ using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.File;
 using CommonLibrary.DTOs.ForestDiseasePublications;
 using CommonLibrary.DTOs.OperationLog;
-using CommonLibrary.DTOs.TreeBasicInfo;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interface;
-using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
@@ -80,7 +78,7 @@ namespace admin_backend.Services
                 );
             }
 
-            if (dto.Status.HasValue) 
+            if (dto.Status.HasValue)
             {
                 query = query.Where(x => x.Status == dto.Status.Value);
             }
@@ -140,7 +138,7 @@ namespace admin_backend.Services
                     Author = Authors,
                     Type = dto.Type,
                     Status = dto.Status,
-                    Sort= dto.Sort,
+                    Sort = dto.Sort,
                 };
             }
 

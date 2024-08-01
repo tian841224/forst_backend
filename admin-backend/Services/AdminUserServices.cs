@@ -95,10 +95,13 @@ namespace admin_backend.Services
                 if (!string.IsNullOrEmpty(x.Photo))
                 {
                     var fileDto = JsonSerializer.Deserialize<FileUploadDto>(x.Photo);
-                    if (fileDto != null)
+                    if (!string.IsNullOrEmpty(x.Photo))
                     {
-                        string file = await _fileService.Value.FileToBase64(fileDto.FilePath);
-                        x.Photo = file;
+                        if (fileDto != null)
+                        {
+                            string file = await _fileService.Value.FileToBase64(fileDto.FilePath);
+                            x.Photo = file;
+                        }
                     }
                 }
 

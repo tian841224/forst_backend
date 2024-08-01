@@ -56,13 +56,14 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 更新樹木基本資料
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(UpdateTreeBasicInfoDto dto)
+        public async Task<IActionResult> Update(int id,UpdateTreeBasicInfoDto dto)
         {
-            return Ok(await _treeBasicInfoService.Update(dto));
+            return Ok(await _treeBasicInfoService.Update(id,dto));
         }
 
         /// <summary>

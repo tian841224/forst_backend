@@ -1,5 +1,6 @@
 ﻿using admin_backend.Interfaces;
 using admin_backend.Services;
+using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.DamageType;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -76,6 +77,18 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Update(UpdateDamageTypeDto dto)
         {
             return Ok(await _damageTypeService.Update(dto));
+        }
+
+        /// <summary>
+        /// 更新危害類型排序
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> UpdateSort(List<SortBasicDto> dto)
+        {
+            return Ok(await _damageTypeService.UpdateSort(dto));
         }
 
         /// <summary>

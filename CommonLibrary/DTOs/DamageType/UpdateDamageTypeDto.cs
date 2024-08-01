@@ -2,7 +2,7 @@
 
 namespace CommonLibrary.DTOs.DamageType
 {
-    public class UpdateDamageTypeDto : SortBasicDto
+    public class UpdateDamageTypeDto : BasicDto
     {
         /// <summary>
         /// 危害類型

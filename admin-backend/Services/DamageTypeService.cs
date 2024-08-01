@@ -1,6 +1,7 @@
 ﻿using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.Data;
+using CommonLibrary.DTOs;
 using CommonLibrary.DTOs.DamageType;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
@@ -113,9 +114,6 @@ namespace admin_backend.Services
             if (dto.Status.HasValue)
                 damageType.Status = dto.Status.Value;
 
-            if (dto.Sort.HasValue)
-                damageType.Sort = dto.Sort.Value;
-
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             _context.DamageType.Update(damageType);
@@ -131,6 +129,39 @@ namespace admin_backend.Services
             };
             scope.Complete();
             return _mapper.Map<DamageTypeResponse>(damageType);
+        }
+
+        public async Task<List<DamageTypeResponse>> UpdateSort(List<SortBasicDto> dto)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            var result = new List<DamageTypeResponse>();
+
+            foreach (var value in dto)
+            {
+                var damageType = await _context.DamageType.Where(x => x.Id == value.Id).FirstOrDefaultAsync();
+                if (damageType == null) continue;
+
+                if (value.Sort.HasValue)
+                    damageType.Sort = value.Sort.Value;
+
+                _context.DamageType.Update(damageType);
+
+                //新增操作紀錄
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    await _operationLogService.Value.Add(new AddOperationLogDto
+                    {
+                        Type = ChangeTypeEnum.Edit,
+                        Content = $"修改危害類型排序：{damageType.Name}/{damageType.Sort}",
+                    });
+                };
+
+                result.Add(_mapper.Map<DamageTypeResponse>(damageType));
+            }
+
+            scope.Complete();
+            return result;
         }
 
         public async Task<DamageTypeResponse> Delete(int Id)

@@ -21,7 +21,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得危害類型
+        /// 取得單筆危害類型
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -41,6 +41,17 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Get()
         {
             return Ok(await _damageTypeService.Get());
+        }
+
+        /// <summary>
+        /// 取得危害類型
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Get(GetDamageTypeDto dto)
+        {
+            return Ok(await _damageTypeService.Get(dto));
         }
 
         /// <summary>

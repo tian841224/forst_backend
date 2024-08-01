@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CommonLibrary.DTOs.DamageType
 {
-    public class AddDamageTypeDto
+    public class AddDamageTypeDto: SortDto
     {
         /// <summary>
         /// 危害類型

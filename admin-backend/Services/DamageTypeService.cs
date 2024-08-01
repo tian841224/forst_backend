@@ -11,7 +11,7 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class DamageTypeService: IDamageTypeService
+    public class DamageTypeService : IDamageTypeService
     {
         private readonly ILogger<DamageTypeService> _log;
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
@@ -39,6 +39,35 @@ namespace admin_backend.Services
             return _mapper.Map<List<DamageTypeResponse>>(damageTypes);
         }
 
+        public async Task<List<DamageTypeResponse>> Get(GetDamageTypeDto dto)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            IQueryable<DamageType> query = _context.DamageType.AsQueryable();
+
+            var damageTypes = new List<DamageType>();
+
+
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                string keyword = dto.Keyword.ToLower();
+                query = query.Where(x =>
+                    x.Name.ToLower().Contains(keyword) ||
+                    x.Id.ToString().Contains(keyword)
+                );
+            }
+
+            if (dto.Status.HasValue)
+            {
+                query = query.Where(x => x.Status == dto.Status);
+            }
+
+
+            damageTypes = await query.ToListAsync();
+
+            return _mapper.Map<List<DamageTypeResponse>>(damageTypes);
+        }
+
         public async Task<DamageTypeResponse> Add(AddDamageTypeDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
@@ -47,6 +76,7 @@ namespace admin_backend.Services
             {
                 Name = dto.Name,
                 Status = dto.Status,
+                Sort = dto.Sort,
             };
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -82,6 +112,9 @@ namespace admin_backend.Services
 
             if (dto.Status.HasValue)
                 damageType.Status = dto.Status.Value;
+
+            if (dto.Sort.HasValue)
+                damageType.Sort = dto.Sort.Value;
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 

@@ -24,17 +24,30 @@ namespace admin_backend.Services
             _log = log;
         }
 
-        public async Task<List<RolePermission>> Get(int Id)
+        public async Task<GetRolePermission> Get(int Id)
         {
             IQueryable<RolePermission> query = _context.RolePermission.AsQueryable();
 
             query = query.Where(x => x.RoleId == Id);
 
-            return await query.ToListAsync();
+            return new GetRolePermission
+            {
+                RoleId = Id,
+                Permissions = await query.Select(x => new GetRolePermission.Permission
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    View = x.View,
+                    Add = x.Add,
+                    Sign = x.Sign,
+                    Edit = x.Edit,
+                    Delete = x.Delete
+                }).ToListAsync()
+            };
         }
         public async Task<RolePermission> Add(AddRolePermissionDto dto)
         {
-            var rolePermission = await _context.RolePermission.Where(x => x.Name == dto.Name).FirstOrDefaultAsync();
+            var rolePermission = await _context.RolePermission.Where(x => x.RoleId == dto.RoleId && x.Name == dto.Name).FirstOrDefaultAsync();
 
             if (rolePermission != null)
             {
@@ -178,12 +191,12 @@ namespace admin_backend.Services
                 }
                 else
                 {
-                        rolePermission.Name = value.Name ?? string.Empty;
-                        rolePermission.View = value.View;
-                        rolePermission.Add = value.Add;
-                        rolePermission.Sign = value.Sign;
-                        rolePermission.Edit = value.Edit;
-                        rolePermission.Delete = value.Delete;
+                    rolePermission.Name = value.Name ?? string.Empty;
+                    rolePermission.View = value.View;
+                    rolePermission.Add = value.Add;
+                    rolePermission.Sign = value.Sign;
+                    rolePermission.Edit = value.Edit;
+                    rolePermission.Delete = value.Delete;
 
                     _context.RolePermission.Update(rolePermission);
 

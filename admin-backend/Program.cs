@@ -1,4 +1,5 @@
 using admin_backend.Services;
+using AutoMapper;
 using CommonLibrary.Data;
 using CommonLibrary.DTOs;
 using CommonLibrary.Entities;
@@ -21,6 +22,14 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
+    IHostBuilder hostBuilder = builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+    {
+        var env = hostingContext.HostingEnvironment;
+        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+              .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+        config.AddEnvironmentVariables();
+    }); 
+
     //加入NLog
     builder.Logging.ClearProviders();
     builder.Host.UseNLog();
@@ -35,9 +44,11 @@ try
 
     var jwtConfigSection = builder.Configuration.GetSection(nameof(JwtConfig));
     builder.Services.Configure<JwtConfig>(jwtConfigSection);
+    builder.Services.AddControllers();
+    builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
     #region 注入
-    builder.Services.AddControllers();
+    builder.Services.AddScoped<FileService>();
     builder.Services.AddScoped<UserService>();
     builder.Services.AddScoped<AdminUserServices>();
     builder.Services.AddScoped<RoleServices>();
@@ -52,6 +63,7 @@ try
     builder.Services.AddScoped<EpidemicSummaryService>();
     builder.Services.AddScoped<DamageClassService>();
     builder.Services.AddScoped<DamageTypeService>();
+    builder.Services.AddScoped<ForestDiseasePublicationsService>();
     #endregion
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -63,6 +75,10 @@ try
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
         options.IncludeXmlComments(xmlPath);
+
+        // 啟用註釋
+        options.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);
+
 
         options.AddSecurityDefinition("Bearer",
          new OpenApiSecurityScheme

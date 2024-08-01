@@ -48,7 +48,7 @@ namespace admin_backend.Services
             var adminUser = (await Get(new GetAdminUserDto { Id = AdminUserId })).FirstOrDefault() ?? new AdminUserResponse();
 
             //取得權限名稱
-            var role = (await _roleService.Get(new GetRoleDto { Id = adminUser.RoleId })).FirstOrDefault() ?? new Role();
+            var role = (await _roleService.Get(new GetRoleDto { Id = adminUser.RoleId })).FirstOrDefault() ?? new RoleResponse();
             adminUser.RoleName = role.Name;
 
             return _mapper.Map<AdminUserResponse>(adminUser);
@@ -103,7 +103,7 @@ namespace admin_backend.Services
                 }
 
                 // 取得權限名稱
-                var role = (await _roleService.Get(new GetRoleDto { Id = x.RoleId })).FirstOrDefault() ?? new Role();
+                var role = (await _roleService.Get(new GetRoleDto { Id = x.RoleId })).FirstOrDefault() ?? new RoleResponse();
                 x.RoleName = role.Name;
 
                 // 如果需要處理其他屬性，可以在這裡添加

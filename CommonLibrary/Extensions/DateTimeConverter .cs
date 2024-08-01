@@ -7,7 +7,10 @@ namespace CommonLibrary.Extensions
     {
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return DateTime.Parse(reader.GetString());
+            if (string.IsNullOrEmpty(reader.GetString()))
+                return DateTime.MinValue;
+
+            return DateTime.Parse(reader.GetString()!);
         }
 
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)

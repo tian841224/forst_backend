@@ -28,7 +28,7 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var epidemicSummary = await _context.EpidemicSummary.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new EpidemicSummary { Title = null, Content = null};
+            var epidemicSummary = await _context.EpidemicSummary.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new EpidemicSummary { Title = null!, Content = null!};
             return _mapper.Map<EpidemicSummaryResponse>(epidemicSummary);
         }
 

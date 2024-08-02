@@ -36,6 +36,7 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 取得全部危害種類
         /// </summary>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
         [Authorize]

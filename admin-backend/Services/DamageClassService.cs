@@ -36,9 +36,14 @@ namespace admin_backend.Services
             if (Id.HasValue)
                 damageClassList = _context.DamageClass.Where(x => x.Id == Id);
 
-            //分頁處理
-            var pageResult = await damageClassList.GetPagedAsync(dto!);
-            return _mapper.Map<List<DamageClassResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
+            if (dto != null)
+            {
+                //分頁處理
+                var pageResult = await damageClassList.GetPagedAsync(dto!);
+                return _mapper.Map<List<DamageClassResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
+            }
+
+            return _mapper.Map<List<DamageClassResponse>>(await damageClassList.ToListAsync());
 
         }
 

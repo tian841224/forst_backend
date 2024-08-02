@@ -2,11 +2,13 @@
 using AutoMapper;
 using CommonLibrary.Data;
 using CommonLibrary.DTOs.Common;
+using CommonLibrary.DTOs.DamageType;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.DTOs.RolePermission;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Transactions;
@@ -36,10 +38,14 @@ namespace admin_backend.Services
 
             query = query.Where(x => x.RoleId == Id);
 
-            var pagedResult = await query.GetPagedAsync(dto!);
+            if (dto != null)
+            {
+                //分頁處理
+                var pagedResult = await query.GetPagedAsync(dto!);
+                return _mapper.Map<RolePermissionResponse>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
+            }
 
-            return _mapper.Map<RolePermissionResponse>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
-
+            return _mapper.Map<RolePermissionResponse>(await query.ToListAsync());
 
             //return new RolePermissionResponse
             //{

@@ -9,6 +9,7 @@ using CommonLibrary.Entities;
 using CommonLibrary.Enums;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interface;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
@@ -39,7 +40,7 @@ namespace admin_backend.Services
             IQueryable<ForestDiseasePublications> forestDiseasePublications = _context.ForestDiseasePublications;
 
             if (Id.HasValue)
-                forestDiseasePublications = _context.ForestDiseasePublications.Where(x => x.Id == Id.Value).AsQueryable();
+                forestDiseasePublications = _context.ForestDiseasePublications.Where(x => x.Id == Id.Value);
 
             foreach (var item in forestDiseasePublications)
             {
@@ -50,9 +51,13 @@ namespace admin_backend.Services
                     file = await _fileService.Value.FileToBase64(fileDto.FilePath);
             }
 
-            var pagedResult = await forestDiseasePublications.GetPagedAsync(dto!);
+            if(dto != null)
+            {
+                var pagedResult = await forestDiseasePublications.GetPagedAsync(dto!);
+                return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
+            }
 
-            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
+            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(await forestDiseasePublications.ToListAsync());
         }
 
         public async Task<List<ForestDiseasePublicationsResponse>> Get(GetForestDiseasePublicationsDto dto)

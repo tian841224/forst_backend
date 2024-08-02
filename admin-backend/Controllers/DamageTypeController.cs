@@ -35,10 +35,11 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 取得全部危害類型
         /// </summary>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> GetAll([FromBody] PagedOperationDto? dto = null)
+        public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
             return Ok(await _damageTypeService.Get(dto: dto));
         }

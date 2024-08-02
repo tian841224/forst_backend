@@ -36,9 +36,9 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Get(PagedOperationDto? dto = null)
+        public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
             return Ok(await _treeBasicInfoService.Get(dto:dto));
         }

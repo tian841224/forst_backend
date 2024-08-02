@@ -106,10 +106,10 @@ namespace admin_backend.Services
             }
         }
 
-        //public async Task ResetPassword(ResetPasswordDto dto)
-        //{
+        public async Task ResetPassword(ResetPasswordDto dto)
+        {
 
-        //}
+        }
 
         //public async Task<CaptchaDto> GetCaptchaAsync()
         //{

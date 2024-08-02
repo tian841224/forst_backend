@@ -2,6 +2,7 @@
 using AutoMapper;
 using CommonLibrary.Data;
 using CommonLibrary.DTOs.Common;
+using CommonLibrary.DTOs.DamageClass;
 using CommonLibrary.DTOs.DamageType;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
@@ -35,9 +36,14 @@ namespace admin_backend.Services
             if (Id.HasValue)
                 damageTypes = _context.DamageType.Where(x => x.Id == Id).AsQueryable();
 
-            //分頁處理
-            var pageResult = await damageTypes.GetPagedAsync(dto!);
-            return _mapper.Map<List<DamageTypeResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
+            if (dto != null)
+            {
+                //分頁處理
+                var pageResult = await damageTypes.GetPagedAsync(dto!);
+                return _mapper.Map<List<DamageTypeResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
+            }
+
+            return _mapper.Map<List<DamageTypeResponse>>(await damageTypes.ToListAsync());
         }
 
         public async Task<List<DamageTypeResponse>> Get(GetDamageTypeDto dto)

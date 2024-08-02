@@ -10,6 +10,7 @@ using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 using CommonLibrary.DTOs.Common;
+using CommonLibrary.DTOs.DamageType;
 
 namespace admin_backend.Services
 {
@@ -55,8 +56,13 @@ namespace admin_backend.Services
                 );
             }
 
-            var pagedResult = await treeBasicInfos.GetPagedAsync(dto!);
-            return _mapper.Map<List<TreeBasicInfoResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
+            if (dto != null)
+            {
+                var pagedResult = await treeBasicInfos.GetPagedAsync(dto!);
+                return _mapper.Map<List<TreeBasicInfoResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
+            }
+
+            return _mapper.Map<List<TreeBasicInfoResponse>>(await treeBasicInfos.ToListAsync());
         }
         public async Task<TreeBasicInfoResponse> Add(AddTreeBasicInfoDto dto)
         {

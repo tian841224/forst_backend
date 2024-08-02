@@ -37,9 +37,9 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Get(PagedOperationDto? dto = null)
+        public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
             return Ok(await _forestDiseasePublicationsService.Get(dto:dto));
         }
@@ -104,5 +104,17 @@ namespace admin_backend.Controllers
         {
             return Ok(await _forestDiseasePublicationsService.Delete(id));
         }
+
+        //[HttpGet("/Image/{fileId}")]
+        //public IActionResult GetImage(Guid fileId)
+        //{
+        //    var imageFile = _context.AgencyUploadFiles.FirstOrDefault(_ => _.FileId == fileId);
+        //    if (imageFile == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var image = System.IO.File.OpenRead(imageFile.FilePath);
+        //    return File(image, "image/jpeg");
+        //}
     }
 }

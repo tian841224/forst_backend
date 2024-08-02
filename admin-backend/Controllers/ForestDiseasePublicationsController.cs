@@ -1,7 +1,6 @@
-﻿using admin_backend.Interfaces;
-using CommonLibrary.DTOs.Common;
-using CommonLibrary.DTOs.ForestDiseasePublications;
-using CommonLibrary.DTOs.TreeBasicInfo;
+﻿using admin_backend.DTOs.ForestDiseasePublications;
+using admin_backend.Interfaces;
+using CommonLibrary.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,7 +40,7 @@ namespace admin_backend.Controllers
         [Authorize]
         public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
-            return Ok(await _forestDiseasePublicationsService.Get(dto:dto));
+            return Ok(await _forestDiseasePublicationsService.Get(dto: dto));
         }
 
         /// <summary>
@@ -105,16 +104,19 @@ namespace admin_backend.Controllers
             return Ok(await _forestDiseasePublicationsService.Delete(id));
         }
 
-        //[HttpGet("/Image/{fileId}")]
-        //public IActionResult GetImage(Guid fileId)
-        //{
-        //    var imageFile = _context.AgencyUploadFiles.FirstOrDefault(_ => _.FileId == fileId);
-        //    if (imageFile == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var image = System.IO.File.OpenRead(imageFile.FilePath);
-        //    return File(image, "image/jpeg");
-        //}
+        [HttpPost("[controller]/file/[action]")]
+        public async Task<IActionResult> GetFile(GetFileDto dto)
+        {
+            var path = await _forestDiseasePublicationsService.GetFile(dto);
+
+            // 確認文件存在
+            if (!System.IO.File.Exists(path))
+            {
+                return NotFound();
+            }
+
+            var fileBytes = System.IO.File.ReadAllBytes(path);
+            return File(fileBytes, "application/octet-stream", path);
+        }
     }
 }

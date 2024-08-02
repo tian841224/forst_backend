@@ -1,6 +1,5 @@
-﻿using CommonLibrary.DTOs.File;
+﻿using CommonLibrary.DTOs;
 using CommonLibrary.Interface;
-using Humanizer;
 using Microsoft.AspNetCore.Http;
 
 namespace CommonLibrary.Service
@@ -8,12 +7,12 @@ namespace CommonLibrary.Service
     /// <summary>
     /// 檔案處理
     /// </summary>
-    public class FileService: IFileService
+    public class FileService : IFileService
     {
         private readonly string _fileUploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Files");
 
 
-        public async Task<FileUploadDto> UploadFile(IFormFile FormFile, string? FileUploadPath = null)
+        public async Task<FileUploadDto> UploadFile(string FileName, IFormFile FormFile, string? FileUploadPath = null)
         {
             if (FileUploadPath == null)
                 FileUploadPath = _fileUploadPath;
@@ -34,7 +33,7 @@ namespace CommonLibrary.Service
 
             return new FileUploadDto
             {
-                FileName = FormFile.FileName,
+                FileName = FileName,
                 FilePath = filePath,
             };
         }
@@ -48,7 +47,7 @@ namespace CommonLibrary.Service
         {
             string filePath = Path.GetTempFileName();
 
-            using(var stream = File.Create(filePath))
+            using (var stream = File.Create(filePath))
             {
                 await formFile.CopyToAsync(stream);
             }
@@ -91,6 +90,12 @@ namespace CommonLibrary.Service
                     return memoryStream.ToArray();
                 }
             }
+        }
+
+        public FileStream DownloadFile(string filePath)
+        {
+            var file = File.OpenRead(filePath);
+            return file;
         }
     }
 }

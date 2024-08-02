@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs.MailConfig;
+﻿using admin_backend.DTOs.MailConfig;
 
 namespace admin_backend.Interfaces
 {

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using admin_backend.Entities;
+using AutoMapper;
 
 namespace admin_backend.Extensions
 {
@@ -7,7 +8,7 @@ namespace admin_backend.Extensions
         public MappingProfile()
         {
             //自動映射
-            var assembly = typeof(CommonLibrary.Entities.AdminUser).Assembly;
+            var assembly = typeof(AdminUser).Assembly;
 
             var entityTypes = assembly.GetTypes()
                 .Where(t => t.Namespace == "CommonLibrary.Entities" && !t.IsAbstract && !t.IsInterface)

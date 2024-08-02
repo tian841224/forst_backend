@@ -1,5 +1,5 @@
-﻿using CommonLibrary.DTOs.Common;
-using CommonLibrary.DTOs.RolePermission;
+﻿using admin_backend.DTOs.RolePermission;
+using CommonLibrary.DTOs;
 
 namespace admin_backend.Interfaces
 {

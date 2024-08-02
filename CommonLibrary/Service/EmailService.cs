@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs.Common;
+﻿using CommonLibrary.DTOs;
 using CommonLibrary.Interface;
 using System.Net;
 using System.Net.Mail;

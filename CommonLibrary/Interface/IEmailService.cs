@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs.Common;
+﻿using CommonLibrary.DTOs;
 
 namespace CommonLibrary.Interface
 {

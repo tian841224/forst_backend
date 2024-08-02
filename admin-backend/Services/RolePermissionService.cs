@@ -1,14 +1,12 @@
-﻿using admin_backend.Interfaces;
+﻿using admin_backend.Data;
+using admin_backend.DTOs.OperationLog;
+using admin_backend.DTOs.RolePermission;
+using admin_backend.Entities;
+using admin_backend.Enums;
+using admin_backend.Interfaces;
 using AutoMapper;
-using CommonLibrary.Data;
-using CommonLibrary.DTOs.Common;
-using CommonLibrary.DTOs.DamageType;
-using CommonLibrary.DTOs.OperationLog;
-using CommonLibrary.DTOs.RolePermission;
-using CommonLibrary.Entities;
-using CommonLibrary.Enums;
+using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Transactions;
@@ -69,7 +67,7 @@ namespace admin_backend.Services
 
             if (rolePermission != null)
             {
-                await Update(new UpdateRolePermissionDto 
+                await Update(new UpdateRolePermissionDto
                 {
                     Id = rolePermission.Id,
                     Name = rolePermission.Name,

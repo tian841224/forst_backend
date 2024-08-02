@@ -1,4 +1,4 @@
-﻿namespace CommonLibrary.DTOs.Common
+﻿namespace CommonLibrary.Extensions
 {
     public class PagedResult<T>
     {

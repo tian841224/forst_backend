@@ -1,10 +1,10 @@
+using admin_backend.Data;
+using admin_backend.Infrastructure;
 using admin_backend.Interfaces;
 using admin_backend.Middleware;
 using admin_backend.Services;
-using CommonLibrary.Data;
-using CommonLibrary.DTOs.Common;
+using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
-using CommonLibrary.Infrastructure;
 using CommonLibrary.Interface;
 using CommonLibrary.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

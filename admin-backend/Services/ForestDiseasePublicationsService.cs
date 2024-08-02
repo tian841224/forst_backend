@@ -1,15 +1,14 @@
-﻿using admin_backend.Interfaces;
+﻿using admin_backend.Data;
+using admin_backend.DTOs.ForestDiseasePublications;
+using admin_backend.DTOs.OperationLog;
+using admin_backend.Entities;
+using admin_backend.Enums;
+using admin_backend.Interfaces;
 using AutoMapper;
-using CommonLibrary.Data;
-using CommonLibrary.DTOs.Common;
-using CommonLibrary.DTOs.File;
-using CommonLibrary.DTOs.ForestDiseasePublications;
-using CommonLibrary.DTOs.OperationLog;
-using CommonLibrary.Entities;
-using CommonLibrary.Enums;
+using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interface;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
@@ -51,7 +50,7 @@ namespace admin_backend.Services
                     file = await _fileService.Value.FileToBase64(fileDto.FilePath);
             }
 
-            if(dto != null)
+            if (dto != null)
             {
                 var pagedResult = await forestDiseasePublications.GetPagedAsync(dto!);
                 return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
@@ -106,7 +105,8 @@ namespace admin_backend.Services
 #pragma warning restore CS8602 // 可能 null 參考的取值 (dereference)。
 
                 //上傳檔案
-                var fileUploadDto = await _fileService.Value.UploadFile(dto.File);
+                var fileName = $"{DateTime.Now.ToTimestamp().ToString}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, dto.File);
                 var file = JsonSerializer.Serialize(fileUploadDto);
 
                 forestDiseasePublications = new ForestDiseasePublications
@@ -121,12 +121,17 @@ namespace admin_backend.Services
             }
             else
             {
-                if (dto.Authors!.Count == 0 || !dto.Date.HasValue || string.IsNullOrEmpty(dto.Link))
+                if (dto.Authors!.Count == 0 || !dto.Date.HasValue || string.IsNullOrEmpty(dto.Link) || dto.File.Length == 0)
                 {
                     throw new ApiException($"請輸入出版單位及檔案");
                 }
 
                 string Authors = JsonSerializer.Serialize(dto.Authors);
+
+                //上傳檔案
+                var fileName = $"{DateTime.Now.ToTimestamp().ToString}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, dto.File);
+                var file = JsonSerializer.Serialize(fileUploadDto);
 
                 forestDiseasePublications = new ForestDiseasePublications
                 {
@@ -137,6 +142,7 @@ namespace admin_backend.Services
                     Type = dto.Type,
                     Status = dto.Status,
                     Sort = dto.Sort,
+                    File = file,
                 };
             }
 
@@ -270,5 +276,25 @@ namespace admin_backend.Services
             return _mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications);
         }
 
+        public async Task<string> GetFile(GetFileDto dto)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.Id == dto.Id && x.File.Contains(dto.FileName)).FirstOrDefaultAsync();
+
+            if (forestDiseasePublications == null)
+            {
+                throw new ApiException($"找不到此資料-{dto.Id}");
+            }
+
+            var fileDto = JsonSerializer.Deserialize<FileUploadDto>(forestDiseasePublications.File);
+
+            if (fileDto == null)
+            {
+                throw new ApiException($"未上傳或找不到檔案-{dto.Id}");
+            }
+
+            return fileDto.FilePath;
+        }
     }
 }

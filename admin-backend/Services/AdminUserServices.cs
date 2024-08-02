@@ -1,11 +1,11 @@
+using admin_backend.Data;
+using admin_backend.DTOs.AdminUser;
+using admin_backend.DTOs.Role;
+using admin_backend.Entities;
+using admin_backend.Enums;
 using admin_backend.Interfaces;
 using AutoMapper;
-using CommonLibrary.Data;
-using CommonLibrary.DTOs.AdminUser;
-using CommonLibrary.DTOs.File;
-using CommonLibrary.DTOs.Role;
-using CommonLibrary.Entities;
-using CommonLibrary.Enums;
+using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -134,7 +134,7 @@ namespace admin_backend.Services
             if (dto.Photo != null)
             {
                 //上傳檔案
-                var fileUploadDto = await _fileService.Value.UploadFile(dto.Photo);
+                var fileUploadDto = await _fileService.Value.UploadFile(dto.Account, dto.Photo);
                 file = JsonSerializer.Serialize(fileUploadDto);
             }
 
@@ -226,7 +226,7 @@ namespace admin_backend.Services
             if (dto.Photo != null)
             {
                 //上傳檔案
-                var fileUploadDto = await _fileService.Value.UploadFile(dto.Photo);
+                var fileUploadDto = await _fileService.Value.UploadFile(adminUser.Account, dto.Photo);
                 var file = JsonSerializer.Serialize(fileUploadDto);
                 adminUser.Photo = file;
             }

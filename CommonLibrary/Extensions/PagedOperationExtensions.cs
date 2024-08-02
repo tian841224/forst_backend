@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs.Common;
+﻿using CommonLibrary.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace CommonLibrary.Extensions

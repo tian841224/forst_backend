@@ -1,22 +1,22 @@
-﻿using admin_backend.Interfaces;
+﻿using admin_backend.Data;
+using admin_backend.DTOs.EpidemicSummary;
+using admin_backend.DTOs.OperationLog;
+using admin_backend.Entities;
+using admin_backend.Enums;
+using admin_backend.Interfaces;
 using AutoMapper;
-using CommonLibrary.Data;
-using CommonLibrary.DTOs.EpidemicSummary;
-using CommonLibrary.DTOs.OperationLog;
-using CommonLibrary.Entities;
-using CommonLibrary.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class EpidemicSummaryService: IEpidemicSummaryService
+    public class EpidemicSummaryService : IEpidemicSummaryService
     {
         private readonly ILogger<EpidemicSummaryService> _log;
         private readonly IMapper _mapper;
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly Lazy<IOperationLogService> _operationLogService;
-        public EpidemicSummaryService(ILogger<EpidemicSummaryService> log, IDbContextFactory<MysqlDbContext> contextFactory , Lazy<IOperationLogService> operationLogService, IMapper mapper)
+        public EpidemicSummaryService(ILogger<EpidemicSummaryService> log, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService, IMapper mapper)
         {
             _log = log;
             _contextFactory = contextFactory;
@@ -28,7 +28,7 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var epidemicSummary = await _context.EpidemicSummary.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new EpidemicSummary { Title = null!, Content = null!};
+            var epidemicSummary = await _context.EpidemicSummary.OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new EpidemicSummary { Title = null!, Content = null! };
             return _mapper.Map<EpidemicSummaryResponse>(epidemicSummary);
         }
 

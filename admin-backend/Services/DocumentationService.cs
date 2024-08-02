@@ -1,16 +1,16 @@
-﻿using admin_backend.Interfaces;
+﻿using admin_backend.Data;
+using admin_backend.DTOs.Documentation;
+using admin_backend.DTOs.OperationLog;
+using admin_backend.Entities;
+using admin_backend.Enums;
+using admin_backend.Interfaces;
 using AutoMapper;
-using CommonLibrary.Data;
-using CommonLibrary.DTOs.Documentation;
-using CommonLibrary.DTOs.OperationLog;
-using CommonLibrary.Entities;
-using CommonLibrary.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class DocumentationService: IDocumentationService
+    public class DocumentationService : IDocumentationService
     {
         private readonly ILogger<DocumentationService> _log;
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;

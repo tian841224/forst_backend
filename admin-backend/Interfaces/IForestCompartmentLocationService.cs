@@ -1,5 +1,5 @@
-﻿using CommonLibrary.DTOs.Common;
-using CommonLibrary.DTOs.ForestCompartmentLocation;
+﻿using admin_backend.DTOs.ForestCompartmentLocation;
+using CommonLibrary.DTOs;
 
 namespace admin_backend.Interfaces
 {

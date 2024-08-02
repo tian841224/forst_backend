@@ -1,6 +1,6 @@
+using admin_backend.DTOs.Login;
 using admin_backend.Interfaces;
 using admin_backend.Services;
-using CommonLibrary.DTOs.Login;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,6 +30,19 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Login(LoginDto dto)
         {
             return Ok(await _loginServices.Login(dto));
+        }
+
+        /// <summary>
+        /// §Ñ°O±K½X
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
+        {
+            await _loginServices.ResetPassword(dto);
+            return Ok();
         }
     }
 }

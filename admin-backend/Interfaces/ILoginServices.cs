@@ -1,5 +1,5 @@
-﻿using CommonLibrary.DTOs.Login;
-using CommonLibrary.DTOs.Common;
+﻿using admin_backend.DTOs.Login;
+using CommonLibrary.DTOs;
 
 namespace admin_backend.Interfaces
 {

@@ -1,5 +1,5 @@
-﻿using admin_backend.Interfaces;
-using CommonLibrary.DTOs.EpidemicSummary;
+﻿using admin_backend.DTOs.EpidemicSummary;
+using admin_backend.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

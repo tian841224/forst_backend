@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs.EpidemicSummary;
+﻿using admin_backend.DTOs.EpidemicSummary;
 
 namespace admin_backend.Interfaces
 {

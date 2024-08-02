@@ -1,6 +1,6 @@
-﻿using admin_backend.Interfaces;
+﻿using admin_backend.DTOs.RolePermission;
+using admin_backend.Interfaces;
 using admin_backend.Services;
-using CommonLibrary.DTOs.RolePermission;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

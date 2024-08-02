@@ -1,6 +1,6 @@
-﻿using admin_backend.Interfaces;
-using CommonLibrary.DTOs.Common;
-using CommonLibrary.DTOs.DamageType;
+﻿using admin_backend.DTOs.DamageType;
+using admin_backend.Interfaces;
+using CommonLibrary.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

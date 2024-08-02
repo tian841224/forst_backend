@@ -1,5 +1,5 @@
-﻿using admin_backend.Interfaces;
-using CommonLibrary.DTOs.User;
+﻿using admin_backend.DTOs.User;
+using admin_backend.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs.Role;
+﻿using admin_backend.DTOs.Role;
 
 namespace admin_backend.Interfaces
 {

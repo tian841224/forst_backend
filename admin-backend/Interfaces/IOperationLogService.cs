@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs.OperationLog;
+﻿using admin_backend.DTOs.OperationLog;
 
 namespace admin_backend.Interfaces
 {

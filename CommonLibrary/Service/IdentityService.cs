@@ -1,5 +1,4 @@
-﻿using CommonLibrary.DTOs.Common;
-using CommonLibrary.DTOs.Login;
+﻿using CommonLibrary.DTOs;
 using CommonLibrary.Interface;
 using IdentityModel;
 using Microsoft.AspNetCore.Http;

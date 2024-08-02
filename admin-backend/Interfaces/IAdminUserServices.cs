@@ -1,5 +1,5 @@
-﻿using CommonLibrary.DTOs.AdminUser;
-using CommonLibrary.Entities;
+﻿using admin_backend.DTOs.AdminUser;
+using admin_backend.Entities;
 
 namespace admin_backend.Interfaces
 {

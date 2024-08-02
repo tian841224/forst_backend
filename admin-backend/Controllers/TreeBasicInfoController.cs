@@ -1,6 +1,6 @@
-﻿using admin_backend.Interfaces;
-using CommonLibrary.DTOs.Common;
-using CommonLibrary.DTOs.TreeBasicInfo;
+﻿using admin_backend.DTOs.TreeBasicInfo;
+using admin_backend.Interfaces;
+using CommonLibrary.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,7 +40,7 @@ namespace admin_backend.Controllers
         [Authorize]
         public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
-            return Ok(await _treeBasicInfoService.Get(dto:dto));
+            return Ok(await _treeBasicInfoService.Get(dto: dto));
         }
 
         /// <summary>

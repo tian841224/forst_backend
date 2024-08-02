@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs.Common;
+﻿using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using System.Net;
 using System.Text;
@@ -20,9 +20,10 @@ namespace admin_backend.Middleware
         {
             string STATICS_PATH = "/statics";
             string SWAGGER_PATH = "/swagger";
-            var notConvertUrlList = new List<string>() { STATICS_PATH, SWAGGER_PATH };
+            string FILE_PATH = "/file";
+            var notConvertUrlList = new List<string>() { STATICS_PATH, SWAGGER_PATH, FILE_PATH };
 
-            if (context.Request.Path.HasValue && notConvertUrlList.Any(p => context.Request.Path.Value.Contains(p)))
+            if (context.Request.Path.HasValue && notConvertUrlList.Any(p => context.Request.Path.Value.ToLower().Contains(p)))
             {
                 await _next(context);
                 return;

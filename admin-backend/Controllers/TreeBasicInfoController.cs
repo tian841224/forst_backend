@@ -34,12 +34,13 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 取得全部樹木基本資料
         /// </summary>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(PagedOperationDto? dto = null)
         {
-            return Ok(await _treeBasicInfoService.Get());
+            return Ok(await _treeBasicInfoService.Get(dto:dto));
         }
 
         /// <summary>

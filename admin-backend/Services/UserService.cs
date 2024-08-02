@@ -31,34 +31,36 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<User> query = _context.User.AsQueryable();
+            IQueryable<User> user = _context.User;
 
             if (dto.Id.HasValue)
             {
-                query = query.Where(x => x.Id == dto.Id);
+                user = user.Where(x => x.Id == dto.Id);
             }
 
             if (!string.IsNullOrEmpty(dto.Account))
             {
-                query = query.Where(x => x.Account == dto.Account);
+                user = user.Where(x => x.Account == dto.Account);
             }
 
             if (!string.IsNullOrEmpty(dto.Name))
             {
-                query = query.Where(x => x.Name == dto.Name);
+                user = user.Where(x => x.Name == dto.Name);
             }
 
             if (dto.Status.HasValue)
             {
-                query = query.Where(x => x.Status == dto.Status);
+                user = user.Where(x => x.Status == dto.Status);
             }
 
             if (dto.LoginTime.HasValue)
             {
-                query = query.Where(x => x.LoginTime == dto.LoginTime);
+                user = user.Where(x => x.LoginTime == dto.LoginTime);
             }
 
-            return _mapper.Map<List<UserResponse>>(await query.ToListAsync());
+            var pagedResult = await user.GetPagedAsync(dto);
+
+            return _mapper.Map<List<UserResponse>>(pagedResult.Items.OrderBy(x => dto.OrderBy));
         }
 
         public async Task<UserResponse> Add(AddUserDto dto)

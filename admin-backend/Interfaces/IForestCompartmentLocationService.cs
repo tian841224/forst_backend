@@ -5,7 +5,7 @@ namespace admin_backend.Interfaces
 {
     public interface IForestCompartmentLocationService
     {
-        Task<List<ForestCompartmentLocationResponse>> Get(int? Id = null);
+        Task<List<ForestCompartmentLocationResponse>> Get(int? Id = null, PagedOperationDto? dto = null);
         Task<List<ForestCompartmentLocationResponse>> Get(GetForestCompartmentLocationDto dto);
         Task<ForestCompartmentLocationResponse> Add(AddForestCompartmentLocationDto dto);
         Task<ForestCompartmentLocationResponse> Update(int Id, UpdateForestCompartmentLocationDto dto);

@@ -32,7 +32,7 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<Role> query = _context.Role.AsQueryable();
+            IQueryable<Role> query = _context.Role;
 
             if (dto.Id.HasValue)
             {
@@ -44,7 +44,9 @@ namespace admin_backend.Services
                 query = query.Where(x => x.Name == dto.Name);
             }
 
-            return _mapper.Map<List<RoleResponse>>(await query.ToListAsync());
+            var pagedResult = await query.GetPagedAsync(dto);
+
+            return _mapper.Map<List<RoleResponse>>(pagedResult.Items.OrderBy(x => dto.OrderBy));
         }
 
         public async Task<RoleResponse> Add(AddRoleDto dto)

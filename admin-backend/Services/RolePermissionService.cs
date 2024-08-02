@@ -1,6 +1,7 @@
 ﻿using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.Data;
+using CommonLibrary.DTOs.Common;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.DTOs.RolePermission;
 using CommonLibrary.Entities;
@@ -27,15 +28,17 @@ namespace admin_backend.Services
             _operationLogService = operationLogService;
         }
 
-        public async Task<RolePermissionResponse> Get(int Id)
+        public async Task<RolePermissionResponse> Get(int Id, PagedOperationDto? dto = null)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<RolePermission> query = _context.RolePermission.AsQueryable();
+            IQueryable<RolePermission> query = _context.RolePermission;
 
             query = query.Where(x => x.RoleId == Id);
 
-            return _mapper.Map<RolePermissionResponse>(await query.ToArrayAsync());
+            var pagedResult = await query.GetPagedAsync(dto!);
+
+            return _mapper.Map<RolePermissionResponse>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
 
 
             //return new RolePermissionResponse

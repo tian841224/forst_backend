@@ -35,12 +35,13 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 取得全部林木疫情出版品
         /// </summary>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(PagedOperationDto? dto = null)
         {
-            return Ok(await _forestDiseasePublicationsService.Get());
+            return Ok(await _forestDiseasePublicationsService.Get(dto:dto));
         }
 
         /// <summary>

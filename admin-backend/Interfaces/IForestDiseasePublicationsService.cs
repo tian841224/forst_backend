@@ -5,7 +5,7 @@ namespace admin_backend.Interfaces
 {
     public interface IForestDiseasePublicationsService
     {
-        Task<List<ForestDiseasePublicationsResponse>> Get(int? Id = null);
+        Task<List<ForestDiseasePublicationsResponse>> Get(int? Id = null, PagedOperationDto? dto = null);
         Task<List<ForestDiseasePublicationsResponse>> Get(GetForestDiseasePublicationsDto dto);
         Task<ForestDiseasePublicationsResponse> Add(AddForestDiseasePublicationsDto dto);
         Task<ForestDiseasePublicationsResponse> Update(int Id, UpdateForestDiseasePublicationsDto dto);

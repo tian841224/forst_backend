@@ -1,5 +1,4 @@
 ﻿using admin_backend.Interfaces;
-using admin_backend.Services;
 using CommonLibrary.DTOs.Common;
 using CommonLibrary.DTOs.DamageType;
 using Microsoft.AspNetCore.Authorization;
@@ -37,11 +36,11 @@ namespace admin_backend.Controllers
         /// 取得全部危害類型
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAll([FromBody] PagedOperationDto? dto = null)
         {
-            return Ok(await _damageTypeService.Get());
+            return Ok(await _damageTypeService.Get(dto: dto));
         }
 
         /// <summary>

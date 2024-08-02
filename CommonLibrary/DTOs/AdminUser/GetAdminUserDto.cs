@@ -1,8 +1,9 @@
-﻿using CommonLibrary.Enums;
+﻿using CommonLibrary.DTOs.Common;
+using CommonLibrary.Enums;
 
 namespace CommonLibrary.DTOs.AdminUser
 {
-    public class GetAdminUserDto
+    public class GetAdminUserDto : PagedOperationDto
     {
         public int? Id { get; set; }
 

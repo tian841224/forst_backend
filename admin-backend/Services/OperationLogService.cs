@@ -4,6 +4,7 @@ using CommonLibrary.Data;
 using CommonLibrary.DTOs.AdminUser;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
+using CommonLibrary.Extensions;
 using CommonLibrary.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
@@ -33,8 +34,8 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<OperationLog> query = _context.OperationLog.AsQueryable();
             var result = new List<OperationLogResponse>();
+            IQueryable<OperationLog> operationLog = _context.OperationLog;
 
             if (dto.RoleId.HasValue)
             {
@@ -46,32 +47,30 @@ namespace admin_backend.Services
                 if (adminUser.Any())
                 {
                     var adminUserIds = adminUser.Select(y => y.Id).ToList();
-                    var operationLogs = _context.OperationLog.Where(x => adminUserIds.Contains(x.Id));
-                    query = operationLogs;
+                    operationLog = _context.OperationLog.Where(x => adminUserIds.Contains(x.Id));
                 }
             }
 
             if (dto.AdminUserId.HasValue)
             {
-                query = query.Where(x => x.AdminUserId == dto.AdminUserId);
+                operationLog = operationLog.Where(x => x.AdminUserId == dto.AdminUserId);
             }
 
             if (dto.Type.HasValue)
             {
-                query = query.Where(x => x.Type == dto.Type);
+                operationLog = operationLog.Where(x => x.Type == dto.Type);
             }
 
             if (dto.StartTime.HasValue)
             {
-                query = query.Where(x => x.CreateTime >= dto.StartTime);
+                operationLog = operationLog.Where(x => x.CreateTime >= dto.StartTime);
             }
 
             if (dto.EndTime.HasValue)
             {
-                query = query.Where(x => x.CreateTime < dto.EndTime);
+                operationLog = operationLog.Where(x => x.CreateTime < dto.EndTime);
             }
 
-            var operationLog = await query.ToListAsync();
             foreach (var x in operationLog)
             {
                 var adminUser = (await _adminUserServices.Get(new GetAdminUserDto { Id = x.AdminUserId })).FirstOrDefault();
@@ -88,7 +87,7 @@ namespace admin_backend.Services
                     });
                 }
             }
-            return _mapper.Map<List<OperationLogResponse>>(result);
+            return _mapper.Map<List<OperationLogResponse>>(result.GetPaged(dto).Items.OrderBy(x => dto.OrderBy));
         }
 
         public async Task Add(AddOperationLogDto dto)

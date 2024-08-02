@@ -1,11 +1,11 @@
 using admin_backend.Interfaces;
+using admin_backend.Middleware;
 using admin_backend.Services;
 using CommonLibrary.Data;
 using CommonLibrary.DTOs.Common;
 using CommonLibrary.Extensions;
 using CommonLibrary.Infrastructure;
 using CommonLibrary.Interface;
-using CommonLibrary.Middleware;
 using CommonLibrary.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -52,21 +52,21 @@ try
     #region 注入
     builder.Services.AddScoped<UserService>();
     builder.Services.AddScoped<IAdminUserServices, AdminUserServices>();
-    builder.Services.AddScoped<IDamageClassService,DamageClassService>();
-    builder.Services.AddScoped<IDamageTypeService,DamageTypeService>();
-    builder.Services.AddScoped<IDocumentationService,DocumentationService>();
-    builder.Services.AddScoped<IEpidemicSummaryService,EpidemicSummaryService>();
-    builder.Services.AddScoped<IForestCompartmentLocationService,ForestCompartmentLocationService>();
-    builder.Services.AddScoped<ILoginServices,LoginServices>();
-    builder.Services.AddScoped<IMailConfigService,MailConfigService>();
+    builder.Services.AddScoped<IDamageClassService, DamageClassService>();
+    builder.Services.AddScoped<IDamageTypeService, DamageTypeService>();
+    builder.Services.AddScoped<IDocumentationService, DocumentationService>();
+    builder.Services.AddScoped<IEpidemicSummaryService, EpidemicSummaryService>();
+    builder.Services.AddScoped<IForestCompartmentLocationService, ForestCompartmentLocationService>();
+    builder.Services.AddScoped<ILoginServices, LoginServices>();
+    builder.Services.AddScoped<IMailConfigService, MailConfigService>();
     builder.Services.AddScoped<IOperationLogService, OperationLogService>();
     //延遲載入
     builder.Services.AddScoped(provider =>
         new Lazy<IOperationLogService>(() => provider.GetRequiredService<IOperationLogService>()));
-    builder.Services.AddScoped<IRoleService,RoleService>();
+    builder.Services.AddScoped<IRoleService, RoleService>();
     builder.Services.AddScoped<IRolePermissionService, RolePermissionService>();
-    builder.Services.AddScoped<ITreeBasicInfoService,TreeBasicInfoService>();
-    builder.Services.AddScoped<IForestDiseasePublicationsService,ForestDiseasePublicationsService>();
+    builder.Services.AddScoped<ITreeBasicInfoService, TreeBasicInfoService>();
+    builder.Services.AddScoped<IForestDiseasePublicationsService, ForestDiseasePublicationsService>();
     builder.Services.AddScoped<IUserService, UserService>();
 
 
@@ -79,7 +79,7 @@ try
         new Lazy<IIdentityService>(() => provider.GetRequiredService<IIdentityService>()));
 
     //檔案處理服務
-    builder.Services.AddScoped<IFileService,FileService>();
+    builder.Services.AddScoped<IFileService, FileService>();
     //延遲載入
     builder.Services.AddScoped(provider =>
         new Lazy<IFileService>(() => provider.GetRequiredService<IFileService>()));

@@ -1,8 +1,9 @@
-﻿using CommonLibrary.Enums;
+﻿using CommonLibrary.DTOs.Common;
+using CommonLibrary.Enums;
 
 namespace CommonLibrary.DTOs.ForestDiseasePublications
 {
-    public class GetForestDiseasePublicationsDto
+    public class GetForestDiseasePublicationsDto: PagedOperationDto
     {
         /// <summary>
         /// 關鍵字

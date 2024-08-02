@@ -1,6 +1,8 @@
-﻿namespace CommonLibrary.DTOs.Role
+﻿using CommonLibrary.DTOs.Common;
+
+namespace CommonLibrary.DTOs.Role
 {
-    public class GetRoleDto
+    public class GetRoleDto : PagedOperationDto
     {
         public int? Id { get; set; }
 

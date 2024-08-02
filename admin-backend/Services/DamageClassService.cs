@@ -1,7 +1,9 @@
 ﻿using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.Data;
+using CommonLibrary.DTOs.Common;
 using CommonLibrary.DTOs.DamageClass;
+using CommonLibrary.DTOs.DamageType;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
 using CommonLibrary.Enums;
@@ -11,7 +13,7 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class DamageClassService: IDamageClassService
+    public class DamageClassService : IDamageClassService
     {
         private readonly ILogger<DamageClassService> _log;
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
@@ -25,36 +27,39 @@ namespace admin_backend.Services
             _operationLogService = operationLogService;
         }
 
-        public async Task<List<DamageClassResponse>> Get(int? Id = null)
+        public async Task<List<DamageClassResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var damageClassList = new List<DamageClass>();
+            IQueryable<DamageClass> damageClassList = _context.DamageClass;
 
             if (Id.HasValue)
-                damageClassList = await _context.DamageClass.Where(x => x.Id == Id).ToListAsync();
-            else
-                damageClassList = await _context.DamageClass.ToListAsync();
+                damageClassList = _context.DamageClass.Where(x => x.Id == Id);
 
-            return _mapper.Map<List<DamageClassResponse>>(damageClassList);
+            //分頁處理
+            var pageResult = await damageClassList.GetPagedAsync(dto!);
+            return _mapper.Map<List<DamageClassResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
+
         }
 
-        public async Task<List<DamageClassResponse>> Get(int TypeId)
+        public async Task<List<DamageClassResponse>> Get(GetDamageClassDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var damageClassList = new List<DamageClass>();
+            IQueryable<DamageClass> damageClassList = _context.DamageClass;
 
-            damageClassList = await _context.DamageClass.Where(x => x.DamageTypeId == TypeId).ToListAsync();
+            damageClassList = _context.DamageClass.Where(x => x.DamageTypeId == dto.TypeId);
 
-            return _mapper.Map<List<DamageClassResponse>>(damageClassList);
+            //分頁處理
+            var pageResult = await damageClassList.GetPagedAsync(dto);
+            return _mapper.Map<List<DamageClassResponse>>(pageResult.Items.OrderBy(x => dto.OrderBy));
         }
 
         public async Task<DamageClassResponse> Add(AddDamageClassDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var damageClasses = new DamageClass 
+            var damageClasses = new DamageClass
             {
                 Name = dto.Name,
                 DamageTypeId = dto.DamageTypeId,

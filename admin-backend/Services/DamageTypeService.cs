@@ -26,33 +26,30 @@ namespace admin_backend.Services
             _mapper = mapper;
         }
 
-        public async Task<List<DamageTypeResponse>> Get(int? Id = null)
+        public async Task<List<DamageTypeResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var damageTypes = new List<DamageType>();
+            IQueryable<DamageType> damageTypes = _context.DamageType;
 
             if (Id.HasValue)
-                damageTypes = await _context.DamageType.Where(x => x.Id == Id).ToListAsync();
-            else
-                damageTypes = await _context.DamageType.ToListAsync();
+                damageTypes = _context.DamageType.Where(x => x.Id == Id).AsQueryable();
 
-            return _mapper.Map<List<DamageTypeResponse>>(damageTypes);
+            //分頁處理
+            var pageResult = await damageTypes.GetPagedAsync(dto!);
+            return _mapper.Map<List<DamageTypeResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
         }
 
         public async Task<List<DamageTypeResponse>> Get(GetDamageTypeDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<DamageType> query = _context.DamageType.AsQueryable();
-
-            var damageTypes = new List<DamageType>();
-
+            IQueryable<DamageType> damageTypes = _context.DamageType;
 
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
                 string keyword = dto.Keyword.ToLower();
-                query = query.Where(x =>
+                damageTypes = damageTypes.Where(x =>
                     x.Name.ToLower().Contains(keyword) ||
                     x.Id.ToString().Contains(keyword)
                 );
@@ -60,13 +57,12 @@ namespace admin_backend.Services
 
             if (dto.Status.HasValue)
             {
-                query = query.Where(x => x.Status == dto.Status);
+                damageTypes = damageTypes.Where(x => x.Status == dto.Status);
             }
 
-
-            damageTypes = await query.ToListAsync();
-
-            return _mapper.Map<List<DamageTypeResponse>>(damageTypes);
+            //分頁處理
+            var pageResult = await damageTypes.GetPagedAsync(dto!);
+            return _mapper.Map<List<DamageTypeResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
         }
 
         public async Task<DamageTypeResponse> Add(AddDamageTypeDto dto)

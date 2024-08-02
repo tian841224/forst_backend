@@ -2,7 +2,6 @@
 using AutoMapper;
 using CommonLibrary.Data;
 using CommonLibrary.DTOs.Common;
-using CommonLibrary.DTOs.DamageType;
 using CommonLibrary.DTOs.ForestCompartmentLocation;
 using CommonLibrary.DTOs.OperationLog;
 using CommonLibrary.Entities;
@@ -13,7 +12,7 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class ForestCompartmentLocationService: IForestCompartmentLocationService
+    public class ForestCompartmentLocationService : IForestCompartmentLocationService
     {
         private readonly ILogger<ForestCompartmentLocationService> _log;
         private readonly IMapper _mapper;
@@ -28,26 +27,26 @@ namespace admin_backend.Services
             _mapper = mapper;
         }
 
-        public async Task<List<ForestCompartmentLocationResponse>> Get(int? Id = null)
+        public async Task<List<ForestCompartmentLocationResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var forestCompartmentLocation = new List<ForestCompartmentLocation>();
-            if (Id.HasValue)
-                forestCompartmentLocation = await _context.ForestCompartmentLocation.Where(x => x.Id == Id).ToListAsync();
-            else
-                forestCompartmentLocation = await _context.ForestCompartmentLocation.ToListAsync();
+            IQueryable<ForestCompartmentLocation> forestCompartmentLocation = _context.ForestCompartmentLocation;
 
-            return _mapper.Map<List<ForestCompartmentLocationResponse>>(forestCompartmentLocation);
+            if (Id.HasValue)
+                forestCompartmentLocation = _context.ForestCompartmentLocation.Where(x => x.Id == Id).AsQueryable();
+
+            //分頁處理
+            var pageResult = await forestCompartmentLocation.GetPagedAsync(dto!);
+            return _mapper.Map<List<ForestCompartmentLocationResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
         }
 
         public async Task<List<ForestCompartmentLocationResponse>> Get(GetForestCompartmentLocationDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            IQueryable<ForestCompartmentLocation> query = _context.ForestCompartmentLocation.AsQueryable();
+            IQueryable<ForestCompartmentLocation> query = _context.ForestCompartmentLocation;
 
             var forestCompartmentLocations = new List<ForestCompartmentLocation>();
-
 
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
@@ -59,8 +58,10 @@ namespace admin_backend.Services
                 );
             }
 
-            forestCompartmentLocations = await query.ToListAsync();
-            return _mapper.Map<List<ForestCompartmentLocationResponse>>(forestCompartmentLocations);
+            //分頁處理
+            forestCompartmentLocations = (await query.GetPagedAsync(dto!)).Items;
+
+            return _mapper.Map<List<ForestCompartmentLocationResponse>>(forestCompartmentLocations.OrderBy(x => dto!.OrderBy));
         }
 
         public async Task<ForestCompartmentLocationResponse> Add(AddForestCompartmentLocationDto dto)

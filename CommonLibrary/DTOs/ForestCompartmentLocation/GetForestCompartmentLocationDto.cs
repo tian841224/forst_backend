@@ -1,6 +1,8 @@
-﻿namespace CommonLibrary.DTOs.ForestCompartmentLocation
+﻿using CommonLibrary.DTOs.Common;
+
+namespace CommonLibrary.DTOs.ForestCompartmentLocation
 {
-    public class GetForestCompartmentLocationDto
+    public class GetForestCompartmentLocationDto: PagedOperationDto
     {
         /// <summary>
         /// 關鍵字

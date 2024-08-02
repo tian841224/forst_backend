@@ -32,22 +32,16 @@ namespace admin_backend.Services
             _fileService = fileService;
         }
 
-        public async Task<List<ForestDiseasePublicationsResponse>> Get(int? Id = null)
+        public async Task<List<ForestDiseasePublicationsResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var list = new List<ForestDiseasePublications>();
+            IQueryable<ForestDiseasePublications> forestDiseasePublications = _context.ForestDiseasePublications;
 
             if (Id.HasValue)
-            {
-                list = await _context.ForestDiseasePublications.Where(x => x.Id == Id.Value).ToListAsync();
-            }
-            else
-            {
-                list = await _context.ForestDiseasePublications.ToListAsync();
-            }
+                forestDiseasePublications = _context.ForestDiseasePublications.Where(x => x.Id == Id.Value).AsQueryable();
 
-            foreach (var item in list)
+            foreach (var item in forestDiseasePublications)
             {
                 if (string.IsNullOrEmpty(item.File)) continue;
                 var fileDto = JsonSerializer.Deserialize<FileUploadDto>(item.File);
@@ -56,21 +50,20 @@ namespace admin_backend.Services
                     file = await _fileService.Value.FileToBase64(fileDto.FilePath);
             }
 
-            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(list);
+            var pagedResult = await forestDiseasePublications.GetPagedAsync(dto!);
+
+            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
         }
 
         public async Task<List<ForestDiseasePublicationsResponse>> Get(GetForestDiseasePublicationsDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            IQueryable<ForestDiseasePublications> query = _context.ForestDiseasePublications.AsQueryable();
-
-            var forestDiseasePublications = new List<ForestDiseasePublications>();
-
+            IQueryable<ForestDiseasePublications> forestDiseasePublications = _context.ForestDiseasePublications;
 
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
                 string keyword = dto.Keyword.ToLower();
-                query = query.Where(x =>
+                forestDiseasePublications = forestDiseasePublications.Where(x =>
                     x.Unit.ToLower().Contains(keyword) ||
                     x.Name.ToLower().Contains(keyword) ||
                     x.Author.ToLower().Contains(keyword) ||
@@ -80,11 +73,11 @@ namespace admin_backend.Services
 
             if (dto.Status.HasValue)
             {
-                query = query.Where(x => x.Status == dto.Status.Value);
+                forestDiseasePublications = forestDiseasePublications.Where(x => x.Status == dto.Status.Value);
             }
 
-            forestDiseasePublications = await query.ToListAsync();
-            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(forestDiseasePublications);
+            var pagedResult = await forestDiseasePublications.GetPagedAsync(dto);
+            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items.OrderBy(x => dto.OrderBy));
         }
 
         public async Task<ForestDiseasePublicationsResponse> Add(AddForestDiseasePublicationsDto dto)

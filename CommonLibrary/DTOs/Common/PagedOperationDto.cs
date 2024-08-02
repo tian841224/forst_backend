@@ -11,5 +11,9 @@
         /// 單頁筆數
         /// </summary>
         public int PageSize { get; set; } = int.MaxValue;
+
+        public string OrderBy { get; set; } = "Id";
+
+        //public int Desc { get; set; }
     }
 }

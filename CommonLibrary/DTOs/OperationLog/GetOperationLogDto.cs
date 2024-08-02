@@ -1,8 +1,9 @@
-﻿using CommonLibrary.Enums;
+﻿using CommonLibrary.DTOs.Common;
+using CommonLibrary.Enums;
 
 namespace CommonLibrary.DTOs.OperationLog
 {
-    public class GetOperationLogDto
+    public class GetOperationLogDto: PagedOperationDto
     {
         /// <summary>
         /// 角色ID

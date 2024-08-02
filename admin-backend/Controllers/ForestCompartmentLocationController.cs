@@ -38,11 +38,11 @@ namespace admin_backend.Controllers
         /// 取得全部林班位置
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
-            return Ok(await _forestCompartmentLocationService.Get());
+            return Ok(await _forestCompartmentLocationService.Get(dto: dto));
         }
 
         /// <summary>

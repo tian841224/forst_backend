@@ -1,6 +1,8 @@
-﻿namespace CommonLibrary.DTOs.TreeBasicInfo
+﻿using CommonLibrary.DTOs.Common;
+
+namespace CommonLibrary.DTOs.TreeBasicInfo
 {
-    public class GetTreeBasicInfoDto
+    public class GetTreeBasicInfoDto: PagedOperationDto
     {
         /// <summary>
         /// 關鍵字

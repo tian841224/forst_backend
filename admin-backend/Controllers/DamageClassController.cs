@@ -1,6 +1,7 @@
 ﻿using admin_backend.Interfaces;
-using admin_backend.Services;
+using CommonLibrary.DTOs.Common;
 using CommonLibrary.DTOs.DamageClass;
+using CommonLibrary.DTOs.DamageType;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得危害種類
+        /// 取得單筆危害種類
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -36,22 +37,22 @@ namespace admin_backend.Controllers
         /// 取得全部危害種類
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
-            return Ok(await _damageClassService.Get());
+            return Ok(await _damageClassService.Get(dto: dto));
         }
 
         /// <summary>
         /// 使用危害類型取得
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> GetByType(int TypeId)
+        public async Task<IActionResult> GetByType(GetDamageClassDto dto)
         {
-            return Ok(await _damageClassService.Get(TypeId));
+            return Ok(await _damageClassService.Get(dto));
         }
 
         /// <summary>

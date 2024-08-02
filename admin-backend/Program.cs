@@ -50,7 +50,6 @@ try
     builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
     #region ª`¤J
-    builder.Services.AddScoped<UserService>();
     builder.Services.AddScoped<IAdminUserServices, AdminUserServices>();
     builder.Services.AddScoped<IDamageClassService, DamageClassService>();
     builder.Services.AddScoped<IDamageTypeService, DamageTypeService>();

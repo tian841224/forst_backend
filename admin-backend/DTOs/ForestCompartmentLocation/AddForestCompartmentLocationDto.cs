@@ -1,4 +1,4 @@
-﻿using CommonLibrary.DTOs;
+﻿using CommonLibrary.Extensions;
 using System.ComponentModel.DataAnnotations;
 
 namespace admin_backend.DTOs.ForestCompartmentLocation

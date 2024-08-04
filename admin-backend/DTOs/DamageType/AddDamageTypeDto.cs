@@ -1,5 +1,5 @@
 ﻿using admin_backend.Enums;
-using CommonLibrary.DTOs;
+using CommonLibrary.Extensions;
 using System.ComponentModel.DataAnnotations;
 
 namespace admin_backend.DTOs.DamageType

@@ -1,4 +1,5 @@
 using admin_backend.Data;
+using admin_backend.Extensions;
 using admin_backend.Infrastructure;
 using admin_backend.Interfaces;
 using admin_backend.Middleware;
@@ -148,11 +149,12 @@ try
             .AddJsonFile("appsettings.json")
             .Build();
 
+        var expiredHours = config.GetSection("JwtConfig")["Expired"];
         var jwtSecret = config.GetSection("JwtConfig")["SecretKey"];
 
-        if (string.IsNullOrEmpty(jwtSecret))
+        if (string.IsNullOrEmpty(jwtSecret) || string.IsNullOrEmpty(expiredHours))
         {
-            throw new InvalidOperationException("JwtConfig:Secret is missing or empty in appsettings.json");
+            throw new InvalidOperationException("JwtConfig is missing or empty in appsettings.json");
         }
 
         jwt.SaveToken = true;
@@ -164,7 +166,7 @@ try
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.FromHours(int.Parse(expiredHours))
         };
     });
     #endregion

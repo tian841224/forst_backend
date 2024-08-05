@@ -7,7 +7,7 @@ using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
-using CommonLibrary.Interface;
+using CommonLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
@@ -48,7 +48,7 @@ namespace admin_backend.Services
                     if (string.IsNullOrEmpty(item.File)) continue;
                     var fileUpload = JsonSerializer.Deserialize<List<string>>(item.File);
                     if (fileUpload != null)
-                        fileList.AddRange(fileUpload);
+                        fileList.AddRange(fileUpload.Select(x => _fileService.Value.GetFile(x)));
 
                     result.Add(new ForestDiseasePublicationsResponse
                     {
@@ -110,7 +110,7 @@ namespace admin_backend.Services
                 if (string.IsNullOrEmpty(item.File)) continue;
                 var fileUpload = JsonSerializer.Deserialize<List<string>>(item.File);
                 if (fileUpload != null)
-                    fileList.AddRange(fileUpload);
+                    fileList.AddRange(fileUpload.Select(x => _fileService.Value.GetFile(x)));
 
                 result.Add(new ForestDiseasePublicationsResponse
                 {
@@ -158,9 +158,9 @@ namespace admin_backend.Services
             var fileUploadList = new List<string>();
             foreach (var file in dto.File)
             {
-                var fileName = $"{Guid.NewGuid()}";
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
                 var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
-                fileUploadList.Add(fileUploadDto.FileName);
+                fileUploadList.Add(_fileService.Value.GetFile(fileName));
             }
 
             var jsonResult = JsonSerializer.Serialize(fileUploadList);

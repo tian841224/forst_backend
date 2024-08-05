@@ -8,7 +8,7 @@ namespace admin_backend.Controllers
     /// 檔案相關
     /// </summary>
     [ApiController]
-    [Route("[controller]")]
+    [Route("[Action]")]
     public class FileController : ControllerBase
     {
         private readonly IFileService _fileService;
@@ -31,7 +31,36 @@ namespace admin_backend.Controllers
             }
 
             var fileBytes = System.IO.File.ReadAllBytes(path);
-            return File(fileBytes, "application/octet-stream", path);
+            return File(fileBytes, "application/pdf", path);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{fileId}")]
+        public IActionResult Image(string fileId)
+        {
+            var path = $"{_fileService.GetFileUploadPath()}/{fileId}";
+
+            // 確認文件存在
+            if (!System.IO.File.Exists(path))
+            {
+                return NotFound();
+            }
+
+            var fileBytes = System.IO.File.ReadAllBytes(path);
+            var mimeType = "image/jpeg"; // 默认 MIME 类型
+            var extension = Path.GetExtension(path).ToLowerInvariant();
+            switch (extension)
+            {
+                case ".png":
+                    mimeType = "image/png";
+                    break;
+                case ".gif":
+                    mimeType = "image/gif";
+                    break;
+                    // 添加其他文件类型
+            }
+
+            return File(fileBytes, mimeType);
         }
     }
 }

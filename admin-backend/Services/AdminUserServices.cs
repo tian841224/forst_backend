@@ -6,9 +6,8 @@ using admin_backend.Enums;
 using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.Extensions;
-using CommonLibrary.Interface;
+using CommonLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 
 namespace admin_backend.Services
 {
@@ -48,7 +47,7 @@ namespace admin_backend.Services
             // 照片處理
             if (!string.IsNullOrEmpty(adminUser.Photo))
             {
-                adminUser.Photo = GetPhotoPath(adminUser.Photo);
+                adminUser.Photo = _fileService.Value.GetFile(adminUser.Photo,"image");
             }
 
             return _mapper.Map<AdminUserResponse>(adminUser);
@@ -93,7 +92,7 @@ namespace admin_backend.Services
                 // 照片處理
                 if (!string.IsNullOrEmpty(x.Photo))
                 {
-                    x.Photo = GetPhotoPath(x.Photo);
+                    x.Photo = _fileService.Value.GetFile(x.Photo, "image");
                 }
 
                 // 取得權限名稱
@@ -122,11 +121,12 @@ namespace admin_backend.Services
                 throw new ApiException($"此帳號已註冊-{dto.Name}");
             }
 
-            var file = Guid.NewGuid().ToString();
+            var photo = string.Empty;
             if (dto.Photo != null)
             {
+                photo = $"{Guid.NewGuid()}{Path.GetExtension(dto.Photo.FileName)}";
                 //上傳檔案
-                var fileUploadDto = await _fileService.Value.UploadFile(file, dto.Photo);
+                var fileUploadDto = await _fileService.Value.UploadFile(photo, dto.Photo);
             }
 
             adminUser = new AdminUser
@@ -137,7 +137,7 @@ namespace admin_backend.Services
                 Email = dto.Email,
                 RoleId = dto.RoleId,
                 Status = dto.Status,
-                Photo = file,
+                Photo = photo,
             };
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -164,7 +164,7 @@ namespace admin_backend.Services
                     await _context.SaveChangesAsync();
                 }
                 await transaction.CommitAsync();
-                adminUser.Photo = GetPhotoPath(file);
+                adminUser.Photo = _fileService.Value.GetFile(photo, "image");
                 return adminUser;
             }
             catch (Exception ex)
@@ -217,10 +217,11 @@ namespace admin_backend.Services
 
             if (dto.Photo != null)
             {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.Photo.FileName)}";
+
                 //上傳檔案
-                var fileUploadDto = await _fileService.Value.UploadFile(adminUser.Account, dto.Photo);
-                var file = JsonSerializer.Serialize(fileUploadDto);
-                adminUser.Photo = file;
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, dto.Photo);
+                adminUser.Photo = _fileService.Value.GetFile(fileUploadDto.FileName,"image");
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -251,13 +252,6 @@ namespace admin_backend.Services
                 _log.LogError(ex.Message);
                 throw;
             }
-        }
-        private string GetPhotoPath(string fileName)
-        {
-            var request = _httpContextAccessor.HttpContext.Request;
-            var domain = $"{request.Scheme}://{request.Host}";
-            var newPath = $"/image/{fileName}";
-            return domain + newPath;
         }
     }
 }

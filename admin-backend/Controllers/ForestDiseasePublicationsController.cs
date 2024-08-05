@@ -81,6 +81,20 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
+        /// 修改上傳檔案
+        /// </summary>
+        /// <param name="fileName">檔名</param>
+        /// <param name="file">檔案</param>
+        /// <returns></returns>
+        [HttpPut("{fileName}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateFile(string fileName, IFormFile file)
+        {
+            await _forestDiseasePublicationsService.UpdateFile(fileName, file);
+            return Ok();
+        }
+
+        /// <summary>
         /// 更新林木疫情出版品排序
         /// </summary>
         /// <param name="dto"></param>
@@ -104,10 +118,11 @@ namespace admin_backend.Controllers
             return Ok(await _forestDiseasePublicationsService.Delete(id));
         }
 
-        [HttpPost("[controller]/file/[action]")]
-        public async Task<IActionResult> GetFile(GetFileDto dto)
+        [AllowAnonymous]
+        [HttpGet("{fileId}")]
+        public async Task<IActionResult> GetFile(string fileId)
         {
-            var path = await _forestDiseasePublicationsService.GetFile(dto);
+            var path = await _forestDiseasePublicationsService.GetFile(fileId);
 
             // 確認文件存在
             if (!System.IO.File.Exists(path))

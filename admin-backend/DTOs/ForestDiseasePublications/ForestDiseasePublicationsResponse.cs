@@ -33,7 +33,7 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// <summary>
         /// 出版品檔案
         /// </summary>
-        public string File { get; set; } = string.Empty;
+        public List<string> File { get; set; } = new();
 
         /// <summary>
         /// 出版品作者

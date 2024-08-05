@@ -31,10 +31,10 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// </summary>
         public string? Unit { get; set; } = string.Empty;
 
-        /// <summary>
-        /// 出版品檔案
-        /// </summary>
-        public IFormFile? File { get; set; }
+        ///// <summary>
+        ///// 出版品檔案
+        ///// </summary>
+        //public IFormFile? File { get; set; }
 
         /// <summary>
         /// 出版品作者

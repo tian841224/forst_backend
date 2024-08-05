@@ -1,5 +1,7 @@
-﻿using admin_backend.Entities;
+﻿using admin_backend.DTOs.ForestDiseasePublications;
+using admin_backend.Entities;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace admin_backend.Extensions
 {
@@ -24,6 +26,8 @@ namespace admin_backend.Extensions
                     CreateMap(entityType, dtoType).ReverseMap();
                 }
             }
+
+            CreateMap<ForestDiseasePublications, ForestDiseasePublicationsResponse>().ReverseMap();
 
             // 對某個命名空間下的所有類進行映射
             this.RecognizePrefixes("CommonLibrary.Entities", "CommonLibrary.DTOs");

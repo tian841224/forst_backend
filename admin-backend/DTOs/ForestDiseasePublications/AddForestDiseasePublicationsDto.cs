@@ -36,7 +36,8 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// <summary>
         /// 出版品檔案
         /// </summary>
-        public IFormFile? File { get; set; }
+        [Required]
+        public List<IFormFile?> File { get; set; } = new List<IFormFile?>();
 
         /// <summary>
         /// 出版品作者

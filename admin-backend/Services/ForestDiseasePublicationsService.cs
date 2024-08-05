@@ -8,7 +8,6 @@ using AutoMapper;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interface;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
@@ -34,33 +33,58 @@ namespace admin_backend.Services
 
         public async Task<List<ForestDiseasePublicationsResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
         {
+            var result = new List<ForestDiseasePublicationsResponse>();
             await using var _context = await _contextFactory.CreateDbContextAsync();
-
             IQueryable<ForestDiseasePublications> forestDiseasePublications = _context.ForestDiseasePublications;
 
-            if (Id.HasValue)
-                forestDiseasePublications = _context.ForestDiseasePublications.Where(x => x.Id == Id.Value);
-
-            foreach (var item in forestDiseasePublications)
+            try
             {
-                if (string.IsNullOrEmpty(item.File)) continue;
-                var fileDto = JsonSerializer.Deserialize<FileUploadDto>(item.File);
-                var file = string.Empty;
-                if (fileDto != null)
-                    file = await _fileService.Value.FileToBase64(fileDto.FilePath);
+                if (Id.HasValue)
+                    forestDiseasePublications = _context.ForestDiseasePublications.Where(x => x.Id == Id.Value);
+
+                foreach (var item in forestDiseasePublications)
+                {
+                    var fileList = new List<string>();
+                    if (string.IsNullOrEmpty(item.File)) continue;
+                    var fileUpload = JsonSerializer.Deserialize<List<string>>(item.File);
+                    if (fileUpload != null)
+                        fileList.AddRange(fileUpload);
+
+                    result.Add(new ForestDiseasePublicationsResponse
+                    {
+                        Id = item.Id,
+                        Type = item.Type,
+                        Name = item.Name,
+                        Author = item.Author,
+                        Date = item.Date,
+                        Link = item.Link,
+                        Sort = item.Sort,
+                        Status = item.Status,
+                        Unit = item.Unit,
+                        File = fileList,
+                        CreateTime = item.CreateTime,
+                        UpdateTime = item.UpdateTime,
+                    });
+                }
+
+                if (dto != null)
+                {
+                    var pagedResult = result.GetPaged(dto!);
+                    return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex.Message);
             }
 
-            if (dto != null)
-            {
-                var pagedResult = await forestDiseasePublications.GetPagedAsync(dto!);
-                return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
-            }
+            return result;
 
-            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(await forestDiseasePublications.ToListAsync());
         }
 
         public async Task<List<ForestDiseasePublicationsResponse>> Get(GetForestDiseasePublicationsDto dto)
         {
+            var result = new List<ForestDiseasePublicationsResponse>();
             await using var _context = await _contextFactory.CreateDbContextAsync();
             IQueryable<ForestDiseasePublications> forestDiseasePublications = _context.ForestDiseasePublications;
 
@@ -80,12 +104,39 @@ namespace admin_backend.Services
                 forestDiseasePublications = forestDiseasePublications.Where(x => x.Status == dto.Status.Value);
             }
 
-            var pagedResult = await forestDiseasePublications.GetPagedAsync(dto);
+            foreach (var item in forestDiseasePublications)
+            {
+                var fileList = new List<string>();
+                if (string.IsNullOrEmpty(item.File)) continue;
+                var fileUpload = JsonSerializer.Deserialize<List<string>>(item.File);
+                if (fileUpload != null)
+                    fileList.AddRange(fileUpload);
+
+                result.Add(new ForestDiseasePublicationsResponse
+                {
+                    Id = item.Id,
+                    Type = item.Type,
+                    Name = item.Name,
+                    Author = item.Author,
+                    Date = item.Date,
+                    Link = item.Link,
+                    Sort = item.Sort,
+                    Status = item.Status,
+                    Unit = item.Unit,
+                    File = fileList,
+                    CreateTime = item.CreateTime,
+                    UpdateTime = item.UpdateTime,
+                });
+            }
+
+            var pagedResult = result.GetPaged(dto!);
             return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items.OrderBy(x => dto.OrderBy));
         }
 
         public async Task<ForestDiseasePublicationsResponse> Add(AddForestDiseasePublicationsDto dto)
         {
+            var result = new ForestDiseasePublicationsResponse();
+
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
             var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.Name == dto.Name).FirstOrDefaultAsync();
@@ -95,55 +146,55 @@ namespace admin_backend.Services
                 throw new ApiException($"此名稱重複-{dto.Name}");
             }
 
+            forestDiseasePublications = new ForestDiseasePublications();
+
+            if (dto.File.Count == 0)
+            {
+                throw new ApiException($"請上傳檔案");
+            }
+
+            //上傳檔案
+            var date = $"{DateTime.Now.Year}{DateTime.Now.Month}{DateTime.Now.Day}";
+            var fileUploadList = new List<string>();
+            foreach (var file in dto.File)
+            {
+                var fileName = $"{Guid.NewGuid()}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
+                fileUploadList.Add(fileUploadDto.FileName);
+            }
+
+            var jsonResult = JsonSerializer.Serialize(fileUploadList);
+
             if (dto.Type == 1)
             {
 #pragma warning disable CS8602 // 可能 null 參考的取值 (dereference)。
-                if (string.IsNullOrEmpty(dto.Unit) || dto.File.Length == 0)
+                if (string.IsNullOrEmpty(dto.Unit))
                 {
-                    throw new ApiException($"請輸入出版單位及檔案");
+                    throw new ApiException($"請輸入出版單位");
                 }
 #pragma warning restore CS8602 // 可能 null 參考的取值 (dereference)。
-
-                //上傳檔案
-                var fileName = $"{DateTime.Now.ToTimestamp().ToString}";
-                var fileUploadDto = await _fileService.Value.UploadFile(fileName, dto.File);
-                var file = JsonSerializer.Serialize(fileUploadDto);
-
-                forestDiseasePublications = new ForestDiseasePublications
-                {
-                    Name = dto.Name,
-                    Unit = dto.Unit,
-                    File = file,
-                    Type = dto.Type,
-                    Status = dto.Status,
-                    Sort = dto.Sort,
-                };
+                forestDiseasePublications.Name = dto.Name;
+                forestDiseasePublications.Unit = dto.Unit;
+                forestDiseasePublications.Type = dto.Type;
+                forestDiseasePublications.Status = dto.Status;
+                forestDiseasePublications.Sort = dto.Sort;
+                forestDiseasePublications.File = jsonResult;
             }
             else
             {
-                if (dto.Authors!.Count == 0 || !dto.Date.HasValue || string.IsNullOrEmpty(dto.Link) || dto.File.Length == 0)
+                if (dto.Authors!.Count == 0 || !dto.Date.HasValue || string.IsNullOrEmpty(dto.Link))
                 {
-                    throw new ApiException($"請輸入出版單位及檔案");
+                    throw new ApiException($"請輸入作者、日期、連結");
                 }
 
-                string Authors = JsonSerializer.Serialize(dto.Authors);
-
-                //上傳檔案
-                var fileName = $"{DateTime.Now.ToTimestamp().ToString}";
-                var fileUploadDto = await _fileService.Value.UploadFile(fileName, dto.File);
-                var file = JsonSerializer.Serialize(fileUploadDto);
-
-                forestDiseasePublications = new ForestDiseasePublications
-                {
-                    Name = dto.Name,
-                    Link = dto.Link,
-                    Date = dto.Date.Value,
-                    Author = Authors,
-                    Type = dto.Type,
-                    Status = dto.Status,
-                    Sort = dto.Sort,
-                    File = file,
-                };
+                forestDiseasePublications.File = jsonResult;
+                forestDiseasePublications.Name = dto.Name;
+                forestDiseasePublications.Link = dto.Link;
+                forestDiseasePublications.Date = dto.Date.Value;
+                forestDiseasePublications.Author = JsonSerializer.Serialize(dto.Authors);
+                forestDiseasePublications.Type = dto.Type;
+                forestDiseasePublications.Status = dto.Status;
+                forestDiseasePublications.Sort = dto.Sort;
             }
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -160,7 +211,21 @@ namespace admin_backend.Services
                 });
             }
             scope.Complete();
-            return _mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications);
+
+            result.Id = forestDiseasePublications.Id;
+            result.CreateTime = forestDiseasePublications.CreateTime;
+            result.UpdateTime = forestDiseasePublications.UpdateTime;
+            result.Name = dto.Name;
+            result.Unit = dto.Unit ?? string.Empty;
+            result.Author = dto.Authors.Count == 0 ? string.Empty : JsonSerializer.Serialize(dto.Authors);
+            result.Link = dto.Link ?? string.Empty;
+            result.Date = dto.Date.Value;
+            result.Type = dto.Type;
+            result.Status = dto.Status;
+            result.Sort = dto.Sort;
+            result.File = fileUploadList;
+
+            return result;
         }
 
         public async Task<ForestDiseasePublicationsResponse> Update(int Id, UpdateForestDiseasePublicationsDto dto)
@@ -213,6 +278,10 @@ namespace admin_backend.Services
             return _mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications);
         }
 
+        public async Task UpdateFile(string fileName, IFormFile file)
+        {
+            await _fileService.Value.UploadFile(fileName, file);
+        }
 
         public async Task<List<ForestDiseasePublicationsResponse>> UpdateSort(List<SortBasicDto> dto)
         {
@@ -276,25 +345,27 @@ namespace admin_backend.Services
             return _mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications);
         }
 
-        public async Task<string> GetFile(GetFileDto dto)
+        public async Task<string> GetFile(string FileName)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.Id == dto.Id && x.File.Contains(dto.FileName)).FirstOrDefaultAsync();
+            var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.File.Contains(FileName)).FirstOrDefaultAsync();
 
             if (forestDiseasePublications == null)
             {
-                throw new ApiException($"找不到此資料-{dto.Id}");
+                throw new ApiException($"找不到此資料-{FileName}");
             }
 
-            var fileDto = JsonSerializer.Deserialize<FileUploadDto>(forestDiseasePublications.File);
+            var fileList = JsonSerializer.Deserialize<List<string>>(forestDiseasePublications.File);
 
-            if (fileDto == null)
+            if (fileList == null)
             {
-                throw new ApiException($"未上傳或找不到檔案-{dto.Id}");
+                throw new ApiException($"未上傳或找不到檔案-{FileName}");
             }
 
-            return fileDto.FilePath;
+            var fileUploadPath = _fileService.Value.GetFileUploadPath();
+
+            return $"{fileUploadPath}/{fileList.Where(x => x == FileName).FirstOrDefault()!}";
         }
     }
 }

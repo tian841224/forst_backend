@@ -5,7 +5,6 @@ using admin_backend.Entities;
 using admin_backend.Enums;
 using admin_backend.Interfaces;
 using AutoMapper;
-using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -36,29 +35,30 @@ namespace admin_backend.Services
 
         public async Task<AdminUserResponse> Get()
         {
-            //取得IP
-            var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
-            //取得Jwt Token資訊
-            var JwtClaims = _httpContextAccessor.HttpContext?.User?.Claims.ToList();
-
             var claimsDto = _identityService.Value.GetUser();
 
             int.TryParse(claimsDto.UserId, out int AdminUserId);
 
-            var adminUser = (await Get(new GetAdminUserDto { Id = AdminUserId })).FirstOrDefault() ?? new AdminUserResponse();
+            var adminUser = (await Get(new GetAdminUserDto { Id = AdminUserId })).Items.FirstOrDefault() ?? new AdminUserResponse();
 
             //取得權限名稱
             var role = (await _roleService.Get(new GetRoleDto { Id = adminUser.RoleId })).FirstOrDefault() ?? new RoleResponse();
             adminUser.RoleName = role.Name;
 
+            // 照片處理
+            if (!string.IsNullOrEmpty(adminUser.Photo))
+            {
+                adminUser.Photo = GetPhotoPath(adminUser.Photo);
+            }
+
             return _mapper.Map<AdminUserResponse>(adminUser);
         }
 
-        public async Task<List<AdminUserResponse>> Get(GetAdminUserDto dto)
+        public async Task<PagedResult<AdminUserResponse>> Get(GetAdminUserDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<AdminUser> query = _context.AdminUser.AsQueryable();
+            IQueryable<AdminUser> query = _context.AdminUser;
 
             if (dto.Id.HasValue)
             {
@@ -86,24 +86,14 @@ namespace admin_backend.Services
                 query = query.Where(x => x.Status == dto.Status);
             }
 
-            var pagedResult = await query.GetPagedAsync(dto);
-
-            var adminUserResponse = _mapper.Map<List<AdminUserResponse>>(pagedResult.Items.OrderBy(x => dto.OrderBy));
+            var adminUserResponse = _mapper.Map<List<AdminUserResponse>>(query.OrderBy(x => dto.OrderBy));
 
             var tasks = adminUserResponse.Select(async x =>
             {
                 // 照片處理
                 if (!string.IsNullOrEmpty(x.Photo))
                 {
-                    var fileDto = JsonSerializer.Deserialize<FileUploadDto>(x.Photo);
-                    if (!string.IsNullOrEmpty(x.Photo))
-                    {
-                        if (fileDto != null)
-                        {
-                            string file = await _fileService.Value.FileToBase64(fileDto.FilePath);
-                            x.Photo = file;
-                        }
-                    }
+                    x.Photo = GetPhotoPath(x.Photo);
                 }
 
                 // 取得權限名稱
@@ -116,7 +106,9 @@ namespace admin_backend.Services
             // 等待所有任務完成
             await Task.WhenAll(tasks);
 
-            return adminUserResponse;
+            var pagedResult = adminUserResponse.GetPaged(dto);
+
+            return pagedResult;
         }
 
         public async Task<AdminUser> Add(AddAdminUserDto dto)
@@ -130,12 +122,11 @@ namespace admin_backend.Services
                 throw new ApiException($"此帳號已註冊-{dto.Name}");
             }
 
-            var file = string.Empty;
+            var file = Guid.NewGuid().ToString();
             if (dto.Photo != null)
             {
                 //上傳檔案
-                var fileUploadDto = await _fileService.Value.UploadFile(dto.Account, dto.Photo);
-                file = JsonSerializer.Serialize(fileUploadDto);
+                var fileUploadDto = await _fileService.Value.UploadFile(file, dto.Photo);
             }
 
             adminUser = new AdminUser
@@ -173,6 +164,7 @@ namespace admin_backend.Services
                     await _context.SaveChangesAsync();
                 }
                 await transaction.CommitAsync();
+                adminUser.Photo = GetPhotoPath(file);
                 return adminUser;
             }
             catch (Exception ex)
@@ -259,6 +251,13 @@ namespace admin_backend.Services
                 _log.LogError(ex.Message);
                 throw;
             }
+        }
+        private string GetPhotoPath(string fileName)
+        {
+            var request = _httpContextAccessor.HttpContext.Request;
+            var domain = $"{request.Scheme}://{request.Host}";
+            var newPath = $"/image/{fileName}";
+            return domain + newPath;
         }
     }
 }

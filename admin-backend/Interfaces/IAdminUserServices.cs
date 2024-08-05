@@ -1,5 +1,7 @@
 ﻿using admin_backend.DTOs.AdminUser;
 using admin_backend.Entities;
+using CommonLibrary.DTOs;
+using CommonLibrary.Extensions;
 
 namespace admin_backend.Interfaces
 {
@@ -7,8 +9,7 @@ namespace admin_backend.Interfaces
     {
          Task<AdminUserResponse> Get();
 
-        Task<List<AdminUserResponse>> Get(GetAdminUserDto dto);
-
+        Task<PagedResult<AdminUserResponse>> Get(GetAdminUserDto dto);
         Task<AdminUser> Add(AddAdminUserDto dto);
 
         Task<AdminUser> Update(int Id, UpdateAdminUserDto dto);

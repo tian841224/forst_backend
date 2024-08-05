@@ -1,13 +1,12 @@
 using admin_backend.Data;
-using admin_backend.Extensions;
 using admin_backend.Infrastructure;
 using admin_backend.Interfaces;
-using admin_backend.Middleware;
 using admin_backend.Services;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
-using CommonLibrary.Interface;
-using CommonLibrary.Service;
+using CommonLibrary.Interfaces;
+using CommonLibrary.Middlewares;
+using CommonLibrary.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -56,6 +55,7 @@ try
     builder.Services.AddScoped<IDamageTypeService, DamageTypeService>();
     builder.Services.AddScoped<IDocumentationService, DocumentationService>();
     builder.Services.AddScoped<IEpidemicSummaryService, EpidemicSummaryService>();
+    builder.Services.AddScoped<IFileService, FileService>();
     builder.Services.AddScoped<IForestCompartmentLocationService, ForestCompartmentLocationService>();
     builder.Services.AddScoped<ILoginServices, LoginServices>();
     builder.Services.AddScoped<IMailConfigService, MailConfigService>();

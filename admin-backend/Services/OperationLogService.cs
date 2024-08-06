@@ -30,7 +30,7 @@ namespace admin_backend.Services
             _identityService = identityService;
         }
 
-        public async Task<List<OperationLogResponse>> Get(GetOperationLogDto dto)
+        public async Task<PagedResult<OperationLogResponse>> Get(GetOperationLogDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
@@ -84,10 +84,11 @@ namespace admin_backend.Services
                         Type = x.Type.GetDisplayName(),
                         Content = x.Content,
                         Ip = x.Ip,
+                        Id = x.Id,
                     });
                 }
             }
-            return _mapper.Map<List<OperationLogResponse>>(result.GetPaged(dto.Page).Items);
+            return result.GetPaged(dto.Page);
         }
 
         public async Task Add(AddOperationLogDto dto)

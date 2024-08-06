@@ -50,7 +50,7 @@ namespace admin_backend.Services
                 adminUser.Photo = _fileService.Value.GetFile(adminUser.Photo,"image");
             }
 
-            return _mapper.Map<AdminUserResponse>(adminUser);
+            return adminUser;
         }
 
         public async Task<PagedResult<AdminUserResponse>> Get(GetAdminUserDto dto)

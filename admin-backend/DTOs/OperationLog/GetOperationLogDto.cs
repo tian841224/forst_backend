@@ -3,7 +3,7 @@ using CommonLibrary.DTOs;
 
 namespace admin_backend.DTOs.OperationLog
 {
-    public class GetOperationLogDto : PagedOperationDto
+    public class GetOperationLogDto
     {
         /// <summary>
         /// 角色ID
@@ -29,5 +29,10 @@ namespace admin_backend.DTOs.OperationLog
         /// 結束時間
         /// </summary>
         public DateTime? EndTime { get; set; }
+
+        /// <summary>
+        /// 分頁參數
+        /// </summary>
+        public PagedOperationDto? Page { get; set; }
     }
 }

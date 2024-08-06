@@ -3,7 +3,7 @@ using CommonLibrary.DTOs;
 
 namespace admin_backend.DTOs.User
 {
-    public class GetUserDto : PagedOperationDto
+    public class GetUserDto 
     {
         public int? Id { get; set; }
 
@@ -26,5 +26,10 @@ namespace admin_backend.DTOs.User
         /// 最後登入時間
         /// </summary>
         public DateTime? LoginTime { get; set; }
+
+        /// <summary>
+        /// 分頁參數
+        /// </summary>
+        public PagedOperationDto? Page { get; set; }
     }
 }

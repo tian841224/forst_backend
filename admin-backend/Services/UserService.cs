@@ -58,9 +58,9 @@ namespace admin_backend.Services
                 user = user.Where(x => x.LoginTime == dto.LoginTime);
             }
 
-            var pagedResult = await user.GetPagedAsync(dto);
+            var pagedResult = user.GetPaged(dto.Page);
 
-            return _mapper.Map<List<UserResponse>>(pagedResult.Items.OrderBy(x => dto.OrderBy));
+            return _mapper.Map<List<UserResponse>>(pagedResult.Items);
         }
 
         public async Task<UserResponse> Add(AddUserDto dto)

@@ -39,8 +39,8 @@ namespace admin_backend.Services
             if (dto != null)
             {
                 //分頁處理
-                var pagedResult = await query.GetPagedAsync(dto!);
-                return _mapper.Map<RolePermissionResponse>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
+                var pagedResult = query.GetPaged(dto!);
+                return _mapper.Map<RolePermissionResponse>(pagedResult.Items);
             }
 
             return _mapper.Map<RolePermissionResponse>(await query.ToListAsync());

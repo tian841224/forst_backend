@@ -44,7 +44,7 @@ namespace admin_backend.Services
                 query = query.Where(x => x.Name == dto.Name);
             }
 
-            var pagedResult = await query.GetPagedAsync(dto);
+            var pagedResult = query.GetPaged(dto);
 
             return _mapper.Map<List<RoleResponse>>(pagedResult.Items.OrderBy(x => dto.OrderBy));
         }

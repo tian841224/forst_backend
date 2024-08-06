@@ -7,6 +7,7 @@ using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 
@@ -38,7 +39,7 @@ namespace admin_backend.Services
             if (dto != null)
             {
                 //分頁處理
-                var pageResult = await damageTypes.GetPagedAsync(dto!);
+                var pageResult =  damageTypes.GetPaged(dto!);
                 return _mapper.Map<List<DamageTypeResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
             }
 
@@ -66,8 +67,8 @@ namespace admin_backend.Services
             }
 
             //分頁處理
-            var pageResult = await damageTypes.GetPagedAsync(dto!);
-            return _mapper.Map<List<DamageTypeResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
+            var pageResult = damageTypes.GetPaged(dto.Page);
+            return _mapper.Map<List<DamageTypeResponse>>(pageResult.Items);
         }
 
         public async Task<DamageTypeResponse> Add(AddDamageTypeDto dto)

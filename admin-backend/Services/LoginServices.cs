@@ -5,7 +5,7 @@ using admin_backend.Enums;
 using admin_backend.Interfaces;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
-using CommonLibrary.Interface;
+using CommonLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Data;
@@ -18,10 +18,6 @@ namespace admin_backend.Services
         private readonly JwtConfig _jwtConfig;
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly Lazy<IIdentityService> _identityService;
-        private const string ADMIN_USER_REFRESH_TOKEN_KEY_PRE = "ADMIN_USER_REFRESH_TOKEN_KEY_PRE:";
-        private const string ADMIN_USER_ID_FROM_REFRESH_TOKEN_PRE = "ADMIN_USER_ID_FROM_REFRESH_TOKEN_PRE:";
-        private const string CAPTCHA_CODE_PRE = "CAPTCHA_CODE_PRE:";
-
 
         public LoginServices(IDbContextFactory<MysqlDbContext> contextFactory, IOptions<JwtConfig> jwtConfig, ILogger<LoginServices> log, Lazy<IIdentityService> identityService)
         {
@@ -58,7 +54,7 @@ namespace admin_backend.Services
             //取得Token
             var token = _identityService.Value.GenerateToken(new GenerateTokenDto
             {
-                Id = adminUser.Id,
+                Id = adminUser.Id.ToString(),
                 //RefreshToken = refreshToken,
                 Claims = new ClaimDto
                 {

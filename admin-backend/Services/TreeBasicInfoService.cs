@@ -35,8 +35,8 @@ namespace admin_backend.Services
             if (id != null)
                 treeBasicInfo = _context.TreeBasicInfo.Where(x => x.Id == id);
 
-            var pagedResult = await treeBasicInfo.GetPagedAsync(dto!);
-            return _mapper.Map<List<TreeBasicInfoResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
+            var pagedResult = treeBasicInfo.GetPaged(dto!);
+            return _mapper.Map<List<TreeBasicInfoResponse>>(pagedResult.Items);
         }
 
         public async Task<List<TreeBasicInfoResponse>> Get(GetTreeBasicInfoDto dto)
@@ -56,8 +56,8 @@ namespace admin_backend.Services
 
             if (dto != null)
             {
-                var pagedResult = await treeBasicInfos.GetPagedAsync(dto!);
-                return _mapper.Map<List<TreeBasicInfoResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
+                var pagedResult = treeBasicInfos.GetPaged(dto.Page);
+                return _mapper.Map<List<TreeBasicInfoResponse>>(pagedResult.Items);
             }
 
             return _mapper.Map<List<TreeBasicInfoResponse>>(await treeBasicInfos.ToListAsync());

@@ -6,7 +6,7 @@ using admin_backend.Enums;
 using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.DTOs;
-using CommonLibrary.Interface;
+using CommonLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Mail;
 using System.Transactions;

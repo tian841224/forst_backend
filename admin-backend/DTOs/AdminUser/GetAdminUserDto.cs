@@ -3,7 +3,7 @@ using CommonLibrary.DTOs;
 
 namespace admin_backend.DTOs.AdminUser
 {
-    public class GetAdminUserDto : PagedOperationDto
+    public class GetAdminUserDto 
     {
         public int? Id { get; set; }
 
@@ -21,5 +21,10 @@ namespace admin_backend.DTOs.AdminUser
         /// 狀態 0 = 關閉, 1 = 開啟 
         /// </summary>
         public StatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 分頁參數
+        /// </summary>
+        public PagedOperationDto? Page { get; set; }
     }
 }

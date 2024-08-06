@@ -37,7 +37,7 @@ namespace admin_backend.Services
                 forestCompartmentLocation = _context.ForestCompartmentLocation.Where(x => x.Id == Id).AsQueryable();
 
             //分頁處理
-            var pageResult = await forestCompartmentLocation.GetPagedAsync(dto!);
+            var pageResult = forestCompartmentLocation.GetPaged(dto!);
             return _mapper.Map<List<ForestCompartmentLocationResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
         }
 
@@ -59,7 +59,7 @@ namespace admin_backend.Services
             }
 
             //分頁處理
-            forestCompartmentLocations = (await query.GetPagedAsync(dto!)).Items;
+            forestCompartmentLocations = (query.GetPaged(dto!)).Items;
 
             return _mapper.Map<List<ForestCompartmentLocationResponse>>(forestCompartmentLocations.OrderBy(x => dto!.OrderBy));
         }

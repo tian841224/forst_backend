@@ -2,10 +2,13 @@
 
 namespace admin_backend.DTOs.DamageType
 {
-    public class GetDamageClassDto : PagedOperationDto
+    public class GetDamageClassDto 
     {
         public int TypeId { get; set; }
 
-        //public PagedOperationDto? PagedOperation { get; set; } = null;
+        /// <summary>
+        /// 分頁參數
+        /// </summary>
+        public PagedOperationDto? Page { get; set; }
     }
 }

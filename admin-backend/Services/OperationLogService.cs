@@ -5,7 +5,7 @@ using admin_backend.Entities;
 using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.Extensions;
-using CommonLibrary.Interface;
+using CommonLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
 
@@ -44,9 +44,9 @@ namespace admin_backend.Services
                     RoleId = dto.RoleId.Value,
                 });
 
-                if (adminUser.Any())
+                if (adminUser.Items.Any())
                 {
-                    var adminUserIds = adminUser.Select(y => y.Id).ToList();
+                    var adminUserIds = adminUser.Items.Select(y => y.Id).ToList();
                     operationLog = _context.OperationLog.Where(x => adminUserIds.Contains(x.Id));
                 }
             }
@@ -73,7 +73,7 @@ namespace admin_backend.Services
 
             foreach (var x in operationLog)
             {
-                var adminUser = (await _adminUserServices.Get(new GetAdminUserDto { Id = x.AdminUserId })).FirstOrDefault();
+                var adminUser = (await _adminUserServices.Get(new GetAdminUserDto { Id = x.AdminUserId })).Items.FirstOrDefault();
                 if (adminUser != null)
                 {
                     var name = adminUser.Name;
@@ -87,7 +87,7 @@ namespace admin_backend.Services
                     });
                 }
             }
-            return _mapper.Map<List<OperationLogResponse>>(result.GetPaged(dto).Items.OrderBy(x => dto.OrderBy));
+            return _mapper.Map<List<OperationLogResponse>>(result.GetPaged(dto.Page).Items);
         }
 
         public async Task Add(AddOperationLogDto dto)

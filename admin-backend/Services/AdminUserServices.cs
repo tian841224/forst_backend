@@ -85,7 +85,7 @@ namespace admin_backend.Services
                 query = query.Where(x => x.Status == dto.Status);
             }
 
-            var adminUserResponse = _mapper.Map<List<AdminUserResponse>>(query.OrderBy(x => dto.OrderBy));
+            var adminUserResponse = _mapper.Map<List<AdminUserResponse>>(query);
 
             var tasks = adminUserResponse.Select(async x =>
             {
@@ -105,7 +105,7 @@ namespace admin_backend.Services
             // 等待所有任務完成
             await Task.WhenAll(tasks);
 
-            var pagedResult = adminUserResponse.GetPaged(dto);
+            var pagedResult = adminUserResponse.GetPaged(dto.Page);
 
             return pagedResult;
         }

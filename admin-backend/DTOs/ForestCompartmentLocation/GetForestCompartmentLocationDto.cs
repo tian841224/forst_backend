@@ -12,6 +12,6 @@ namespace admin_backend.DTOs.ForestCompartmentLocation
         /// <summary>
         /// 分頁參數
         /// </summary>
-        public PagedOperationDto? Page { get; set; }
+        public PagedOperationDto? Page { get; set; } = new PagedOperationDto();
     }
 }

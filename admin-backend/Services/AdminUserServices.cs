@@ -221,7 +221,7 @@ namespace admin_backend.Services
 
                 //¤W¶ÇÀÉ®×
                 var fileUploadDto = await _fileService.Value.UploadFile(fileName, dto.Photo);
-                adminUser.Photo = _fileService.Value.GetFile(fileUploadDto.FileName,"image");
+                adminUser.Photo = fileName;
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();

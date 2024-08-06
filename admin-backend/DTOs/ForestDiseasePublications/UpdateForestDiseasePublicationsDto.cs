@@ -1,6 +1,4 @@
 ﻿using admin_backend.Enums;
-using Microsoft.AspNetCore.Http;
-using System.ComponentModel.DataAnnotations;
 
 namespace admin_backend.DTOs.ForestDiseasePublications
 {
@@ -31,9 +29,9 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// </summary>
         public string? Unit { get; set; } = string.Empty;
 
-        ///// <summary>
-        ///// 出版品檔案
-        ///// </summary>
+        /////// <summary>
+        /////// 出版品檔案
+        /////// </summary>
         //public IFormFile? File { get; set; }
 
         /// <summary>

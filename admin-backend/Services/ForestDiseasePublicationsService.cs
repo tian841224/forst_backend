@@ -8,6 +8,7 @@ using AutoMapper;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interfaces;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
@@ -31,8 +32,9 @@ namespace admin_backend.Services
             _fileService = fileService;
         }
 
-        public async Task<List<ForestDiseasePublicationsResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
+        public async Task<PagedResult<ForestDiseasePublicationsResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
         {
+            if (dto == null) dto = new PagedOperationDto();
             var result = new List<ForestDiseasePublicationsResponse>();
             await using var _context = await _contextFactory.CreateDbContextAsync();
             IQueryable<ForestDiseasePublications> forestDiseasePublications = _context.ForestDiseasePublications;
@@ -66,23 +68,16 @@ namespace admin_backend.Services
                         UpdateTime = item.UpdateTime,
                     });
                 }
-
-                if (dto != null)
-                {
-                    var pagedResult = result.GetPaged(dto!);
-                    return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items.OrderBy(x => dto!.OrderBy));
-                }
+                return result.GetPaged(dto!);
             }
             catch (Exception ex)
             {
                 _log.LogError(ex.Message);
+                throw;
             }
-
-            return result;
-
         }
 
-        public async Task<List<ForestDiseasePublicationsResponse>> Get(GetForestDiseasePublicationsDto dto)
+        public async Task<PagedResult<ForestDiseasePublicationsResponse>> Get(GetForestDiseasePublicationsDto dto)
         {
             var result = new List<ForestDiseasePublicationsResponse>();
             await using var _context = await _contextFactory.CreateDbContextAsync();
@@ -130,7 +125,7 @@ namespace admin_backend.Services
             }
 
             var pagedResult = result.GetPaged(dto.Page!);
-            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items);
+            return pagedResult;
         }
 
         public async Task<ForestDiseasePublicationsResponse> Add(AddForestDiseasePublicationsDto dto)
@@ -275,12 +270,46 @@ namespace admin_backend.Services
                 });
             }
             scope.Complete();
+
             return _mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications);
         }
 
-        public async Task UpdateFile(string fileName, IFormFile file)
+        public async Task UpdateFile(int Id, List<IFormFile> files)
         {
-            await _fileService.Value.UploadFile(fileName, file);
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.Id == Id).FirstOrDefaultAsync();
+
+            if (forestDiseasePublications == null)
+            {
+                throw new ApiException($"找不到此資料-{Id}");
+            }
+
+            var fileUploadList = new List<string>{ forestDiseasePublications.File };
+            foreach (var file in files)
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
+                fileUploadList.Add(fileName);
+            }
+
+            var jsonResult = JsonSerializer.Serialize(fileUploadList);
+            forestDiseasePublications.File = jsonResult;
+
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            _context.ForestDiseasePublications.Update(forestDiseasePublications);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Value.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Edit,
+                    Content = $"修改出版品附件{forestDiseasePublications.Name}",
+                });
+            }
+            scope.Complete();
         }
 
         public async Task<List<ForestDiseasePublicationsResponse>> UpdateSort(List<SortBasicDto> dto)
@@ -345,27 +374,64 @@ namespace admin_backend.Services
             return _mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications);
         }
 
-        public async Task<string> GetFile(string FileName)
+        public async Task DeleteFile(int Id, string fileId)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.File.Contains(FileName)).FirstOrDefaultAsync();
+            var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (forestDiseasePublications == null)
             {
-                throw new ApiException($"找不到此資料-{FileName}");
+                throw new ApiException($"找不到此資料-{Id}");
             }
 
             var fileList = JsonSerializer.Deserialize<List<string>>(forestDiseasePublications.File);
-
-            if (fileList == null)
+            if( fileList.Where(x => x.Contains(fileId)).Any())
             {
-                throw new ApiException($"未上傳或找不到檔案-{FileName}");
+                var removeFile = fileList.Where(_x => _x.Contains(fileId)).FirstOrDefault();
+                fileList.Remove(removeFile);
             }
 
-            var fileUploadPath = _fileService.Value.GetFileUploadPath();
+            var jsonResult = JsonSerializer.Serialize(fileList);
+            forestDiseasePublications.File = jsonResult;
 
-            return $"{fileUploadPath}/{fileList.Where(x => x == FileName).FirstOrDefault()!}";
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            _context.ForestDiseasePublications.Update(forestDiseasePublications);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Value.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Edit,
+                    Content = $"刪除出版品附件-{forestDiseasePublications.Name}/{fileId}",
+                });
+            }
+            scope.Complete();
         }
+
+        //public async Task<string> GetFile(string FileName)
+        //{
+        //    await using var _context = await _contextFactory.CreateDbContextAsync();
+
+        //    var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.File.Contains(FileName)).FirstOrDefaultAsync();
+
+        //    if (forestDiseasePublications == null)
+        //    {
+        //        throw new ApiException($"找不到此資料-{FileName}");
+        //    }
+
+        //    var fileList = JsonSerializer.Deserialize<List<string>>(forestDiseasePublications.File);
+
+        //    if (fileList == null)
+        //    {
+        //        throw new ApiException($"未上傳或找不到檔案-{FileName}");
+        //    }
+
+        //    var fileUploadPath = _fileService.Value.GetFileUploadPath();
+
+        //    return $"{fileUploadPath}/{fileList.Where(x => x == FileName).FirstOrDefault()!}";
+        //}
     }
 }

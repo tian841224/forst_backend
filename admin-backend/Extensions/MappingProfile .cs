@@ -10,8 +10,6 @@ namespace admin_backend.Extensions
     {
         public MappingProfile()
         {
-            CreateMap<ForestDiseasePublications, ForestDiseasePublicationsResponse>().ReverseMap();
-
             // 對某個命名空間下的所有類進行映射
             this.RecognizePrefixes("admin_backend.Entities", "admin_backend.DTOs");
             this.RecognizeDestinationPrefixes("admin_backend.DTOs");
@@ -38,6 +36,12 @@ namespace admin_backend.Extensions
                     CreateMap(entityType, dtoType).ReverseMap();
                 }
             }
+
+            //忽略File
+            CreateMap<ForestDiseasePublications, ForestDiseasePublicationsResponse>()
+             .ForMember(dest => dest.File, opt => opt.Ignore())
+             .IgnoreAllPropertiesWithAnInaccessibleSetter()
+             .IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
         }
     }
 }

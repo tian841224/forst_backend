@@ -83,14 +83,14 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 修改上傳檔案
         /// </summary>
-        /// <param name="fileName">檔名</param>
+        /// <param name="id"></param>
         /// <param name="file">檔案</param>
         /// <returns></returns>
-        [HttpPut("{fileName}")]
+        [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateFile(string fileName, IFormFile file)
+        public async Task<IActionResult> UpdateFile(int id, List<IFormFile> file)
         {
-            await _forestDiseasePublicationsService.UpdateFile(fileName, file);
+            await _forestDiseasePublicationsService.UpdateFile(id, file);
             return Ok();
         }
 
@@ -118,20 +118,18 @@ namespace admin_backend.Controllers
             return Ok(await _forestDiseasePublicationsService.Delete(id));
         }
 
-        [AllowAnonymous]
-        [HttpGet("{fileId}")]
-        public async Task<IActionResult> GetFile(string fileId)
+        /// <summary>
+        /// 刪除附件
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="fileId">檔案ID</param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteFile(int id,string fileId)
         {
-            var path = await _forestDiseasePublicationsService.GetFile(fileId);
-
-            // 確認文件存在
-            if (!System.IO.File.Exists(path))
-            {
-                return NotFound();
-            }
-
-            var fileBytes = System.IO.File.ReadAllBytes(path);
-            return File(fileBytes, "application/octet-stream", path);
+            await _forestDiseasePublicationsService.DeleteFile(id,fileId);
+            return Ok();
         }
     }
 }

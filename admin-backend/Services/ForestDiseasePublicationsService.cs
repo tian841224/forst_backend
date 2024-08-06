@@ -129,8 +129,8 @@ namespace admin_backend.Services
                 });
             }
 
-            var pagedResult = result.GetPaged(dto!);
-            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items.OrderBy(x => dto.OrderBy));
+            var pagedResult = result.GetPaged(dto.Page!);
+            return _mapper.Map<List<ForestDiseasePublicationsResponse>>(pagedResult.Items);
         }
 
         public async Task<ForestDiseasePublicationsResponse> Add(AddForestDiseasePublicationsDto dto)

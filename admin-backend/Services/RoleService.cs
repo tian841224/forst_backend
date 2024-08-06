@@ -44,9 +44,9 @@ namespace admin_backend.Services
                 query = query.Where(x => x.Name == dto.Name);
             }
 
-            var pagedResult = query.GetPaged(dto);
+            var pagedResult = query.GetPaged(dto.Page);
 
-            return _mapper.Map<List<RoleResponse>>(pagedResult.Items.OrderBy(x => dto.OrderBy));
+            return _mapper.Map<List<RoleResponse>>(pagedResult.Items);
         }
 
         public async Task<RoleResponse> Add(AddRoleDto dto)

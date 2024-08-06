@@ -38,7 +38,7 @@ namespace admin_backend.Services
 
             //分頁處理
             var pageResult = forestCompartmentLocation.GetPaged(dto!);
-            return _mapper.Map<List<ForestCompartmentLocationResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
+            return _mapper.Map<List<ForestCompartmentLocationResponse>>(pageResult.Items);
         }
 
         public async Task<List<ForestCompartmentLocationResponse>> Get(GetForestCompartmentLocationDto dto)
@@ -59,9 +59,9 @@ namespace admin_backend.Services
             }
 
             //分頁處理
-            forestCompartmentLocations = (query.GetPaged(dto!)).Items;
+            forestCompartmentLocations = (query.GetPaged(dto.Page!)).Items;
 
-            return _mapper.Map<List<ForestCompartmentLocationResponse>>(forestCompartmentLocations.OrderBy(x => dto!.OrderBy));
+            return _mapper.Map<List<ForestCompartmentLocationResponse>>(forestCompartmentLocations);
         }
 
         public async Task<ForestCompartmentLocationResponse> Add(AddForestCompartmentLocationDto dto)

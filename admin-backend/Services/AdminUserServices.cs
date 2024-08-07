@@ -41,14 +41,8 @@ namespace admin_backend.Services
             var adminUser = (await Get(new GetAdminUserDto { Id = AdminUserId })).Items.FirstOrDefault() ?? new AdminUserResponse();
 
             //取得權限名稱
-            var role = (await _roleService.Get(new GetRoleDto { Id = adminUser.RoleId })).FirstOrDefault() ?? new RoleResponse();
+            var role = (await _roleService.Get(new GetRoleDto { Id = adminUser.RoleId })).Items.FirstOrDefault() ?? new RoleResponse();
             adminUser.RoleName = role.Name;
-
-            // 照片處理
-            if (!string.IsNullOrEmpty(adminUser.Photo))
-            {
-                adminUser.Photo = _fileService.Value.GetFile(adminUser.Photo,"image");
-            }
 
             return adminUser;
         }
@@ -96,7 +90,7 @@ namespace admin_backend.Services
                 }
 
                 // 取得權限名稱
-                var role = (await _roleService.Get(new GetRoleDto { Id = x.RoleId })).FirstOrDefault() ?? new RoleResponse();
+                var role = (await _roleService.Get(new GetRoleDto { Id = x.RoleId })).Items.FirstOrDefault() ?? new RoleResponse();
                 x.RoleName = role.Name;
 
                 // 如果需要處理其他屬性，可以在這裡添加
@@ -105,12 +99,12 @@ namespace admin_backend.Services
             // 等待所有任務完成
             await Task.WhenAll(tasks);
 
-            var pagedResult = adminUserResponse.GetPaged(dto.Page);
+            var pagedResult = adminUserResponse.GetPaged(dto.Page!);
 
             return pagedResult;
         }
 
-        public async Task<AdminUser> Add(AddAdminUserDto dto)
+        public async Task<AdminUserResponse> Add(AddAdminUserDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
@@ -119,6 +113,13 @@ namespace admin_backend.Services
             if (adminUser != null)
             {
                 throw new ApiException($"此帳號已註冊-{dto.Name}");
+            }
+
+            var role = await _context.Role.Where(x => x.Id == dto.RoleId).FirstOrDefaultAsync();
+
+            if (role == null)
+            {
+                throw new ApiException($"此身分權限不存在-{dto.RoleId}");
             }
 
             var photo = string.Empty;
@@ -165,7 +166,7 @@ namespace admin_backend.Services
                 }
                 await transaction.CommitAsync();
                 adminUser.Photo = _fileService.Value.GetFile(photo, "image");
-                return adminUser;
+                return _mapper.Map<AdminUserResponse>(adminUser);
             }
             catch (Exception ex)
             {
@@ -174,7 +175,7 @@ namespace admin_backend.Services
                 throw;
             }
         }
-        public async Task<AdminUser> Update(int Id, UpdateAdminUserDto dto)
+        public async Task<AdminUserResponse> Update(int Id, UpdateAdminUserDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
@@ -183,6 +184,18 @@ namespace admin_backend.Services
             if (adminUser == null)
             {
                 throw new ApiException($"無此資料-{Id}");
+            }
+
+            if (dto.RoleId.HasValue)
+            {
+                var role = await _context.Role.Where(x => x.Id == dto.RoleId).FirstOrDefaultAsync();
+
+                if (role == null)
+                {
+                    throw new ApiException($"此身分權限不存在-{dto.RoleId}");
+                }
+
+                adminUser.RoleId = dto.RoleId.Value;
             }
 
             //取得IP
@@ -244,7 +257,9 @@ namespace admin_backend.Services
                     await _context.SaveChangesAsync();
                 }
                 await transaction.CommitAsync();
-                return adminUser;
+
+                return _mapper.Map<AdminUserResponse>(adminUser);
+
             }
             catch (Exception ex)
             {

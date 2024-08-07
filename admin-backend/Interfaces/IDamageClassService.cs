@@ -1,5 +1,4 @@
 ﻿using admin_backend.DTOs.DamageClass;
-using admin_backend.DTOs.DamageType;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 

@@ -81,16 +81,16 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 修改上傳檔案
+        /// 上傳檔案
         /// </summary>
         /// <param name="id"></param>
         /// <param name="file">檔案</param>
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateFile(int id, List<IFormFile> file)
+        public async Task<IActionResult> UploadFile(int id, List<IFormFile> file)
         {
-            await _forestDiseasePublicationsService.UpdateFile(id, file);
+            await _forestDiseasePublicationsService.UploadFile(id, file);
             return Ok();
         }
 

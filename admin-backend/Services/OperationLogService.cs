@@ -47,7 +47,7 @@ namespace admin_backend.Services
                 if (adminUser.Items.Any())
                 {
                     var adminUserIds = adminUser.Items.Select(y => y.Id).ToList();
-                    operationLog = _context.OperationLog.Where(x => adminUserIds.Contains(x.Id));
+                    operationLog = operationLog.Where(x => adminUserIds.Contains(x.AdminUserId));
                 }
             }
 
@@ -88,7 +88,7 @@ namespace admin_backend.Services
                     });
                 }
             }
-            return result.GetPaged(dto.Page);
+            return result.GetPaged(dto.Page!);
         }
 
         public async Task Add(AddOperationLogDto dto)

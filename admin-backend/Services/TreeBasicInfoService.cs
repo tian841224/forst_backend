@@ -27,19 +27,20 @@ namespace admin_backend.Services
             _operationLogService = operationLogService;
         }
 
-        public async Task<List<TreeBasicInfoResponse>> Get(int? id = null, PagedOperationDto? dto = null)
+        public async Task<PagedResult<TreeBasicInfoResponse>> Get(int? id = null, PagedOperationDto? dto = null)
         {
+            if (dto == null) dto = new PagedOperationDto();
             await using var _context = await _contextFactory.CreateDbContextAsync();
             IQueryable<TreeBasicInfo> treeBasicInfo = _context.TreeBasicInfo;
 
             if (id != null)
                 treeBasicInfo = _context.TreeBasicInfo.Where(x => x.Id == id);
 
-            var pagedResult = treeBasicInfo.GetPaged(dto!);
-            return _mapper.Map<List<TreeBasicInfoResponse>>(pagedResult.Items);
+            var treeBasicInfoResponse = _mapper.Map<List<TreeBasicInfoResponse>>(treeBasicInfo);
+            return treeBasicInfoResponse.GetPaged(dto!);
         }
 
-        public async Task<List<TreeBasicInfoResponse>> Get(GetTreeBasicInfoDto dto)
+        public async Task<PagedResult<TreeBasicInfoResponse>> Get(GetTreeBasicInfoDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
             IQueryable<TreeBasicInfo> treeBasicInfos = _context.TreeBasicInfo;
@@ -54,13 +55,8 @@ namespace admin_backend.Services
                 );
             }
 
-            if (dto != null)
-            {
-                var pagedResult = treeBasicInfos.GetPaged(dto.Page);
-                return _mapper.Map<List<TreeBasicInfoResponse>>(pagedResult.Items);
-            }
-
-            return _mapper.Map<List<TreeBasicInfoResponse>>(await treeBasicInfos.ToListAsync());
+            var treeBasicInfoResponse = _mapper.Map<List<TreeBasicInfoResponse>>(treeBasicInfos);
+            return treeBasicInfoResponse.GetPaged(dto.Page!);
         }
         public async Task<TreeBasicInfoResponse> Add(AddTreeBasicInfoDto dto)
         {

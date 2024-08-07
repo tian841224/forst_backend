@@ -124,8 +124,7 @@ namespace admin_backend.Services
                 });
             }
 
-            var pagedResult = result.GetPaged(dto.Page!);
-            return pagedResult;
+            return result.GetPaged(dto.Page!);
         }
 
         public async Task<ForestDiseasePublicationsResponse> Add(AddForestDiseasePublicationsDto dto)
@@ -212,9 +211,9 @@ namespace admin_backend.Services
             result.UpdateTime = forestDiseasePublications.UpdateTime;
             result.Name = dto.Name;
             result.Unit = dto.Unit ?? string.Empty;
-            result.Author = dto.Authors.Count == 0 ? string.Empty : JsonSerializer.Serialize(dto.Authors);
+            result.Author = dto.Authors!.Count == 0 ? string.Empty : JsonSerializer.Serialize(dto.Authors);
             result.Link = dto.Link ?? string.Empty;
-            result.Date = dto.Date.Value;
+            result.Date = dto.Date!.Value;
             result.Type = dto.Type;
             result.Status = dto.Status;
             result.Sort = dto.Sort;
@@ -386,10 +385,10 @@ namespace admin_backend.Services
             }
 
             var fileList = JsonSerializer.Deserialize<List<string>>(forestDiseasePublications.File);
-            if( fileList.Where(x => x.Contains(fileId)).Any())
+            if( fileList!.Where(x => x.Contains(fileId)).Any())
             {
-                var removeFile = fileList.Where(_x => _x.Contains(fileId)).FirstOrDefault();
-                fileList.Remove(removeFile);
+                var removeFile = fileList!.Where(_x => _x.Contains(fileId)).FirstOrDefault();
+                fileList!.Remove(removeFile!);
             }
 
             var jsonResult = JsonSerializer.Serialize(fileList);

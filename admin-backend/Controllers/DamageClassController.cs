@@ -71,13 +71,14 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 更新危害種類
         /// </summary>
+        /// <param name="Id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(UpdateDamageClassDto dto)
+        public async Task<IActionResult> Update(int Id, UpdateDamageClassDto dto)
         {
-            return Ok(await _damageClassService.Update(dto));
+            return Ok(await _damageClassService.Update(Id,dto));
         }
 
         /// <summary>

@@ -28,25 +28,24 @@ namespace admin_backend.Services
             _rolePermissionService = rolePermissionService;
         }
 
-        public async Task<List<RoleResponse>> Get(GetRoleDto dto)
+        public async Task<PagedResult<RoleResponse>> Get(GetRoleDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<Role> query = _context.Role;
+            IQueryable<Role> role = _context.Role;
 
             if (dto.Id.HasValue)
             {
-                query = query.Where(x => x.Id == dto.Id);
+                role = role.Where(x => x.Id == dto.Id);
             }
 
             if (!string.IsNullOrEmpty(dto.Name))
             {
-                query = query.Where(x => x.Name == dto.Name);
+                role = role.Where(x => x.Name == dto.Name);
             }
 
-            var pagedResult = query.GetPaged(dto.Page);
-
-            return _mapper.Map<List<RoleResponse>>(pagedResult.Items);
+            var roleResponse = _mapper.Map<List<RoleResponse>>(role);
+            return roleResponse.GetPaged(dto.Page!);
         }
 
         public async Task<RoleResponse> Add(AddRoleDto dto)

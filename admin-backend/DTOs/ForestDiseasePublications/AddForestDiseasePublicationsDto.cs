@@ -21,7 +21,7 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// <summary>
         /// 出版品日期
         /// </summary>
-        public DateTime? Date { get; set; }
+        public DateTime? Date { get; set; } = DateTime.MinValue;
 
         /// <summary>
         /// 出版品連結
@@ -42,7 +42,7 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// <summary>
         /// 出版品作者
         /// </summary>
-        public List<string>? Authors { get; set; }
+        public List<string>? Authors { get; set; } = new ();
 
         /// <summary>
         /// 發佈狀態 0 = 關閉, 1 = 開啟

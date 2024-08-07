@@ -27,7 +27,7 @@ namespace admin_backend.Services
             _operationLogService = operationLogService;
         }
 
-        public async Task<List<UserResponse>> Get(GetUserDto dto)
+        public async Task<PagedResult<UserResponse>> Get(GetUserDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
@@ -58,9 +58,8 @@ namespace admin_backend.Services
                 user = user.Where(x => x.LoginTime == dto.LoginTime);
             }
 
-            var pagedResult = user.GetPaged(dto.Page);
-
-            return _mapper.Map<List<UserResponse>>(pagedResult.Items);
+            var userResponse = _mapper.Map<List<UserResponse>>(user);
+            return userResponse.GetPaged(dto.Page!);
         }
 
         public async Task<UserResponse> Add(AddUserDto dto)

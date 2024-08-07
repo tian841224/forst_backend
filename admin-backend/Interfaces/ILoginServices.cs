@@ -6,6 +6,6 @@ namespace admin_backend.Interfaces
     public interface ILoginServices
     {
         Task<IdentityResultDto> Login(LoginDto dto);
-        Task ResetPassword(ResetPasswordDto dto);
+        void ResetPassword(ResetPasswordDto dto);
     }
 }

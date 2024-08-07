@@ -28,22 +28,18 @@ namespace admin_backend.Services
             _operationLogService = operationLogService;
         }
 
-        public async Task<RolePermissionResponse> Get(int Id, PagedOperationDto? dto = null)
+        public async Task<PagedResult<RolePermissionResponse>> Get(int Id, PagedOperationDto? dto = null)
         {
+            if (dto == null) dto = new PagedOperationDto();
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<RolePermission> query = _context.RolePermission;
+            IQueryable<RolePermission> rolePermissions = _context.RolePermission;
 
-            query = query.Where(x => x.RoleId == Id);
+            rolePermissions = rolePermissions.Where(x => x.RoleId == Id);
 
-            if (dto != null)
-            {
-                //分頁處理
-                var pagedResult = query.GetPaged(dto!);
-                return _mapper.Map<RolePermissionResponse>(pagedResult.Items);
-            }
-
-            return _mapper.Map<RolePermissionResponse>(await query.ToListAsync());
+            //分頁處理
+            var rolePermissionResponse =_mapper.Map<List<RolePermissionResponse>>(rolePermissions);
+            return rolePermissionResponse.GetPaged(dto!);
 
             //return new RolePermissionResponse
             //{

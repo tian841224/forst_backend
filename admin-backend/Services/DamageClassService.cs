@@ -32,24 +32,19 @@ namespace admin_backend.Services
             _fileService = fileService;
         }
 
-        public async Task<List<DamageClassResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
+        public async Task<PagedResult<DamageClassResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
         {
+            if(dto == null) dto = new PagedOperationDto();
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
             IQueryable<DamageClass> damageClassList = _context.DamageClass;
 
             if (Id.HasValue)
                 damageClassList = _context.DamageClass.Where(x => x.Id == Id);
-
-            if (dto != null)
-            {
-                //分頁處理
-                //var pageResult = await damageClassList.GetPagedAsync(dto!);
-                //return _mapper.Map<List<DamageClassResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
-            }
-
-            return _mapper.Map<List<DamageClassResponse>>(await damageClassList.ToListAsync());
-
+            
+            var damageClassListResponse = _mapper.Map<List<DamageClassResponse>>(damageClassList);
+            //分頁處理
+            return damageClassListResponse.GetPaged(dto!);
         }
 
         public async Task<PagedResult<DamageClassResponse>> Get(GetDamageClassDto dto)
@@ -63,7 +58,7 @@ namespace admin_backend.Services
             var damageClassResponse = _mapper.Map<List<DamageClassResponse>>(damageClassList);
 
             //分頁處理
-            return damageClassResponse.GetPaged(dto.Page);
+            return damageClassResponse.GetPaged(dto.Page!);
         }
 
         public async Task<DamageClassResponse> Add(AddDamageClassDto dto)
@@ -94,15 +89,15 @@ namespace admin_backend.Services
             return _mapper.Map<DamageClassResponse>(damageClasses);
         }
 
-        public async Task<DamageClassResponse> Update(UpdateDamageClassDto dto)
+        public async Task<DamageClassResponse> Update(int Id,UpdateDamageClassDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var damageClasses = await _context.DamageClass.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+            var damageClasses = await _context.DamageClass.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (damageClasses == null)
             {
-                throw new ApiException($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{Id}");
             }
 
             if (!string.IsNullOrEmpty(dto.Name))

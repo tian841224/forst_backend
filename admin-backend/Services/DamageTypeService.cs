@@ -7,7 +7,6 @@ using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 
@@ -27,8 +26,9 @@ namespace admin_backend.Services
             _mapper = mapper;
         }
 
-        public async Task<List<DamageTypeResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
+        public async Task<PagedResult<DamageTypeResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
         {
+            if (dto == null) dto = new PagedOperationDto();
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
             IQueryable<DamageType> damageTypes = _context.DamageType;
@@ -36,17 +36,12 @@ namespace admin_backend.Services
             if (Id.HasValue)
                 damageTypes = _context.DamageType.Where(x => x.Id == Id).AsQueryable();
 
-            if (dto != null)
-            {
-                //分頁處理
-                var pageResult =  damageTypes.GetPaged(dto!);
-                return _mapper.Map<List<DamageTypeResponse>>(pageResult.Items.OrderBy(x => dto!.OrderBy));
-            }
-
-            return _mapper.Map<List<DamageTypeResponse>>(await damageTypes.ToListAsync());
+            var damageTypesResponse = _mapper.Map<List<DamageTypeResponse>>(damageTypes);
+            //分頁處理
+            return damageTypesResponse.GetPaged(dto!);
         }
 
-        public async Task<List<DamageTypeResponse>> Get(GetDamageTypeDto dto)
+        public async Task<PagedResult<DamageTypeResponse>> Get(GetDamageTypeDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
@@ -66,9 +61,9 @@ namespace admin_backend.Services
                 damageTypes = damageTypes.Where(x => x.Status == dto.Status);
             }
 
+            var damageTypesResponse = _mapper.Map<List<DamageTypeResponse>>(damageTypes);
             //分頁處理
-            var pageResult = damageTypes.GetPaged(dto.Page);
-            return _mapper.Map<List<DamageTypeResponse>>(pageResult.Items);
+            return damageTypesResponse.GetPaged(dto.Page!);
         }
 
         public async Task<DamageTypeResponse> Add(AddDamageTypeDto dto)
@@ -99,15 +94,15 @@ namespace admin_backend.Services
             return _mapper.Map<DamageTypeResponse>(damageType);
         }
 
-        public async Task<DamageTypeResponse> Update(UpdateDamageTypeDto dto)
+        public async Task<DamageTypeResponse> Update(int Id, UpdateDamageTypeDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var damageType = await _context.DamageType.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+            var damageType = await _context.DamageType.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (damageType == null)
             {
-                throw new ApiException($"無此資料-{dto.Id}");
+                throw new ApiException($"無此資料-{Id}");
             }
 
             if (!string.IsNullOrEmpty(dto.Name))

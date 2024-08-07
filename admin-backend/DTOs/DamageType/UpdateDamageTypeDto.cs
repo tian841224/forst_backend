@@ -1,9 +1,8 @@
 ﻿using admin_backend.Enums;
-using CommonLibrary.DTOs;
 
 namespace admin_backend.DTOs.DamageType
 {
-    public class UpdateDamageTypeDto : BasicDto
+    public class UpdateDamageTypeDto
     {
         /// <summary>
         /// 危害類型

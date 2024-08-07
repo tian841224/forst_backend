@@ -27,8 +27,9 @@ namespace admin_backend.Services
             _mapper = mapper;
         }
 
-        public async Task<List<ForestCompartmentLocationResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
+        public async Task<PagedResult<ForestCompartmentLocationResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
         {
+            if (dto == null) dto = new PagedOperationDto();
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
             IQueryable<ForestCompartmentLocation> forestCompartmentLocation = _context.ForestCompartmentLocation;
@@ -36,32 +37,29 @@ namespace admin_backend.Services
             if (Id.HasValue)
                 forestCompartmentLocation = _context.ForestCompartmentLocation.Where(x => x.Id == Id).AsQueryable();
 
+            var forestCompartmentLocationResponse = _mapper.Map<List<ForestCompartmentLocationResponse>>(forestCompartmentLocation);
             //分頁處理
-            var pageResult = forestCompartmentLocation.GetPaged(dto!);
-            return _mapper.Map<List<ForestCompartmentLocationResponse>>(pageResult.Items);
+            return forestCompartmentLocationResponse.GetPaged(dto!);
         }
 
-        public async Task<List<ForestCompartmentLocationResponse>> Get(GetForestCompartmentLocationDto dto)
+        public async Task<PagedResult<ForestCompartmentLocationResponse>> Get(GetForestCompartmentLocationDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            IQueryable<ForestCompartmentLocation> query = _context.ForestCompartmentLocation;
-
-            var forestCompartmentLocations = new List<ForestCompartmentLocation>();
+            IQueryable<ForestCompartmentLocation> forestCompartmentLocations = _context.ForestCompartmentLocation;
 
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
                 string keyword = dto.Keyword.ToLower();
-                query = query.Where(x =>
+                forestCompartmentLocations = forestCompartmentLocations.Where(x =>
                     x.AffiliatedUnit.ToLower().Contains(keyword) ||
                     x.Postion.ToLower().Contains(keyword) ||
                     x.Id.ToString().Contains(keyword)
                 );
             }
 
+            var forestCompartmentLocationResponse = _mapper.Map<List<ForestCompartmentLocationResponse>>(forestCompartmentLocations);
             //分頁處理
-            forestCompartmentLocations = (query.GetPaged(dto.Page!)).Items;
-
-            return _mapper.Map<List<ForestCompartmentLocationResponse>>(forestCompartmentLocations);
+            return forestCompartmentLocationResponse.GetPaged(dto.Page!);
         }
 
         public async Task<ForestCompartmentLocationResponse> Add(AddForestCompartmentLocationDto dto)

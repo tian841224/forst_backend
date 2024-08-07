@@ -1,10 +1,9 @@
 ﻿using admin_backend.Enums;
-using CommonLibrary.DTOs;
 using System.ComponentModel.DataAnnotations;
 
 namespace admin_backend.DTOs.DamageClass
 {
-    public class UpdateDamageClassDto : BasicDto
+    public class UpdateDamageClassDto
     {
         /// <summary>
         /// 危害種類

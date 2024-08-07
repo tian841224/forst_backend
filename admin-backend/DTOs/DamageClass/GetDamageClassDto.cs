@@ -1,8 +1,8 @@
 ﻿using CommonLibrary.DTOs;
 
-namespace admin_backend.DTOs.DamageType
+namespace admin_backend.DTOs.DamageClass
 {
-    public class GetDamageClassDto 
+    public class GetDamageClassDto
     {
         public int TypeId { get; set; }
 

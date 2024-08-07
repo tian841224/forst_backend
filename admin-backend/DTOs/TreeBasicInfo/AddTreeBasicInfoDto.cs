@@ -1,4 +1,4 @@
-﻿using CommonLibrary.Extensions;
+﻿using CommonLibrary.DTOs;
 using System.ComponentModel.DataAnnotations;
 
 namespace admin_backend.DTOs.TreeBasicInfo

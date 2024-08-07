@@ -8,7 +8,6 @@ using AutoMapper;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interfaces;
-using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
@@ -161,21 +160,6 @@ namespace admin_backend.Services
 
             if (dto.Type == 1)
             {
-#pragma warning disable CS8602 // 可能 null 參考的取值 (dereference)。
-                if (string.IsNullOrEmpty(dto.Unit))
-                {
-                    throw new ApiException($"請輸入出版單位");
-                }
-#pragma warning restore CS8602 // 可能 null 參考的取值 (dereference)。
-                forestDiseasePublications.Name = dto.Name;
-                forestDiseasePublications.Unit = dto.Unit;
-                forestDiseasePublications.Type = dto.Type;
-                forestDiseasePublications.Status = dto.Status;
-                forestDiseasePublications.Sort = dto.Sort;
-                forestDiseasePublications.File = jsonResult;
-            }
-            else
-            {
                 if (dto.Authors!.Count == 0 || !dto.Date.HasValue || string.IsNullOrEmpty(dto.Link))
                 {
                     throw new ApiException($"請輸入作者、日期、連結");
@@ -189,6 +173,19 @@ namespace admin_backend.Services
                 forestDiseasePublications.Type = dto.Type;
                 forestDiseasePublications.Status = dto.Status;
                 forestDiseasePublications.Sort = dto.Sort;
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(dto.Unit))
+                {
+                    throw new ApiException($"請輸入出版單位");
+                }
+                forestDiseasePublications.Name = dto.Name;
+                forestDiseasePublications.Unit = dto.Unit;
+                forestDiseasePublications.Type = dto.Type;
+                forestDiseasePublications.Status = dto.Status;
+                forestDiseasePublications.Sort = dto.Sort;
+                forestDiseasePublications.File = jsonResult;
             }
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -284,7 +281,7 @@ namespace admin_backend.Services
                 throw new ApiException($"找不到此資料-{Id}");
             }
 
-            var fileUploadList = new List<string>{ forestDiseasePublications.File };
+            var fileUploadList = new List<string> { forestDiseasePublications.File };
             foreach (var file in files)
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
@@ -385,7 +382,7 @@ namespace admin_backend.Services
             }
 
             var fileList = JsonSerializer.Deserialize<List<string>>(forestDiseasePublications.File);
-            if( fileList!.Where(x => x.Contains(fileId)).Any())
+            if (fileList!.Where(x => x.Contains(fileId)).Any())
             {
                 var removeFile = fileList!.Where(_x => _x.Contains(fileId)).FirstOrDefault();
                 fileList!.Remove(removeFile!);

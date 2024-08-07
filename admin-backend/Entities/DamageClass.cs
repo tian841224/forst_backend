@@ -28,8 +28,8 @@ namespace admin_backend.Entities
         /// <summary>
         /// 狀態
         /// </summary>
-        [Comment("狀態 0 = 關閉, 1 = 開啟")]
         [Required]
+        [Comment("狀態 0 = 關閉, 1 = 開啟")]
         public StatusEnum Status { get; set; }
 
         [ForeignKey("DamageTypeId")]

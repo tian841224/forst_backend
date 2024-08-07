@@ -29,6 +29,6 @@ namespace admin_backend.Data
         public DbSet<TreeBasicInfo> TreeBasicInfo { get; set; }
         public DbSet<ForestCompartmentLocation> ForestCompartmentLocation { get; set; }
         public DbSet<ForestDiseasePublications> ForestDiseasePublications { get; set; }
-
+        public DbSet<CommonDamage> CommonDamage { get; set; }
     }
 }

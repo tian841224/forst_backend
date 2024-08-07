@@ -147,13 +147,12 @@ namespace admin_backend.Services
             }
 
             //上傳檔案
-            var date = $"{DateTime.Now.Year}{DateTime.Now.Month}{DateTime.Now.Day}";
             var fileUploadList = new List<string>();
             foreach (var file in dto.File)
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
                 var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
-                fileUploadList.Add(_fileService.Value.GetFile(fileName));
+                fileUploadList.Add(fileName);
             }
 
             var jsonResult = JsonSerializer.Serialize(fileUploadList);
@@ -270,7 +269,7 @@ namespace admin_backend.Services
             return _mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications);
         }
 
-        public async Task UpdateFile(int Id, List<IFormFile> files)
+        public async Task UploadFile(int Id, List<IFormFile> files)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
@@ -363,7 +362,7 @@ namespace admin_backend.Services
                 await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Delete,
-                    Content = $"刪除出版品{forestDiseasePublications.Name}",
+                    Content = $"刪除出版品-{forestDiseasePublications.Id}/{forestDiseasePublications.Name}",
                 });
             }
             scope.Complete();

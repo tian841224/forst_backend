@@ -18,13 +18,15 @@ namespace admin_backend.Services
         private readonly JwtConfig _jwtConfig;
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly Lazy<IIdentityService> _identityService;
+        private readonly IFileService _fileService;
 
-        public LoginServices(IDbContextFactory<MysqlDbContext> contextFactory, IOptions<JwtConfig> jwtConfig, ILogger<LoginServices> log, Lazy<IIdentityService> identityService)
+        public LoginServices(IDbContextFactory<MysqlDbContext> contextFactory, IOptions<JwtConfig> jwtConfig, ILogger<LoginServices> log, Lazy<IIdentityService> identityService, IFileService fileService)
         {
             _jwtConfig = jwtConfig.Value;
             _log = log;
             _contextFactory = contextFactory;
             _identityService = identityService;
+            _fileService = fileService;
         }
 
         public async Task<IdentityResultDto> Login(LoginDto dto)
@@ -85,6 +87,12 @@ namespace admin_backend.Services
 
                 await transaction.CommitAsync();
 
+                // 照片處理
+                if (!string.IsNullOrEmpty(adminUser.Photo))
+                {
+                    adminUser.Photo = _fileService.GetFile(adminUser.Photo, "image");
+                }
+
                 return new IdentityResultDto
                 {
                     AccessToken = token,
@@ -92,6 +100,7 @@ namespace admin_backend.Services
                     Expires = (new DateTimeOffset(_jwtConfig.Expiration)).ToUnixTimeSeconds(),
                     RoleId = role.Id,
                     Account = adminUser.Account,
+                    Photo = adminUser.Photo,
                 };
             }
             catch (Exception ex)
@@ -102,7 +111,7 @@ namespace admin_backend.Services
             }
         }
 
-        public async Task ResetPassword(ResetPasswordDto dto)
+        public void ResetPassword(ResetPasswordDto dto)
         {
 
         }

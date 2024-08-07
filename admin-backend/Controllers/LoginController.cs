@@ -1,6 +1,5 @@
 using admin_backend.DTOs.Login;
 using admin_backend.Interfaces;
-using admin_backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,9 +38,9 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
+        public IActionResult ResetPassword(ResetPasswordDto dto)
         {
-            await _loginServices.ResetPassword(dto);
+            _loginServices.ResetPassword(dto);
             return Ok();
         }
     }

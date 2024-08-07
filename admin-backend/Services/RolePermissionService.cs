@@ -28,33 +28,41 @@ namespace admin_backend.Services
             _operationLogService = operationLogService;
         }
 
-        public async Task<PagedResult<RolePermissionResponse>> Get(int Id, PagedOperationDto? dto = null)
+        public async Task<RolePermissionResponse> Get(int Id)
         {
-            if (dto == null) dto = new PagedOperationDto();
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
             IQueryable<RolePermission> rolePermissions = _context.RolePermission;
 
             rolePermissions = rolePermissions.Where(x => x.RoleId == Id);
 
+            return new RolePermissionResponse
+            {
+                RoleId = Id,
+                Permissions = await rolePermissions.Select(x => new RolePermissionResponse.Permission
+                {
+                    Name = x.Name,
+                    View = x.View,
+                    Add = x.Add,
+                    Sign = x.Sign,
+                    Edit = x.Edit,
+                    Delete = x.Delete
+                }).ToListAsync()
+            };
+        }
+
+        public async Task<PagedResult<RolePermissionResponse>> Get(PagedOperationDto? dto = null)
+        {
+            if (dto == null) dto = new PagedOperationDto();
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            IQueryable<RolePermission> rolePermissions = _context.RolePermission;
+
             //分頁處理
             var rolePermissionResponse =_mapper.Map<List<RolePermissionResponse>>(rolePermissions);
             return rolePermissionResponse.GetPaged(dto!);
-
-            //return new RolePermissionResponse
-            //{
-            //    RoleId = Id,
-            //    Permissions = await query.Select(x => new RolePermissionResponse.Permission
-            //    {
-            //        Name = x.Name,
-            //        View = x.View,
-            //        Add = x.Add,
-            //        Sign = x.Sign,
-            //        Edit = x.Edit,
-            //        Delete = x.Delete
-            //    }).ToListAsync()
-            //};
         }
+
         public async Task<RolePermissionResponse> Add(AddRolePermissionDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();

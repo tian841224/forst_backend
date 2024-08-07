@@ -1,6 +1,6 @@
 ﻿using admin_backend.DTOs.RolePermission;
 using admin_backend.Interfaces;
-using admin_backend.Services;
+using CommonLibrary.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +20,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 取得角色權限
+        /// 取得單筆角色權限
         /// </summary>
         /// <param name="id">角色ID</param>
         /// <returns></returns>
@@ -29,6 +29,18 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Get(int id)
         {
             return Ok(await _rolePermissionService.Get(id));
+        }
+
+        /// <summary>
+        /// 取得角色權限
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Get(PagedOperationDto? dto = null)
+        {
+            return Ok(await _rolePermissionService.Get(dto));
         }
 
         ///// <summary>

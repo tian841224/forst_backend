@@ -6,7 +6,9 @@ namespace admin_backend.Interfaces
 {
     public interface IRolePermissionService
     {
-        Task<PagedResult<RolePermissionResponse>> Get(int Id, PagedOperationDto? dto = null);
+        Task<RolePermissionResponse> Get(int Id);
+
+        Task<PagedResult<RolePermissionResponse>> Get(PagedOperationDto? dto = null);
 
         Task<RolePermissionResponse> Update(UpdateRolePermissionDto dto);
 

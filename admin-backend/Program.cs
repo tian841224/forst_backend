@@ -56,6 +56,7 @@ try
     builder.Services.AddScoped<ICommonDamageService, CommonDamageService>();
     builder.Services.AddScoped<IDocumentationService, DocumentationService>();
     builder.Services.AddScoped<IEpidemicSummaryService, EpidemicSummaryService>();
+    builder.Services.AddScoped<IFAQService, FAQService>();
     builder.Services.AddScoped<IFileService, FileService>();
     builder.Services.AddScoped<IForestCompartmentLocationService, ForestCompartmentLocationService>();
     builder.Services.AddScoped<ILoginServices, LoginServices>();

@@ -56,7 +56,7 @@ namespace admin_backend.Services
                 if (!string.IsNullOrEmpty(commonDamage.Photo))
                     photo = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo);
 
-                photo = photo.Select(x => new CommonDamagePhotoResponse { Photo = _fileService.Value.GetFile(x.Photo), Sort = x.Sort }).ToList();
+                photo = photo!.Select(x => new CommonDamagePhotoResponse { Photo = _fileService.Value.GetFile(x.Photo), Sort = x.Sort }).ToList();
 
                 var damageTypeName = await _context.DamageType.Where(x => x.Id == commonDamage.DamageTypeId).Select(x => x.Name).FirstOrDefaultAsync();
                 if (damageTypeName == null)
@@ -101,7 +101,7 @@ namespace admin_backend.Services
                 if (!string.IsNullOrEmpty(value.Photo))
                 {
                     photo = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(value.Photo);
-                    photo = photo.Select(x => new CommonDamagePhotoResponse { Photo = _fileService.Value.GetFile(x.Photo), Sort = x.Sort }).ToList();
+                    photo = photo!.Select(x => new CommonDamagePhotoResponse { Photo = _fileService.Value.GetFile(x.Photo), Sort = x.Sort }).ToList();
                 }
 
                 var damageTypeName = await _context.DamageType.Where(x => x.Id == value.DamageTypeId).Select(x => x.Name).FirstOrDefaultAsync();
@@ -361,7 +361,7 @@ namespace admin_backend.Services
             var result = new List<CommonDamagePhotoResponse> { };
 
             if (!string.IsNullOrEmpty(commonDamage.Photo))
-                result.AddRange(JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo));
+                result.AddRange(JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo)!);
 
             //上傳檔案
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto!.Photo.FileName)}";

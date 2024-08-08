@@ -5,6 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace admin_backend.Entities
 {
+    /// <summary>
+    /// 角色權限
+    /// </summary>
     public class RolePermission : DefaultEntity
     {
         /// <summary>

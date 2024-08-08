@@ -34,7 +34,7 @@ namespace admin_backend.Services
             IQueryable<DamageType> damageTypes = _context.DamageType;
 
             if (Id.HasValue)
-                damageTypes = _context.DamageType.Where(x => x.Id == Id).AsQueryable();
+                damageTypes = _context.DamageType.Where(x => x.Id == Id);
 
             var damageTypesResponse = _mapper.Map<List<DamageTypeResponse>>(damageTypes);
             //分頁處理

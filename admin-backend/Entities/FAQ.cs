@@ -1,14 +1,22 @@
 ﻿using admin_backend.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace admin_backend.Entities
 {
     /// <summary>
     /// 常見問答
     /// </summary>
-    public class FAQ : DefaultEntity
+    public class FAQ : SortDefaultEntity
     {
+        /// <summary>
+        /// 發佈者
+        /// </summary>
+        [Required]
+        [Comment("發佈者")]
+        public int AdminUserId { get; set; }
+
         /// <summary>
         /// 問題
         /// </summary>
@@ -29,5 +37,8 @@ namespace admin_backend.Entities
         [Required]
         [Comment("狀態 0 = 關閉, 1 = 開啟")]
         public StatusEnum Status { get; set; }
+
+        [ForeignKey("AdminUserId")]
+        public virtual AdminUser AdminUser { get; set; }
     }
 }

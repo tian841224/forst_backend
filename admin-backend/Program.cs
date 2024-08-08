@@ -53,6 +53,7 @@ try
     builder.Services.AddScoped<IAdminUserServices, AdminUserServices>();
     builder.Services.AddScoped<IDamageClassService, DamageClassService>();
     builder.Services.AddScoped<IDamageTypeService, DamageTypeService>();
+    builder.Services.AddScoped<ICommonDamageService, CommonDamageService>();
     builder.Services.AddScoped<IDocumentationService, DocumentationService>();
     builder.Services.AddScoped<IEpidemicSummaryService, EpidemicSummaryService>();
     builder.Services.AddScoped<IFileService, FileService>();

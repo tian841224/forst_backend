@@ -70,7 +70,7 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 更新常見病蟲害
+        /// 修改常見病蟲害
         /// </summary>
         /// <param name="id"></param>
         /// <param name="dto"></param>
@@ -90,13 +90,13 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> UploadFile(int Id, List<CommonDamagePhotoDto> dto)
+        public async Task<IActionResult> UploadFile(int Id, [FromForm] CommonDamagePhotoDto dto)
         {
             return Ok(await _commonDamageService.UploadFile(Id, dto));
         }
 
         /// <summary>
-        /// 更新常見病蟲害
+        /// 修改常見病蟲害排序
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -105,6 +105,19 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> UpdateSort(List<SortBasicDto> dto)
         {
             return Ok(await _commonDamageService.UpdateSort(dto));
+        }
+
+        /// <summary>
+        /// 修改常見病蟲害圖片排序
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateFileSort(int id, List<UpdateFileSortDto> dto)
+        {
+            return Ok(await _commonDamageService.UpdateFileSort(id,dto));
         }
 
         /// <summary>

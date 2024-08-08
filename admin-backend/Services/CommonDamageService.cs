@@ -52,19 +52,34 @@ namespace admin_backend.Services
 
             foreach (var commonDamage in commonDamageList)
             {
-                var photo = JsonSerializer.Deserialize<CommonDamagePhotoResponse>(commonDamage.Photo);
+                var photo = new List<CommonDamagePhotoResponse>();
+                if (!string.IsNullOrEmpty(commonDamage.Photo))
+                    photo = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo);
+
+                photo = photo.Select(x => new CommonDamagePhotoResponse { Photo = _fileService.Value.GetFile(x.Photo), Sort = x.Sort }).ToList();
+
+                var damageTypeName = await _context.DamageType.Where(x => x.Id == commonDamage.DamageTypeId).Select(x => x.Name).FirstOrDefaultAsync();
+                if (damageTypeName == null)
+                    throw new ApiException($"此危害類型不存在-{commonDamage.DamageTypeId}");
+
+                var damageClassName = await _context.DamageClass.Where(x => x.Id == commonDamage.DamageClassId).Select(x => x.Name).FirstOrDefaultAsync();
+                if (damageClassName == null)
+                    throw new ApiException($"此危害種類不存在-{commonDamage.DamageClassId}");
+
                 commonDamageResponse.Add(new CommonDamageResponse
                 {
                     Id = commonDamage.Id,
                     CreateTime = commonDamage.CreateTime,
                     UpdateTime = commonDamage.UpdateTime,
                     DamageClassId = commonDamage.DamageClassId,
+                    DamageClassName = damageClassName,
                     DamageTypeId = commonDamage.DamageTypeId,
+                    DamageTypeName = damageTypeName,
                     Name = commonDamage.Name,
                     DamagePart = commonDamage.DamagePart,
                     DamageFeatures = commonDamage.DamageFeatures,
                     Suggestions = commonDamage.Suggestions,
-                    Photo = photo,
+                    Photo = photo!,
                     Status = commonDamage.Status
                 });
             }
@@ -76,54 +91,52 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<CommonDamage> commonDamage = _context.CommonDamage;
+            var commonDamageList = await _context.CommonDamage.ToListAsync();
 
             var commonDamageResponse = new List<CommonDamageResponse>();
 
-            if (!string.IsNullOrEmpty(dto.Keyword))
+            foreach (var value in commonDamageList)
             {
-                string keyword = dto.Keyword.ToLower();
-                commonDamage = commonDamage.Where(x =>
-                    x.Name.ToLower().Contains(keyword) ||
-                    x.Id.ToString().Contains(keyword) ||
-                    x.Suggestions.Contains(keyword)
-                );
-
-                var commonDamageList = await commonDamage.ToListAsync();
-
-
-                foreach (var value in commonDamageList)
+                var photo = new List<CommonDamagePhotoResponse>();
+                if (!string.IsNullOrEmpty(value.Photo))
                 {
-                    var photo = JsonSerializer.Deserialize<CommonDamagePhotoResponse>(value.Photo);
+                    photo = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(value.Photo);
+                    photo = photo.Select(x => new CommonDamagePhotoResponse { Photo = _fileService.Value.GetFile(x.Photo), Sort = x.Sort }).ToList();
+                }
 
-                    var damageTypeName = await _context.DamageType.Where(x => x.Id == value.DamageTypeId).Select(x => x.Name).FirstOrDefaultAsync();
-                    if (damageTypeName == null)
-                        throw new ApiException($"此危害類型不存在-{value.DamageTypeId}");
+                var damageTypeName = await _context.DamageType.Where(x => x.Id == value.DamageTypeId).Select(x => x.Name).FirstOrDefaultAsync();
+                if (damageTypeName == null)
+                    throw new ApiException($"此危害類型不存在-{value.DamageTypeId}");
 
-                    var damageClassName = await _context.DamageClass.Where(x => x.Id == value.DamageClassId).Select(x => x.Name).FirstOrDefaultAsync();
-                    if (damageClassName == null)
-                        throw new ApiException($"此危害種類不存在-{value.DamageClassId}");
+                var damageClassName = await _context.DamageClass.Where(x => x.Id == value.DamageClassId).Select(x => x.Name).FirstOrDefaultAsync();
+                if (damageClassName == null)
+                    throw new ApiException($"此危害種類不存在-{value.DamageClassId}");
 
-                    commonDamageResponse.Add(new CommonDamageResponse
-                    {
-                        Id = value.Id,
-                        CreateTime = value.CreateTime,
-                        UpdateTime = value.UpdateTime,
-                        DamageClassId = value.DamageClassId,
-                        DamageClassName = damageClassName,
-                        DamageTypeId = value.DamageTypeId,
-                        DamageTypeName = damageTypeName,
-                        Name = value.Name,
-                        DamagePart = value.DamagePart,
-                        DamageFeatures = value.DamageFeatures,
-                        Suggestions = value.Suggestions,
-                        Photo = photo,
-                        Status = value.Status
-                    });
+                commonDamageResponse.Add(new CommonDamageResponse
+                {
+                    Id = value.Id,
+                    CreateTime = value.CreateTime,
+                    UpdateTime = value.UpdateTime,
+                    DamageClassId = value.DamageClassId,
+                    DamageClassName = damageClassName,
+                    DamageTypeId = value.DamageTypeId,
+                    DamageTypeName = damageTypeName,
+                    Name = value.Name,
+                    DamagePart = value.DamagePart,
+                    DamageFeatures = value.DamageFeatures,
+                    Suggestions = value.Suggestions,
+                    Photo = photo!,
+                    Status = value.Status
+                });
 
-                    //搜尋類別種類
+                if (!string.IsNullOrEmpty(dto.Keyword))
+                {
+                    string keyword = dto.Keyword.ToLower();
                     commonDamageResponse = commonDamageResponse.Where(x =>
-                        x.DamageClassName.ToLower().Contains(keyword) ||
+                        x.Name.ToLower().Contains(keyword) ||
+                        x.Id.ToString().Contains(keyword) ||
+                        x.Suggestions.Contains(keyword) ||
+                          x.DamageClassName.ToLower().Contains(keyword) ||
                         x.DamageTypeName.ToString().Contains(keyword)
                     ).ToList();
                 }
@@ -150,6 +163,16 @@ namespace admin_backend.Services
             if (damageType == null)
                 throw new ApiException($"此危害類型不存在-{dto.DamageTypeId}");
 
+            ////上傳圖片
+            //var fileUploadList = new List<string>();
+            //foreach (var file in dto.Photo)
+            //{
+            //    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Photo.FileName)}";
+            //    var fileUploadDto = await _fileService.Value.UploadFile(fileName, file.Photo);
+            //    fileUploadList.Add(fileName);
+            //}
+            //var jsonResult = JsonSerializer.Serialize(fileUploadList);
+
             var commonDamage = new CommonDamage
             {
                 DamageTypeId = dto.DamageTypeId,
@@ -158,7 +181,7 @@ namespace admin_backend.Services
                 DamagePart = dto.DamagePart,
                 DamageFeatures = dto.DamageFeatures,
                 Suggestions = dto.Suggestions,
-                //Photo = photo,
+                //Photo = jsonResult,
                 Status = dto.Status,
                 Sort = dto.Sort,
             };
@@ -191,8 +214,8 @@ namespace admin_backend.Services
 
             if (dto.DamageClassId.HasValue)
             {
-                var damageClass = _context.DamageClass.Where(x => x.Id == dto.DamageClassId).AnyAsync();
-                if (damageClass == null)
+                var damageClass = await _context.DamageClass.Where(x => x.Id == dto.DamageClassId).AnyAsync();
+                if (!damageClass)
                     throw new ApiException($"此危害種類不存在-{dto.DamageClassId}");
 
                 commonDamage.DamageClassId = dto.DamageClassId.Value;
@@ -200,8 +223,8 @@ namespace admin_backend.Services
 
             if (dto.DamageTypeId.HasValue)
             {
-                var damageType = _context.DamageType.Where(x => x.Id == dto.DamageTypeId).AnyAsync();
-                if (damageType == null)
+                var damageType = await _context.DamageType.Where(x => x.Id == dto.DamageTypeId).AnyAsync();
+                if (!damageType)
                     throw new ApiException($"此危害類型不存在-{dto.DamageTypeId}");
 
                 commonDamage.DamageTypeId = dto.DamageTypeId.Value;
@@ -212,7 +235,7 @@ namespace admin_backend.Services
                 commonDamage.Name = dto.Name;
             }
 
-            if (dto.DamagePart.Count() > 0)
+            if (dto.DamagePart != null && dto.DamagePart.Count() > 0)
             {
                 commonDamage.DamagePart = dto.DamagePart;
             }
@@ -284,7 +307,50 @@ namespace admin_backend.Services
             return result;
         }
 
-        public async Task<List<CommonDamagePhotoResponse>> UploadFile(int Id, List<CommonDamagePhotoDto> dto)
+        public async Task<List<CommonDamagePhotoResponse>> UpdateFileSort(int Id, List<UpdateFileSortDto> dto)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            var commonDamage = await _context.CommonDamage.Where(x => x.Id == Id).FirstOrDefaultAsync();
+
+            if (commonDamage == null)
+                throw new ApiException($"找不到此資料-{Id}");
+
+            var result = new List<CommonDamagePhotoResponse>();
+
+            foreach (var value in dto)
+            {
+                if (commonDamage.Photo.Contains(value.Name))
+                {
+                    var commonDamagePhotoList = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo);
+                    var commonDamagePhoto = commonDamagePhotoList!.Where(x => x.Photo.Contains(value.Name)).FirstOrDefault();
+
+                    commonDamagePhoto!.Sort = value.Sort;
+                    commonDamagePhoto.Photo = commonDamagePhoto.Photo;
+
+                    result.Add(commonDamagePhoto);
+                }
+            }
+
+            commonDamage.Photo = JsonSerializer.Serialize(result);
+            _context.CommonDamage.Update(commonDamage);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Value.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Edit,
+                    Content = $"修改常見病蟲害檔案排序：{commonDamage.Id}",
+                });
+            };
+
+            scope.Complete();
+            return result;
+        }
+
+        public async Task<List<CommonDamagePhotoResponse>> UploadFile(int Id, CommonDamagePhotoDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
             var commonDamage = await _context.CommonDamage.Where(x => x.Id == Id).FirstOrDefaultAsync();
@@ -292,16 +358,17 @@ namespace admin_backend.Services
             if (commonDamage == null)
                 throw new ApiException($"找不到此資料-{Id}");
 
-            //上傳檔案
-            var fileUploadList = new List<CommonDamagePhotoResponse>();
-            foreach (var file in dto)
-            {
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.Photo.FileName)}";
-                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file.Photo);
-                fileUploadList.Add(new CommonDamagePhotoResponse { Photo = _fileService.Value.GetFile(fileName), Sort = file.Sort });
-            }
+            var result = new List<CommonDamagePhotoResponse> { };
 
-            var photo = JsonSerializer.Serialize(fileUploadList);
+            if (!string.IsNullOrEmpty(commonDamage.Photo))
+                result.AddRange(JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo));
+
+            //上傳檔案
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto!.Photo.FileName)}";
+            await _fileService.Value.UploadFile(fileName, dto.Photo);
+            result.Add(new CommonDamagePhotoResponse { Photo = fileName, Sort = dto.Sort });
+
+            var photo = JsonSerializer.Serialize(result);
             commonDamage.Photo = photo;
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -319,7 +386,7 @@ namespace admin_backend.Services
             }
             scope.Complete();
 
-            return fileUploadList;
+            return result;
         }
 
         public async Task<CommonDamageResponse> Delete(int Id)

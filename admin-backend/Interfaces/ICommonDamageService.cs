@@ -12,7 +12,8 @@ namespace admin_backend.Interfaces
         Task<CommonDamageResponse> Add(AddCommonDamageDto dto);
         Task<CommonDamageResponse> Update(int Id, UpdateCommonDamageDto dto);
         Task<List<CommonDamageResponse>> UpdateSort(List<SortBasicDto> dto);
-        Task<List<CommonDamagePhotoResponse>> UploadFile(int Id, List<CommonDamagePhotoDto> dto);
+        Task<List<CommonDamagePhotoResponse>> UpdateFileSort(int Id, List<UpdateFileSortDto> dto);
+        Task<List<CommonDamagePhotoResponse>> UploadFile(int Id, CommonDamagePhotoDto dto);
         Task<CommonDamageResponse> Delete(int Id);
         Task DeleteFile(int Id, string fileId);
     }

@@ -1,4 +1,5 @@
-﻿using admin_backend.DTOs.ForestDiseasePublications;
+﻿using admin_backend.DTOs.CommonDamage;
+using admin_backend.DTOs.ForestDiseasePublications;
 using admin_backend.Entities;
 using AutoMapper;
 using AutoMapper.Internal;
@@ -42,6 +43,12 @@ namespace admin_backend.Extensions
              .ForMember(dest => dest.File, opt => opt.Ignore())
              .IgnoreAllPropertiesWithAnInaccessibleSetter()
              .IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
+
+            //忽略File
+            CreateMap<CommonDamage, CommonDamageResponse>()
+             .ForMember(dest => dest.Photo, opt => opt.Ignore())
+             .ForMember(dest => dest.DamageClassName, opt => opt.Ignore())
+             .ForMember(dest => dest.DamageTypeName, opt => opt.Ignore());
         }
     }
 }

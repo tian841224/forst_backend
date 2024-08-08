@@ -48,7 +48,7 @@ namespace admin_backend.DTOs.CommonDamage
         /// <summary>
         /// 病蟲封面照片
         /// </summary>
-        public CommonDamagePhotoResponse Photo { get; set; } = new();
+        public List<CommonDamagePhotoResponse> Photo { get; set; } = new();
 
         /// <summary>
         /// 狀態 0 = 關閉, 1 = 開啟

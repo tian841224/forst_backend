@@ -90,8 +90,7 @@ namespace admin_backend.Controllers
         [Authorize]
         public async Task<IActionResult> UploadFile(int id, List<IFormFile> file)
         {
-            await _forestDiseasePublicationsService.UploadFile(id, file);
-            return Ok();
+            return Ok(await _forestDiseasePublicationsService.UploadFile(id, file));
         }
 
         /// <summary>
@@ -126,7 +125,7 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteFile(int id,string fileId)
+        public async Task<IActionResult> DeleteFile(int id,int fileId)
         {
             await _forestDiseasePublicationsService.DeleteFile(id,fileId);
             return Ok();

@@ -125,7 +125,7 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteFile(int id,string fileId)
+        public async Task<IActionResult> DeleteFile(int id,int fileId)
         {
             await _forestDiseasePublicationsService.DeleteFile(id,fileId);
             return Ok();

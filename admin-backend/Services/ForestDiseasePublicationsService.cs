@@ -45,11 +45,11 @@ namespace admin_backend.Services
 
                 foreach (var item in forestDiseasePublications)
                 {
-                    var fileList = new List<string>();
+                    var fileList = new List<ForestDiseasePublicationsFileDto>();
                     if (string.IsNullOrEmpty(item.File)) continue;
-                    var fileUpload = JsonSerializer.Deserialize<List<string>>(item.File);
+                    var fileUpload = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(item.File);
                     if (fileUpload != null)
-                        fileList.AddRange(fileUpload.Select(x => _fileService.Value.GetFile(x)));
+                        fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }));
 
                     result.Add(new ForestDiseasePublicationsResponse
                     {
@@ -100,11 +100,11 @@ namespace admin_backend.Services
 
             foreach (var item in forestDiseasePublications)
             {
-                var fileList = new List<string>();
+                var fileList = new List<ForestDiseasePublicationsFileDto>();
                 if (string.IsNullOrEmpty(item.File)) continue;
-                var fileUpload = JsonSerializer.Deserialize<List<string>>(item.File);
+                var fileUpload = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(item.File);
                 if (fileUpload != null)
-                    fileList.AddRange(fileUpload.Select(x => _fileService.Value.GetFile(x)));
+                    fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }));
 
                 result.Add(new ForestDiseasePublicationsResponse
                 {
@@ -268,7 +268,7 @@ namespace admin_backend.Services
             return _mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications);
         }
 
-        public async Task<List<string>> UploadFile(int Id, List<IFormFile> files)
+        public async Task<List<ForestDiseasePublicationsFileDto>> UploadFile(int Id, List<IFormFile> files)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
@@ -279,13 +279,21 @@ namespace admin_backend.Services
                 throw new ApiException($"找不到此資料-{Id}");
             }
 
-            var fileUploadList = new List<string> { };
-            fileUploadList.AddRange(JsonSerializer.Deserialize<List<string>>(forestDiseasePublications.File));
+            var fileUploadList = new List<ForestDiseasePublicationsFileDto> { };
+            var id = 0;
+
+            if (!string.IsNullOrEmpty(forestDiseasePublications.File))
+            {
+                var oldFile = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(forestDiseasePublications.File);
+                fileUploadList.AddRange(oldFile);
+                id = oldFile.Select(x => x.Id).Max();
+            }
+
             foreach (var file in files)
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
                 var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
-                fileUploadList.Add(fileName);
+                fileUploadList.Add(new ForestDiseasePublicationsFileDto { Id = ++id, File = fileName });
             }
 
             var jsonResult = JsonSerializer.Serialize(fileUploadList);
@@ -306,7 +314,7 @@ namespace admin_backend.Services
             }
             scope.Complete();
 
-            return fileUploadList.Select(x => _fileService.Value.GetFile(x)).ToList();
+            return fileUploadList.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }).ToList();
         }
 
         public async Task<List<ForestDiseasePublicationsResponse>> UpdateSort(List<SortBasicDto> dto)
@@ -371,7 +379,7 @@ namespace admin_backend.Services
             return _mapper.Map<ForestDiseasePublicationsResponse>(forestDiseasePublications);
         }
 
-        public async Task DeleteFile(int Id, string fileId)
+        public async Task DeleteFile(int Id, int fileId)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
@@ -382,11 +390,12 @@ namespace admin_backend.Services
                 throw new ApiException($"找不到此資料-{Id}");
             }
 
-            var fileList = JsonSerializer.Deserialize<List<string>>(forestDiseasePublications.File);
-            if (fileList!.Where(x => x.Contains(fileId)).Any())
+            var fileList = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(forestDiseasePublications.File);
+            if (fileList!.Where(x => x.Id == fileId).Any())
             {
-                var removeFile = fileList!.Where(_x => _x.Contains(fileId)).FirstOrDefault();
-                fileList!.Remove(removeFile!);
+                var removeFile = fileList!.Where(_x => _x.Id == fileId).FirstOrDefault();
+                if(removeFile != null)
+                    fileList!.Remove(removeFile!);
             }
 
             var jsonResult = JsonSerializer.Serialize(fileList);

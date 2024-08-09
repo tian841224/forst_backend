@@ -10,7 +10,7 @@ namespace admin_backend.Interfaces
         Task<PagedResult<ForestDiseasePublicationsResponse>> Get(GetForestDiseasePublicationsDto dto);
         Task<ForestDiseasePublicationsResponse> Add(AddForestDiseasePublicationsDto dto);
         Task<ForestDiseasePublicationsResponse> Update(int Id, UpdateForestDiseasePublicationsDto dto);
-        Task UploadFile(int Id, List<IFormFile> files);
+        Task<List<string>> UploadFile(int Id, List<IFormFile> files);
         Task<List<ForestDiseasePublicationsResponse>> UpdateSort(List<SortBasicDto> dto);
         Task<ForestDiseasePublicationsResponse> Delete(int Id);
         Task DeleteFile(int Id, string fileName);

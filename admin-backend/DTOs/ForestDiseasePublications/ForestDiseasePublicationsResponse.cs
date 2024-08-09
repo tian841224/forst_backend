@@ -38,7 +38,7 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// <summary>
         /// 出版品作者
         /// </summary>
-        public string Author { get; set; } = string.Empty;
+        public List<string> Authors { get; set; } = new();
 
         /// <summary>
         /// 發佈狀態

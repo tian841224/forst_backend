@@ -2,7 +2,7 @@
 
 namespace admin_backend.DTOs.RolePermission
 {
-    public class RolePermissionResponse : DefaultResponseDto
+    public class RolePermissionResponse 
     {
         /// <summary>
         /// 角色管理ID

@@ -25,13 +25,6 @@ namespace admin_backend.Entities
         [Comment("角色管理ID")]
         public int RoleId { get; set; }
 
-        ///// <summary>
-        ///// 權限管理
-        ///// </summary>
-        //[Required]
-        //[Comment("權限管理")]
-        //public int PermissionsId { get; set; }
-
         /// <summary>
         /// 檢視
         /// </summary>
@@ -74,8 +67,5 @@ namespace admin_backend.Entities
 
         [ForeignKey("RoleId")]
         public virtual Role Role { get; set; } = null!;
-
-        //[ForeignKey("PermissionsId")]
-        //public virtual Permission Permission { get; set; }
     }
 }

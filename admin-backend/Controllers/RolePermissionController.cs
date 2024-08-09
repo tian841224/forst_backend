@@ -43,17 +43,17 @@ namespace admin_backend.Controllers
             return Ok(await _rolePermissionService.Get(dto));
         }
 
-        ///// <summary>
-        ///// 新增角色權限
-        ///// </summary>
-        ///// <param name="dto"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[Authorize]
-        //public async Task<IActionResult> Add(AddRolePermissionRequestDto dto)
-        //{
-        //    return Ok(await _rolePermissionService.Add(dto));
-        //}
+        /// <summary>
+        /// 新增角色權限
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Add(AddRolePermissionDto dto)
+        {
+            return Ok(await _rolePermissionService.Add(dto));
+        }
 
         /// <summary>
         /// 修改角色權限

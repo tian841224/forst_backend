@@ -38,15 +38,18 @@ namespace admin_backend.Services
 
             return new RolePermissionResponse
             {
-                RoleId = Id,
+                RoleId = await rolePermissions.Select(x => x.RoleId).FirstOrDefaultAsync(),
                 Permissions = await rolePermissions.Select(x => new RolePermissionResponse.Permission
                 {
+                    Id = Id,
                     Name = x.Name,
                     View = x.View,
                     Add = x.Add,
                     Sign = x.Sign,
                     Edit = x.Edit,
-                    Delete = x.Delete
+                    Delete = x.Delete,
+                    UpdateTime = x.UpdateTime,
+                    CreateTime = x.CreateTime,
                 }).ToListAsync()
             };
         }
@@ -59,7 +62,39 @@ namespace admin_backend.Services
             IQueryable<RolePermission> rolePermissions = _context.RolePermission;
 
             //分頁處理
-            var rolePermissionResponse =_mapper.Map<List<RolePermissionResponse>>(rolePermissions);
+            //var rolePermissionResponse = new RolePermissionResponse
+            //{
+            //    RoleId = rolePermissions,
+            //    Permissions = await rolePermissions.Select(x => new RolePermissionResponse.Permission
+            //    {
+            //        Name = x.Name,
+            //        View = x.View,
+            //        Add = x.Add,
+            //        Sign = x.Sign,
+            //        Edit = x.Edit,
+            //        Delete = x.Delete
+            //    }).ToListAsync()
+            //};
+
+            var rolePermissionResponse = await rolePermissions
+              .GroupBy(x => x.RoleId)
+              .Select(group => new RolePermissionResponse
+              {
+                  RoleId = group.Key,
+                  Permissions = group.Select(x => new RolePermissionResponse.Permission
+                  {
+                      Id = x.Id,
+                      CreateTime = x.CreateTime,
+                      UpdateTime = x.UpdateTime,
+                      Name = x.Name,
+                      View = x.View,
+                      Edit = x.Edit,
+                      Add = x.Add,
+                      Sign = x.Sign,
+                      Delete = x.Delete
+                  }).ToList()
+              })
+              .ToListAsync();
             return rolePermissionResponse.GetPaged(dto!);
         }
 
@@ -108,7 +143,27 @@ namespace admin_backend.Services
                 });
             };
             scope.Complete();
-            return _mapper.Map<RolePermissionResponse>(rolePermission);
+
+            var result = new RolePermissionResponse
+            {
+                RoleId = rolePermission.RoleId,
+                Permissions = new List<RolePermissionResponse.Permission>
+                {
+                    new RolePermissionResponse.Permission
+                    {
+                           Id = rolePermission.Id,
+                CreateTime = rolePermission.CreateTime,
+                UpdateTime = rolePermission.UpdateTime,
+                        Name = rolePermission.Name,
+                        View = rolePermission.View,
+                        Edit = rolePermission.Edit,
+                        Add = rolePermission.Add,
+                        Sign = rolePermission.Sign,
+                        Delete = rolePermission.Delete
+                    }
+                }
+            };
+            return result;
         }
 
         #region AddList

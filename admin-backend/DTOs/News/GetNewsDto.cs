@@ -1,7 +1,5 @@
 ﻿using admin_backend.Enums;
 using CommonLibrary.DTOs;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace admin_backend.DTOs.News
 {

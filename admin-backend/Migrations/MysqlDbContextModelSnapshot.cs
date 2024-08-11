@@ -625,6 +625,10 @@ namespace CommonLibrary.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("AdminUserId")
+                        .HasColumnType("int")
+                        .HasComment("發佈者");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("longtext")
@@ -671,9 +675,11 @@ namespace CommonLibrary.Migrations
 
                     b.Property<int>("WebsiteReleases")
                         .HasColumnType("int")
-                        .HasComment("發佈網站");
+                        .HasComment("發佈網站 1 = 林業自然保育署, 2 = 林業試驗所");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AdminUserId");
 
                     b.ToTable("News");
                 });
@@ -966,6 +972,17 @@ namespace CommonLibrary.Migrations
                 });
 
             modelBuilder.Entity("admin_backend.Entities.FAQ", b =>
+                {
+                    b.HasOne("admin_backend.Entities.AdminUser", "AdminUser")
+                        .WithMany()
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdminUser");
+                });
+
+            modelBuilder.Entity("admin_backend.Entities.News", b =>
                 {
                     b.HasOne("admin_backend.Entities.AdminUser", "AdminUser")
                         .WithMany()

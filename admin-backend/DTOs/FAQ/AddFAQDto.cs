@@ -6,11 +6,6 @@ namespace admin_backend.DTOs.FAQ
     public class AddFAQDto : SortDto
     {
         /// <summary>
-        /// 發佈者ID
-        /// </summary>
-        public int AdminUserId { get; set; }
-
-        /// <summary>
         /// 問題
         /// </summary>
         public string Question { get; set; } = string.Empty;

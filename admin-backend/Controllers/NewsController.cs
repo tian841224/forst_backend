@@ -37,7 +37,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
             return Ok(await _newsService.Get(dto: dto));

@@ -141,21 +141,22 @@ namespace admin_backend.Services
 
             forestDiseasePublications = new ForestDiseasePublications();
 
-            //if (dto.File.Count == 0)
-            //{
-            //    throw new ApiException($"請上傳檔案");
-            //}
+            if (dto.File.Count == 0)
+            {
+                throw new ApiException($"請上傳檔案");
+            }
 
-            ////上傳檔案
-            //var fileUploadList = new List<string>();
-            //foreach (var file in dto.File)
-            //{
-            //    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
-            //    var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
-            //    fileUploadList.Add(_fileService.Value.GetFile(fileName));
-            //}
+            var fileUploadList = new List<ForestDiseasePublicationsFileDto>();
+            var id = 0;
+            foreach (var file in dto.File)
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
+                fileUploadList.Add(new ForestDiseasePublicationsFileDto { Id = ++id , File = fileName });
+            }
 
-            //var jsonResult = JsonSerializer.Serialize(fileUploadList);
+            var jsonResult = JsonSerializer.Serialize(fileUploadList);
+            forestDiseasePublications.File = jsonResult;
 
             if (dto.Type == 1)
             {
@@ -163,7 +164,6 @@ namespace admin_backend.Services
                 {
                     throw new ApiException($"請輸入作者、日期、連結");
                 }
-                //forestDiseasePublications.File = jsonResult;
                 forestDiseasePublications.Name = dto.Name;
                 forestDiseasePublications.Link = dto.Link;
                 forestDiseasePublications.Date = dto.Date.Value;
@@ -183,7 +183,6 @@ namespace admin_backend.Services
                 forestDiseasePublications.Type = dto.Type;
                 forestDiseasePublications.Status = dto.Status;
                 forestDiseasePublications.Sort = dto.Sort;
-                //forestDiseasePublications.File = jsonResult;
             }
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);

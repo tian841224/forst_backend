@@ -70,7 +70,7 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 更新林木疫情出版品
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">林木疫情出版品ID</param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
@@ -83,7 +83,7 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 上傳檔案
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">林木疫情出版品ID</param>
         /// <param name="file">檔案</param>
         /// <returns></returns>
         [HttpPut("{id}")]

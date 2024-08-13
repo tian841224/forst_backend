@@ -117,6 +117,8 @@ namespace admin_backend.Services
 
             //await smtpClient.SendMailAsync(mailMessage);
             #endregion
+
+            return;
         }
     }
 }

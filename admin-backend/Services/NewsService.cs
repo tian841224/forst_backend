@@ -18,13 +18,15 @@ namespace admin_backend.Services
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly IMapper _mapper;
         private readonly Lazy<IOperationLogService> _operationLogService;
+        private readonly IAdminUserServices _adminUserServices;
 
-        public NewsService(ILogger<NewsService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IOperationLogService> operationLogService)
+        public NewsService(ILogger<NewsService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IOperationLogService> operationLogService, IAdminUserServices adminUserServices)
         {
             _log = log;
             _contextFactory = contextFactory;
             _mapper = mapper;
             _operationLogService = operationLogService;
+            _adminUserServices = adminUserServices;
         }
 
         public async Task<PagedResult<NewsResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
@@ -38,12 +40,15 @@ namespace admin_backend.Services
                 news = news.Where(x => x.Id == Id);
 
             var newsResponse = _mapper.Map<List<NewsResponse>>(news);
+
+
             foreach (var item in newsResponse)
             {
                 var adminUserName = await _context.AdminUser.Where(x => x.Id == item.AdminUserId).Select(x => x.Name).FirstOrDefaultAsync();
                 if (adminUserName == null) continue;
 
                 item.AdminUserName = adminUserName;
+                item.WebsiteReleases = await news.Where(x => x.Id == item.Id).Select(x => x.WebsiteReleases).FirstOrDefaultAsync();
             }
 
             //分頁處理
@@ -75,17 +80,48 @@ namespace admin_backend.Services
                 news = news.Where(x => x.Type == dto.Type);
             }
 
-            var newsResponse = _mapper.Map<List<NewsResponse>>(news);
+            //var newsResponse = _mapper.Map<List<NewsResponse>>(news);
+
+            var newsResponses = new List<NewsResponse>();
+
+            foreach (var item in await news.ToListAsync())
+            {
+                var adminUserName = await _context.AdminUser.Where(x => x.Id == item.AdminUserId).Select(x => x.Name).FirstOrDefaultAsync();
+                if (adminUserName == null) continue;
+
+                var newsResponse = new NewsResponse
+                {
+                    AdminUserId = item.AdminUserId,
+                    AdminUserName = adminUserName,
+                    Title = item.Title,
+                    Type = item.Type, 
+                    Content = item.Content,
+                    Pinned = item.Pinned,
+                    Schedule = item.Schedule,
+                    StartTime = item.StartTime,
+                    EndTime = item.EndTime,
+                    Status = item.Status, 
+                    WebsiteReleases = item.WebsiteReleases,
+                };
+
+                newsResponses.Add(newsResponse);
+            }
+
             //分頁處理
-            return newsResponse.GetPaged(dto.Page!);
+            return newsResponses.GetPaged(dto.Page!);
         }
         public async Task<NewsResponse> Add(AddNewsDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
+            //取得當前使用者身分
+            var adminUser = await _adminUserServices.Get();
+            if (adminUser == null)
+            { throw new ApiException($"無法取得當前使用者身分"); }
+
             var news = new News
             {
-                AdminUserId = dto.AdminUserId,
+                AdminUserId = adminUser.Id,
                 Content = dto.Content,
                 Pinned = dto.Pinned,
                 Schedule = dto.Schedule,
@@ -124,7 +160,7 @@ namespace admin_backend.Services
                 throw new ApiException($"無此資料-{Id}");
             }
 
-            if (string.IsNullOrEmpty(dto.Title))
+            if (!string.IsNullOrEmpty(dto.Title))
             {
                 news.Title = dto.Title ?? string.Empty;
             }
@@ -134,7 +170,7 @@ namespace admin_backend.Services
                 news.Type = dto.Type.Value;
             }
 
-            if (string.IsNullOrEmpty(dto.Content))
+            if (!string.IsNullOrEmpty(dto.Content))
             {
                 news.Content = dto.Content ?? string.Empty;
             }
@@ -144,9 +180,9 @@ namespace admin_backend.Services
                 news.Pinned = dto.Pinned.Value;
             }
 
-            if (dto.WebsiteReleases.HasValue)
+            if (dto.WebsiteReleases != null && dto.WebsiteReleases.Any())
             {
-                news.WebsiteReleases = dto.WebsiteReleases.Value;
+                news.WebsiteReleases = dto.WebsiteReleases;
             }
 
             if (dto.Schedule.HasValue)

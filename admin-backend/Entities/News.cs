@@ -50,7 +50,7 @@ namespace admin_backend.Entities
         /// </summary>
         [Required]
         [Comment("發佈網站 1 = 林業自然保育署, 2 = 林業試驗所")]
-        public WebsiteEnum WebsiteReleases { get; set; }
+        public List<WebsiteEnum> WebsiteReleases { get; set; } = new();
 
         /// <summary>
         /// 是否開啟排程

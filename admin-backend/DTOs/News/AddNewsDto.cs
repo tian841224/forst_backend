@@ -4,10 +4,10 @@ namespace admin_backend.DTOs.News
 {
     public class AddNewsDto
     {
-        /// <summary>
-        /// 發佈者ID
-        /// </summary>
-        public int AdminUserId { get; set; }
+        ///// <summary>
+        ///// 發佈者ID
+        ///// </summary>
+        //public int AdminUserId { get; set; }
 
         /// <summary>
         /// 標題
@@ -32,7 +32,7 @@ namespace admin_backend.DTOs.News
         /// <summary>
         /// 發佈網站 1 = 林業自然保育署, 2 = 林業試驗所
         /// </summary>
-        public WebsiteEnum WebsiteReleases { get; set; }
+        public List<WebsiteEnum> WebsiteReleases { get; set; } = new();
 
         /// <summary>
         /// 是否開啟排程

@@ -67,6 +67,7 @@ try
     builder.Services.AddScoped<ILoginServices, LoginServices>();
     builder.Services.AddScoped<IMailConfigService, MailConfigService>();
     builder.Services.AddScoped<IOperationLogService, OperationLogService>();
+    builder.Services.AddScoped<INewsService, NewsService>();
     //©µ¿ð¸ü¤J
     builder.Services.AddScoped(provider =>
         new Lazy<IOperationLogService>(() => provider.GetRequiredService<IOperationLogService>()));

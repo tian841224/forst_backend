@@ -199,7 +199,7 @@ namespace admin_backend.Services
             }
 
             //¨ú±oIP
-            var ipAddress = _httpContextAccessor.HttpContext!.Connection.RemoteIpAddress!;
+            var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress ?? new System.Net.IPAddress(0);
 
             if (!string.IsNullOrEmpty(dto.Name))
                 adminUser.Name = dto.Name;

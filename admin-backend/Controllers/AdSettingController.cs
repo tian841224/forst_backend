@@ -38,7 +38,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
             return Ok(await _adSettingService.Get(dto: dto));
@@ -62,7 +62,7 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Add(AddAdSettingDto dto)
+        public async Task<IActionResult> Add([FromForm]AddAdSettingDto dto)
         {
             return Ok(await _adSettingService.Add(dto));
         }
@@ -75,24 +75,24 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(int id, UpdateAdSettingDto dto)
+        public async Task<IActionResult> Update(int id, [FromForm]UpdateAdSettingDto dto)
         {
             return Ok(await _adSettingService.Update(id, dto));
         }
 
-        /// <summary>
-        /// 上傳官網廣告版位圖片
-        /// </summary>
-        /// <param name="Id"></param>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPut("{id}")]
-        [Authorize]
-        public async Task<IActionResult> UploadFile(int id, [FromForm] AdSettingPhotoDto dto)
-        {
-            await _adSettingService.UploadFile(id, dto);
-            return Ok();
-        }
+        ///// <summary>
+        ///// 上傳官網廣告版位圖片
+        ///// </summary>
+        ///// <param name="Id"></param>
+        ///// <param name="dto"></param>
+        ///// <returns></returns>
+        //[HttpPut("{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> UploadFile(int id, [FromForm] AdSettingPhotoDto dto)
+        //{
+        //    await _adSettingService.UploadFile(id, dto);
+        //    return Ok();
+        //}
 
         /// <summary>
         /// 刪除官網廣告版位

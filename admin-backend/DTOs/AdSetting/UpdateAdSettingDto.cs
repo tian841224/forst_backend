@@ -20,6 +20,16 @@ namespace admin_backend.DTOs.AdSetting
         public PositionEnum? Position { get; set; }
 
         /// <summary>
+        /// PC圖案
+        /// </summary>
+        public IFormFile? PhotoPc { get; set; }
+
+        /// <summary>
+        /// 手機圖案
+        /// </summary>
+        public IFormFile? PhotoMobile { get; set; }
+
+        /// <summary>
         /// 狀態 0 = 關閉, 1 = 開啟
         /// </summary>
         public StatusEnum? Status { get; set; }

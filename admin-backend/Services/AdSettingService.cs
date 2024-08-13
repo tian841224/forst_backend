@@ -41,6 +41,14 @@ namespace admin_backend.Services
                 adSettings = _context.AdSetting.Where(x => x.Id == Id);
 
             var adSettingResponses = _mapper.Map<List<AdSettingResponse>>(adSettings);
+            adSettingResponses.ForEach(x =>
+            {
+                if (x.PhotoPc != null)
+                    x.PhotoPc = _fileService.Value.GetFile(x.PhotoPc);
+                if (x.PhotoMobile != null)
+                    x.PhotoMobile = _fileService.Value.GetFile(x.PhotoMobile);
+            });
+            
             //分頁處理
             return adSettingResponses.GetPaged(dto!);
         }
@@ -54,10 +62,16 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.Name))
                 adSettings = _context.AdSetting.Where(x => x.Name.Contains(dto.Name));
 
-            var damageClassResponse = _mapper.Map<List<AdSettingResponse>>(adSettings);
-
+            var adSettingResponses = _mapper.Map<List<AdSettingResponse>>(adSettings);
+            adSettingResponses.ForEach(x =>
+            {
+                if (x.PhotoPc != null)
+                    x.PhotoPc = _fileService.Value.GetFile(x.PhotoPc);
+                if (x.PhotoMobile != null)
+                    x.PhotoMobile = _fileService.Value.GetFile(x.PhotoMobile);
+            });
             //分頁處理
-            return damageClassResponse.GetPaged(dto.Page!);
+            return adSettingResponses.GetPaged(dto.Page!);
         }
 
         public async Task<AdSettingResponse> Add(AddAdSettingDto dto)
@@ -72,6 +86,21 @@ namespace admin_backend.Services
                 Status = dto.Status,
             };
 
+            if (dto.PhotoMobile != null && dto.PhotoMobile.Length > 0)
+            {
+                //上傳檔案
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PhotoMobile.FileName)}";
+                await _fileService.Value.UploadFile(fileName, dto.PhotoMobile);
+                adSettings.PhotoMobile = fileName;
+            }
+
+            if (dto.PhotoPc != null && dto.PhotoPc.Length > 0)
+            {
+                //上傳檔案
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PhotoPc.FileName)}";
+                await _fileService.Value.UploadFile(fileName, dto.PhotoPc);
+                adSettings.PhotoPc = fileName;
+            }
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             await _context.AdSetting.AddAsync(adSettings);
@@ -111,6 +140,22 @@ namespace admin_backend.Services
 
             if (dto.Status.HasValue)
                 adSettings.Status = dto.Status.Value;
+
+            if (dto.PhotoMobile != null && dto.PhotoMobile.Length > 0)
+            {
+                //上傳檔案
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PhotoMobile.FileName)}";
+                await _fileService.Value.UploadFile(fileName, dto.PhotoMobile);
+                adSettings.PhotoMobile = fileName;
+            }
+
+            if (dto.PhotoPc != null && dto.PhotoPc.Length > 0)
+            {
+                //上傳檔案
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PhotoPc.FileName)}";
+                await _fileService.Value.UploadFile(fileName, dto.PhotoPc);
+                adSettings.PhotoPc = fileName;
+            }
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 

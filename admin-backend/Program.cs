@@ -1,4 +1,5 @@
 using admin_backend.Data;
+using admin_backend.DTOs.MailConfig;
 using admin_backend.Infrastructure;
 using admin_backend.Interfaces;
 using admin_backend.Services;
@@ -46,6 +47,10 @@ try
 
     var jwtConfigSection = builder.Configuration.GetSection(nameof(JwtConfig));
     builder.Services.Configure<JwtConfig>(jwtConfigSection);
+    // Åª¨ú MailSettings °t¸m
+    builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
+
     builder.Services.AddControllers();
     builder.Services.AddAutoMapper(typeof(Program).Assembly);
 

@@ -22,7 +22,7 @@ namespace admin_backend.Entities
         /// </summary>
         [Required]
         [Comment("Port")]
-        public byte Port { get; set; }
+        public int Port { get; set; }
 
         /// <summary>
         /// 加密方式

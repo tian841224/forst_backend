@@ -15,7 +15,7 @@ namespace admin_backend.DTOs.MailConfig
         /// Port
         /// </summary>
         [Required]
-        public byte Port { get; set; }
+        public int Port { get; set; }
 
         /// <summary>
         /// 加密方式 1 = SSL, 2 = TSL

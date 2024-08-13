@@ -37,7 +37,7 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Add(AddMailConfigDto dto)
+        public async Task<IActionResult> Add([FromBody] AddMailConfigDto dto)
         {
             return Ok(await _mailConfigService.Add(dto));
         }

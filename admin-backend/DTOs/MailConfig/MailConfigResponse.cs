@@ -13,7 +13,7 @@ namespace admin_backend.DTOs.MailConfig
         /// <summary>
         /// Port
         /// </summary>
-        public byte Port { get; set; }
+        public int Port { get; set; }
 
         /// <summary>
         /// 加密方式 1 = SSL, 2 = TSL
@@ -28,7 +28,7 @@ namespace admin_backend.DTOs.MailConfig
         /// <summary>
         /// 寄信密碼
         /// </summary>
-        public string Password { get; set; } = string.Empty;
+        public string Pkey { get; set; } = string.Empty;
 
         /// <summary>
         /// 顯示名稱

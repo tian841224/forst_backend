@@ -5,7 +5,7 @@ namespace admin_backend.DTOs.Login
     public class ResetPasswordDto
     {
         /// <summary>
-        /// 信箱
+        /// 帳號
         /// </summary>
         [Required]
         [EmailAddress]

@@ -37,7 +37,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public IActionResult ResetPassword(ResetPasswordDto dto)
         {
             _loginServices.ResetPassword(dto);

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace admin_backend.Enums
 {
@@ -7,61 +8,61 @@ namespace admin_backend.Enums
         /// <summary>
         /// 未指定
         /// </summary>
-        [Description("未指定")]
+        [EnumMember(Value = "未指定")]
         None = 0,
 
         /// <summary>
         /// 根
         /// </summary>
-        [Description("根")]
+        [EnumMember(Value = "根")]
         Root = 1,
 
         /// <summary>
         /// 侵害土壤部
         /// </summary>
-        [Description("侵害土壤部")]
+        [EnumMember(Value = "侵害土壤部")]
         Soil = 2,
 
         /// <summary>
         /// 樹幹
         /// </summary>
-        [Description("樹幹")]
+        [EnumMember(Value = "樹幹")]
         Trunk = 3,
 
         /// <summary>
         /// 莖、枝條
         /// </summary>
-        [Description("莖、枝條")]
+        [EnumMember(Value = "莖、枝條")]
         StemBranches = 4,
 
         /// <summary>
         /// 樹枝
         /// </summary>
-        [Description("樹枝")]
+        [EnumMember(Value = "樹枝")]
         Branches = 5,
 
         /// <summary>
         /// 樹葉
         /// </summary>
-        [Description("樹葉")]
+        [EnumMember(Value = "樹葉")]
         Leaf = 6,
 
         /// <summary>
         /// 花果
         /// </summary>
-        [Description("花果")]
+        [EnumMember(Value = "花果")]
         FlowerFruit = 7,
 
         /// <summary>
         /// 全株
         /// </summary>
-        [Description("全株")]
+        [EnumMember(Value = "全株")]
         WholeTree = 8,
 
         /// <summary>
         /// 全面異常症狀病害
         /// </summary>
-        [Description("全面異常症狀病害")]
+        [EnumMember(Value = "全面異常症狀病害")]
         Overall = 9
     }
 }

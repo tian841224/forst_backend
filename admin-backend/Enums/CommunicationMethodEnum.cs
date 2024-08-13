@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace admin_backend.Enums
 {
@@ -7,31 +8,31 @@ namespace admin_backend.Enums
         /// <summary>
         /// 線上
         /// </summary>
-        [Description("線上")]
+        [EnumMember(Value = "線上")]
         Online = 1,
 
         /// <summary>
         /// e-mail
         /// </summary>
-        [Description("e-mail")]
+        [EnumMember(Value = "e-mail")]
         Email = 2,
 
         /// <summary>
         /// 自送
         /// </summary>
-        [Description("自送")]
+        [EnumMember(Value = "自送")]
         SelfDelivery = 3,
 
         /// <summary>
         /// 郵寄
         /// </summary>
-        [Description("郵寄")]
+        [EnumMember(Value = "郵寄")]
         Mail = 4,
 
         /// <summary>
         /// 電話諮詢
         /// </summary>
-        [Description("電話諮詢")]
+        [EnumMember(Value = "電話諮詢")]
         PhoneConsultation = 5
     }
 }

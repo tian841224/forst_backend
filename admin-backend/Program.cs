@@ -112,7 +112,8 @@ try
 
         // 啟用註釋
         options.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);
-
+        //顯示Enum註解
+        options.SchemaFilter<EnumTypesSchemaFilter>();
         options.AddSecurityDefinition("Bearer",
          new OpenApiSecurityScheme
          {

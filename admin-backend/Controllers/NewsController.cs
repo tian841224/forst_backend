@@ -9,6 +9,8 @@ namespace admin_backend.Controllers
     /// <summary>
     /// 最新消息
     /// </summary>
+    [ApiController]
+    [Route("[controller]/[action]")]
     public class NewsController : ControllerBase
     {
         private readonly INewsService _newsService;

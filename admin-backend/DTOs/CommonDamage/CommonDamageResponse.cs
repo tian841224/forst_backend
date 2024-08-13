@@ -33,7 +33,7 @@ namespace admin_backend.DTOs.CommonDamage
         /// <summary>
         /// 危害部位
         /// </summary>
-        public List<TreePartEnum> DamagePart { get; set; } = new();
+        public List<string> DamagePart { get; set; } = new();
 
         /// <summary>
         /// 危害特徵

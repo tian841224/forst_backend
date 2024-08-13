@@ -46,11 +46,11 @@ namespace admin_backend.Services
                 foreach (var item in forestDiseasePublications)
                 {
                     var fileList = new List<ForestDiseasePublicationsFileDto>();
-                    if (string.IsNullOrEmpty(item.File)) continue;
-                    var fileUpload = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(item.File);
-                    if (fileUpload != null)
-                        fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }));
-
+                    if (!string.IsNullOrEmpty(item.File)) {
+                        var fileUpload = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(item.File);
+                        if (fileUpload != null)
+                            fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }));
+                    }
                     result.Add(new ForestDiseasePublicationsResponse
                     {
                         Id = item.Id,
@@ -101,10 +101,12 @@ namespace admin_backend.Services
             foreach (var item in forestDiseasePublications)
             {
                 var fileList = new List<ForestDiseasePublicationsFileDto>();
-                if (string.IsNullOrEmpty(item.File)) continue;
-                var fileUpload = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(item.File);
-                if (fileUpload != null)
-                    fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }));
+                if (!string.IsNullOrEmpty(item.File))
+                {
+                    var fileUpload = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(item.File);
+                    if (fileUpload != null)
+                        fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }));
+                }
 
                 result.Add(new ForestDiseasePublicationsResponse
                 {

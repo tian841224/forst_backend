@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using admin_backend.Data;
 
@@ -10,9 +11,11 @@ using admin_backend.Data;
 namespace CommonLibrary.Migrations
 {
     [DbContext(typeof(MysqlDbContext))]
-    partial class MysqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240808093642_EditNews")]
+    partial class EditNews
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -605,8 +608,8 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("longtext")
                         .HasComment("寄信密碼");
 
-                    b.Property<int>("Port")
-                        .HasColumnType("int")
+                    b.Property<byte>("Port")
+                        .HasColumnType("tinyint unsigned")
                         .HasComment("Port");
 
                     b.Property<DateTime>("UpdateTime")
@@ -673,9 +676,8 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
-                    b.Property<string>("WebsiteReleases")
-                        .IsRequired()
-                        .HasColumnType("longtext")
+                    b.Property<int>("WebsiteReleases")
+                        .HasColumnType("int")
                         .HasComment("發佈網站 1 = 林業自然保育署, 2 = 林業試驗所");
 
                     b.HasKey("Id");

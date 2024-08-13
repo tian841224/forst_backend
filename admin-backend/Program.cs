@@ -68,6 +68,7 @@ try
     builder.Services.AddScoped<IMailConfigService, MailConfigService>();
     builder.Services.AddScoped<IOperationLogService, OperationLogService>();
     builder.Services.AddScoped<INewsService, NewsService>();
+    builder.Services.AddScoped<IAdSettingService, AdSettingService>();
     //©µ¿ð¸ü¤J
     builder.Services.AddScoped(provider =>
         new Lazy<IOperationLogService>(() => provider.GetRequiredService<IOperationLogService>()));
@@ -111,7 +112,6 @@ try
 
         // ±Ò¥ÎµùÄÀ
         options.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);
-
 
         options.AddSecurityDefinition("Bearer",
          new OpenApiSecurityScheme

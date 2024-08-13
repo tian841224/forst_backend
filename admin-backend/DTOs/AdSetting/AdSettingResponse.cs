@@ -1,53 +1,38 @@
 ﻿using admin_backend.Enums;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+using CommonLibrary.DTOs;
 
-namespace admin_backend.Entities
+namespace admin_backend.DTOs.AdSetting
 {
-    /// <summary>
-    /// 廣告設定
-    /// </summary>
-    public class AdSetting : DefaultEntity
+    public class AdSettingResponse : DefaultResponseDto
     {
         /// <summary>
         /// 名稱
         /// </summary>
-        [Required]
-        [Comment("名稱")]
-        [StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 站台
+        /// 站台 1 = 林業自然保育署, 2 = 林業試驗所
         /// </summary>
-        [Required]
-        [Comment("站台 1 = 林業自然保育署, 2 = 林業試驗所")]
         public WebsiteEnum Website { get; set; }
 
         /// <summary>
-        /// 廣告位置
+        /// 廣告位置 1 = 橫幅, 2 = 首頁
         /// </summary>
-        [Required]
-        [Comment("廣告位置 1 = 橫幅, 2 = 首頁")]
         public PositionEnum Position { get; set; }
 
         /// <summary>
         /// PC圖片
         /// </summary>
-        [Comment("PC圖片")]
         public string? PhotoPc { get; set; }
 
         /// <summary>
         /// 手機圖片
         /// </summary>
-        [Comment("手機圖片")]
         public string? PhotoMobile { get; set; }
 
         /// <summary>
-        /// 狀態
+        /// 狀態 0 = 關閉, 1 = 開啟
         /// </summary>
-        [Required]
-        [Comment("狀態 0 = 關閉, 1 = 開啟")]
         public StatusEnum Status { get; set; }
     }
 }

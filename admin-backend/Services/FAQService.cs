@@ -21,13 +21,15 @@ namespace admin_backend.Services
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly IMapper _mapper;
         private readonly Lazy<IOperationLogService> _operationLogService;
+        private readonly IAdminUserServices _adminUserServices;
 
-        public FAQService(ILogger<DocumentationService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IOperationLogService> operationLogService)
+        public FAQService(ILogger<DocumentationService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IOperationLogService> operationLogService, IAdminUserServices adminUserServices)
         {
             _log = log;
             _contextFactory = contextFactory;
             _mapper = mapper;
             _operationLogService = operationLogService;
+            _adminUserServices = adminUserServices;
         }
 
         public async Task<PagedResult<FAQResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
@@ -74,13 +76,18 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var adminUser = await _context.AdminUser.Where(x => x.Id == dto.AdminUserId).FirstOrDefaultAsync();
+            //var adminUser = await _context.AdminUser.Where(x => x.Id == dto.AdminUserId).FirstOrDefaultAsync();
+            //if (adminUser == null)
+            //    throw new ApiException($"無此後台帳號-{dto.AdminUserId}");
+
+            //取得當前使用者身分
+            var adminUser = await _adminUserServices.Get();
             if (adminUser == null)
-                throw new ApiException($"無此後台帳號-{dto.AdminUserId}");
+            { throw new ApiException($"無法取得當前使用者身分"); }
 
             var fAQ = new FAQ
             {
-                AdminUserId = dto.AdminUserId,
+                AdminUserId = adminUser.Id,
                 Question = dto.Question,
                 Answer = dto.Answer,
                 Status = dto.Status,

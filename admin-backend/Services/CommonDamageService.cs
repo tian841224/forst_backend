@@ -155,12 +155,12 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var damageClass = _context.DamageClass.Where(x => x.Id == dto.DamageClassId).AnyAsync();
-            if (damageClass == null)
+            var damageClass = await _context.DamageClass.Where(x => x.Id == dto.DamageClassId).AnyAsync();
+            if (damageClass == null || !damageClass)
                 throw new ApiException($"此危害種類不存在-{dto.DamageClassId}");
 
-            var damageType = _context.DamageType.Where(x => x.Id == dto.DamageTypeId).AnyAsync();
-            if (damageType == null)
+            var damageType = await _context.DamageType.Where(x => x.Id == dto.DamageTypeId).AnyAsync();
+            if (damageType == null || !damageType)
                 throw new ApiException($"此危害類型不存在-{dto.DamageTypeId}");
 
             ////上傳圖片

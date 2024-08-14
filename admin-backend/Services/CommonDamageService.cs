@@ -1,7 +1,6 @@
 ﻿using admin_backend.Data;
 using admin_backend.DTOs.CommonDamage;
 using admin_backend.DTOs.DamageType;
-using admin_backend.DTOs.ForestDiseasePublications;
 using admin_backend.DTOs.OperationLog;
 using admin_backend.Entities;
 using admin_backend.Enums;
@@ -273,23 +272,23 @@ namespace admin_backend.Services
                 commonDamage.Status = dto.Status.Value;
             }
 
-            //上傳圖片
-            if (dto.File == null)
-            {
-                throw new ApiException($"請上傳檔案");
-            }
+            ////上傳圖片
+            //if (dto.File == null)
+            //{
+            //    throw new ApiException($"請上傳檔案");
+            //}
 
-            var fileUploadList = new List<CommonDamagePhotoResponse>();
-            var sort = 0;
-            foreach (var file in dto.File)
-            {
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Photo.FileName)}";
-                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file.Photo);
-                fileUploadList.Add(new CommonDamagePhotoResponse { Sort = ++sort, File = fileName });
-            }
+            //var fileUploadList = new List<CommonDamagePhotoResponse>();
+            //var sort = 0;
+            //foreach (var file in dto.File)
+            //{
+            //    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Photo.FileName)}";
+            //    var fileUploadDto = await _fileService.Value.UploadFile(fileName, file.Photo);
+            //    fileUploadList.Add(new CommonDamagePhotoResponse { Sort = ++sort, File = fileName });
+            //}
 
-            var jsonResult = JsonSerializer.Serialize(fileUploadList);
-            commonDamage.Photo = jsonResult;
+            //var jsonResult = JsonSerializer.Serialize(fileUploadList);
+            //commonDamage.Photo = jsonResult;
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
@@ -402,7 +401,7 @@ namespace admin_backend.Services
             //上傳檔案
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto!.Photo.FileName)}";
             await _fileService.Value.UploadFile(fileName, dto.Photo);
-            result.Add(new CommonDamagePhotoResponse { Sort = dto.Sort, File = fileName});
+            result.Add(new CommonDamagePhotoResponse { Sort = dto.Sort, File = fileName });
 
             var photo = JsonSerializer.Serialize(result);
             commonDamage.Photo = photo;

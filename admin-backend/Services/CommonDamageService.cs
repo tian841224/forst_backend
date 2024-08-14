@@ -1,6 +1,7 @@
 ﻿using admin_backend.Data;
 using admin_backend.DTOs.CommonDamage;
 using admin_backend.DTOs.DamageType;
+using admin_backend.DTOs.ForestDiseasePublications;
 using admin_backend.DTOs.OperationLog;
 using admin_backend.Entities;
 using admin_backend.Enums;
@@ -56,7 +57,7 @@ namespace admin_backend.Services
                 if (!string.IsNullOrEmpty(commonDamage.Photo))
                     photo = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo);
 
-                photo = photo!.Select(x => new CommonDamagePhotoResponse { Photo = _fileService.Value.GetFile(x.Photo), Sort = x.Sort }).ToList();
+                photo = photo!.Select(x => new CommonDamagePhotoResponse { File = _fileService.Value.GetFile(x.File), Sort = x.Sort }).ToList();
 
                 var damageTypeName = await _context.DamageType.Where(x => x.Id == commonDamage.DamageTypeId).Select(x => x.Name).FirstOrDefaultAsync();
                 if (damageTypeName == null)
@@ -101,7 +102,7 @@ namespace admin_backend.Services
                 if (!string.IsNullOrEmpty(value.Photo))
                 {
                     photo = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(value.Photo);
-                    photo = photo!.Select(x => new CommonDamagePhotoResponse { Photo = _fileService.Value.GetFile(x.Photo), Sort = x.Sort }).ToList();
+                    photo = photo!.Select(x => new CommonDamagePhotoResponse { File = _fileService.Value.GetFile(x.File), Sort = x.Sort }).ToList();
                 }
 
                 var damageTypeName = await _context.DamageType.Where(x => x.Id == value.DamageTypeId).Select(x => x.Name).FirstOrDefaultAsync();
@@ -165,13 +166,30 @@ namespace admin_backend.Services
 
             ////上傳圖片
             //var fileUploadList = new List<string>();
-            //foreach (var file in dto.Photo)
+            //foreach (var file in dto.File)
             //{
             //    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Photo.FileName)}";
             //    var fileUploadDto = await _fileService.Value.UploadFile(fileName, file.Photo);
             //    fileUploadList.Add(fileName);
             //}
             //var jsonResult = JsonSerializer.Serialize(fileUploadList);
+
+            //上傳圖片
+            if (dto.File == null)
+            {
+                throw new ApiException($"請上傳檔案");
+            }
+
+            var fileUploadList = new List<CommonDamagePhotoResponse>();
+            var sort = 0;
+            foreach (var file in dto.File)
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
+                fileUploadList.Add(new CommonDamagePhotoResponse { Sort = ++sort, File = fileName });
+            }
+
+            var jsonResult = JsonSerializer.Serialize(fileUploadList);
 
             var commonDamage = new CommonDamage
             {
@@ -181,7 +199,7 @@ namespace admin_backend.Services
                 DamagePart = dto.DamagePart,
                 DamageFeatures = dto.DamageFeatures,
                 Suggestions = dto.Suggestions,
-                //Photo = jsonResult,
+                Photo = jsonResult,
                 Status = dto.Status,
                 Sort = dto.Sort,
             };
@@ -255,6 +273,24 @@ namespace admin_backend.Services
                 commonDamage.Status = dto.Status.Value;
             }
 
+            //上傳圖片
+            if (dto.File == null)
+            {
+                throw new ApiException($"請上傳檔案");
+            }
+
+            var fileUploadList = new List<CommonDamagePhotoResponse>();
+            var sort = 0;
+            foreach (var file in dto.File)
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Photo.FileName)}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file.Photo);
+                fileUploadList.Add(new CommonDamagePhotoResponse { Sort = ++sort, File = fileName });
+            }
+
+            var jsonResult = JsonSerializer.Serialize(fileUploadList);
+            commonDamage.Photo = jsonResult;
+
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             _context.CommonDamage.Update(commonDamage);
@@ -324,10 +360,10 @@ namespace admin_backend.Services
                 if (commonDamage.Photo.Contains(value.Name))
                 {
                     var commonDamagePhotoList = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo);
-                    var commonDamagePhoto = commonDamagePhotoList!.Where(x => x.Photo.Contains(value.Name)).FirstOrDefault();
+                    var commonDamagePhoto = commonDamagePhotoList!.Where(x => x.File.Contains(value.Name)).FirstOrDefault();
 
                     commonDamagePhoto!.Sort = value.Sort;
-                    commonDamagePhoto.Photo = commonDamagePhoto.Photo;
+                    commonDamagePhoto.File = commonDamagePhoto.File;
 
                     result.Add(commonDamagePhoto);
                 }
@@ -366,7 +402,7 @@ namespace admin_backend.Services
             //上傳檔案
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto!.Photo.FileName)}";
             await _fileService.Value.UploadFile(fileName, dto.Photo);
-            result.Add(new CommonDamagePhotoResponse { Photo = fileName, Sort = dto.Sort });
+            result.Add(new CommonDamagePhotoResponse { Sort = dto.Sort, File = fileName});
 
             var photo = JsonSerializer.Serialize(result);
             commonDamage.Photo = photo;
@@ -429,9 +465,9 @@ namespace admin_backend.Services
             }
 
             var fileList = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo);
-            if (fileList!.Where(x => x.Photo.Contains(fileId)).Any())
+            if (fileList!.Where(x => x.File.Contains(fileId)).Any())
             {
-                var removeFile = fileList!.Where(x => x.Photo.Contains(fileId)).FirstOrDefault();
+                var removeFile = fileList!.Where(x => x.File.Contains(fileId)).FirstOrDefault();
                 fileList!.Remove(removeFile!);
             }
 

@@ -64,7 +64,7 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Add(AddCommonDamageDto dto)
+        public async Task<IActionResult> Add([FromForm] AddCommonDamageDto dto)
         {
             return Ok(await _commonDamageService.Add(dto));
         }
@@ -117,7 +117,7 @@ namespace admin_backend.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateFileSort(int id, List<UpdateFileSortDto> dto)
         {
-            return Ok(await _commonDamageService.UpdateFileSort(id,dto));
+            return Ok(await _commonDamageService.UpdateFileSort(id, dto));
         }
 
         /// <summary>

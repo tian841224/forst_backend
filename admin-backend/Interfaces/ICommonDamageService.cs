@@ -5,6 +5,9 @@ using CommonLibrary.Extensions;
 
 namespace admin_backend.Interfaces
 {
+    /// <summary>
+    /// 常見病蟲害
+    /// </summary>
     public interface ICommonDamageService
     {
         /// <summary>取得常見病蟲害</summary>

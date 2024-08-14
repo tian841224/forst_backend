@@ -6,6 +6,5 @@ namespace admin_backend.DTOs.DamageType
     {
         public IFormFile Photo { get; set; }
 
-        //public SortDto SortDtos { get; set; } = new();
     }
 }

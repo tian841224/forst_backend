@@ -1,5 +1,7 @@
-﻿using admin_backend.Enums;
+﻿using admin_backend.DTOs.DamageType;
+using admin_backend.Enums;
 using CommonLibrary.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace admin_backend.DTOs.CommonDamage
@@ -28,6 +30,7 @@ namespace admin_backend.DTOs.CommonDamage
         /// 危害部位
         /// </summary>
         [Required]
+        [FromForm]
         public List<TreePartEnum> DamagePart { get; set; } = null!;
 
         /// <summary>
@@ -42,11 +45,11 @@ namespace admin_backend.DTOs.CommonDamage
         [Required]
         public string Suggestions { get; set; } = string.Empty;
 
-        ///// <summary>
-        ///// 病蟲封面照片
-        ///// </summary>
-        //[Required]
-        //public List<IFormFile> Photo { get; set; } = null!;
+        /// <summary>
+        /// 病蟲封面照片
+        /// </summary>
+        [FromForm]
+        public List<IFormFile> File { get; set; } = new();
 
         /// <summary>
         /// 狀態 0 = 關閉, 1 = 開啟

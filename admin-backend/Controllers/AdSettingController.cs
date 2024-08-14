@@ -80,19 +80,19 @@ namespace admin_backend.Controllers
             return Ok(await _adSettingService.Update(id, dto));
         }
 
-        ///// <summary>
-        ///// 上傳官網廣告版位圖片
-        ///// </summary>
-        ///// <param name="Id"></param>
-        ///// <param name="dto"></param>
-        ///// <returns></returns>
-        //[HttpPut("{id}")]
-        //[Authorize]
-        //public async Task<IActionResult> UploadFile(int id, [FromForm] AdSettingPhotoDto dto)
-        //{
-        //    await _adSettingService.UploadFile(id, dto);
-        //    return Ok();
-        //}
+        /// <summary>
+        /// 上傳官網廣告版位圖片
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UploadFile(int id, [FromForm] AdSettingPhotoDto dto)
+        {
+            await _adSettingService.UploadFile(id, dto);
+            return Ok();
+        }
 
         /// <summary>
         /// 刪除官網廣告版位

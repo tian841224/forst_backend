@@ -20,14 +20,16 @@ namespace admin_backend.Services
         private readonly IMapper _mapper;
         private readonly Lazy<IFileService> _fileService;
         private readonly Lazy<IOperationLogService> _operationLogService;
+        private readonly IAdminUserServices _adminUserServices;
 
-        public AdSettingService(ILogger<AdSettingService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, Lazy<IOperationLogService> operationLogService)
+        public AdSettingService(ILogger<AdSettingService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, Lazy<IOperationLogService> operationLogService, IAdminUserServices adminUserServices)
         {
             _log = log;
             _contextFactory = contextFactory;
             _mapper = mapper;
             _fileService = fileService;
             _operationLogService = operationLogService;
+            _adminUserServices = adminUserServices;
         }
 
         public async Task<PagedResult<AdSettingResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
@@ -40,15 +42,39 @@ namespace admin_backend.Services
             if (Id.HasValue)
                 adSettings = _context.AdSetting.Where(x => x.Id == Id);
 
-            var adSettingResponses = _mapper.Map<List<AdSettingResponse>>(adSettings);
-            adSettingResponses.ForEach(x =>
+            //var adSettingResponses = _mapper.Map<List<AdSettingResponse>>(adSettings);
+
+            var adSettingResponses = (await adSettings.ToListAsync()).Select(x => new AdSettingResponse
             {
-                if (x.PhotoPc != null)
-                    x.PhotoPc = _fileService.Value.GetFile(x.PhotoPc);
-                if (x.PhotoMobile != null)
-                    x.PhotoMobile = _fileService.Value.GetFile(x.PhotoMobile);
-            });
-            
+                Id = x.Id,
+                Name = x.Name,
+                AdminUserId = x.AdminUserId,
+                Status = x.Status,
+                Website = x.Website.Select(e => e.GetDescription()).ToList(),
+                PhotoPc = x.PhotoPc,
+                PhotoMobile = x.PhotoMobile,
+                CreateTime = x.CreateTime,
+                UpdateTime = x.UpdateTime,
+            }).ToList();
+
+            foreach (var adSetting in adSettingResponses)
+            {
+                adSetting.AdminUserName = await _context.AdminUser
+                    .Where(y => y.Id == adSetting.Id)
+                    .Select(y => y.Name)
+                    .FirstOrDefaultAsync() ?? string.Empty;
+
+                if (!string.IsNullOrEmpty(adSetting.PhotoPc))
+                {
+                    adSetting.PhotoPc = _fileService.Value.GetFile(adSetting.PhotoPc);
+                }
+
+                if (!string.IsNullOrEmpty(adSetting.PhotoMobile))
+                {
+                    adSetting.PhotoMobile = _fileService.Value.GetFile(adSetting.PhotoMobile);
+                }
+            }
+
             //分頁處理
             return adSettingResponses.GetPaged(dto!);
         }
@@ -62,14 +88,40 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.Name))
                 adSettings = _context.AdSetting.Where(x => x.Name.Contains(dto.Name));
 
-            var adSettingResponses = _mapper.Map<List<AdSettingResponse>>(adSettings);
-            adSettingResponses.ForEach(x =>
+            //var adSettingResponses = _mapper.Map<List<AdSettingResponse>>(adSettings);
+
+            var adSettingResponses = (await adSettings.ToListAsync()).Select(x => new AdSettingResponse
             {
-                if (x.PhotoPc != null)
-                    x.PhotoPc = _fileService.Value.GetFile(x.PhotoPc);
-                if (x.PhotoMobile != null)
-                    x.PhotoMobile = _fileService.Value.GetFile(x.PhotoMobile);
-            });
+                Id = x.Id,
+                Name = x.Name,
+                AdminUserId = x.AdminUserId,
+                Status = x.Status,
+                Website = x.Website.Select(e => e.GetDescription()).ToList(),
+                PhotoPc = x.PhotoPc,
+                PhotoMobile = x.PhotoMobile,
+                CreateTime = x.CreateTime,
+                UpdateTime = x.UpdateTime,
+            }).ToList();
+
+            foreach (var adSetting in adSettingResponses)
+            {
+                adSetting.AdminUserName = await _context.AdminUser
+                    .Where(y => y.Id == adSetting.AdminUserId)
+                    .Select(y => y.Name)
+                    .FirstOrDefaultAsync() ?? string.Empty;
+
+                if (!string.IsNullOrEmpty(adSetting.PhotoPc))
+                {
+                    adSetting.PhotoPc = _fileService.Value.GetFile(adSetting.PhotoPc);
+                }
+
+                if (!string.IsNullOrEmpty(adSetting.PhotoMobile))
+                {
+                    adSetting.PhotoMobile = _fileService.Value.GetFile(adSetting.PhotoMobile);
+                }
+            }
+
+
             //分頁處理
             return adSettingResponses.GetPaged(dto.Page!);
         }
@@ -78,10 +130,16 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
+            //取得當前使用者身分
+            var adminUser = await _adminUserServices.Get();
+            if (adminUser == null)
+            { throw new ApiException($"無法取得當前使用者身分"); }
+
+
             var adSettings = new AdSetting
             {
+                AdminUserId = adminUser.Id,
                 Name = dto.Name,
-                Position = dto.Position,
                 Website = dto.Website,
                 Status = dto.Status,
             };
@@ -132,11 +190,8 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.Name))
                 adSettings.Name = dto.Name;
 
-            if (dto.Website.HasValue)
-                adSettings.Website = dto.Website.Value;
-
-            if (dto.Position.HasValue)
-                adSettings.Position = dto.Position.Value;
+            if (dto.Website != null && dto.Website.Count > 0)
+                adSettings.Website = dto.Website;
 
             if (dto.Status.HasValue)
                 adSettings.Status = dto.Status.Value;
@@ -187,7 +242,7 @@ namespace admin_backend.Services
                 //上傳檔案
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PhotoMobile.FileName)}";
                 await _fileService.Value.UploadFile(fileName, dto.PhotoMobile);
-                adSettings.PhotoMobile = _fileService.Value.GetFile(fileName); ;
+                adSettings.PhotoMobile = fileName;
             }
 
             if (dto.PhotoPc != null && dto.PhotoPc.Length > 0)
@@ -195,7 +250,7 @@ namespace admin_backend.Services
                 //上傳檔案
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PhotoPc.FileName)}";
                 await _fileService.Value.UploadFile(fileName, dto.PhotoPc);
-                adSettings.PhotoPc = _fileService.Value.GetFile(fileName); ;
+                adSettings.PhotoPc = fileName;
             }
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);

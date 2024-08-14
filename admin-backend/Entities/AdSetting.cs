@@ -1,6 +1,7 @@
 ﻿using admin_backend.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace admin_backend.Entities
 {
@@ -9,6 +10,13 @@ namespace admin_backend.Entities
     /// </summary>
     public class AdSetting : DefaultEntity
     {
+        /// <summary>
+        /// 發佈者
+        /// </summary>
+        [Required]
+        [Comment("發佈者")]
+        public int AdminUserId { get; set; }
+
         /// <summary>
         /// 名稱
         /// </summary>
@@ -22,14 +30,7 @@ namespace admin_backend.Entities
         /// </summary>
         [Required]
         [Comment("站台 1 = 林業自然保育署, 2 = 林業試驗所")]
-        public WebsiteEnum Website { get; set; }
-
-        /// <summary>
-        /// 廣告位置
-        /// </summary>
-        [Required]
-        [Comment("廣告位置 1 = 橫幅, 2 = 首頁")]
-        public PositionEnum Position { get; set; }
+        public List<WebsiteEnum> Website { get; set; } = new List<WebsiteEnum>();
 
         /// <summary>
         /// PC圖片
@@ -49,5 +50,8 @@ namespace admin_backend.Entities
         [Required]
         [Comment("狀態 0 = 關閉, 1 = 開啟")]
         public StatusEnum Status { get; set; }
+
+        [ForeignKey("AdminUserId")]
+        public virtual AdminUser AdminUser { get; set; } = null!;
     }
 }

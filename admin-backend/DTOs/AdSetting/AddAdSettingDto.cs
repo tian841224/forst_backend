@@ -17,14 +17,7 @@ namespace admin_backend.DTOs.AdSetting
         /// </summary>
         [SwaggerParameter(Description = "站台 1 = 林業自然保育署, 2 = 林業試驗所")]
         [Required]
-        public WebsiteEnum Website { get; set; }
-
-        /// <summary>
-        /// 廣告位置 1 = 橫幅, 2 = 首頁
-        /// </summary>
-        [SwaggerParameter(Description = "廣告位置 1 = 橫幅, 2 = 首頁")]
-        [Required]
-        public PositionEnum Position { get; set; }
+        public List<WebsiteEnum> Website { get; set; } = new List<WebsiteEnum>();
 
         /// <summary>
         /// PC圖案

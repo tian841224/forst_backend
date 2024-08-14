@@ -6,6 +6,16 @@ namespace admin_backend.DTOs.AdSetting
     public class AdSettingResponse : DefaultResponseDto
     {
         /// <summary>
+        /// 發佈者ID
+        /// </summary>
+        public int AdminUserId { get; set; }
+
+        /// <summary>
+        /// 發佈者
+        /// </summary>
+        public string AdminUserName { get; set; } = string.Empty;
+
+        /// <summary>
         /// 名稱
         /// </summary>
         public string Name { get; set; } = string.Empty;
@@ -13,12 +23,7 @@ namespace admin_backend.DTOs.AdSetting
         /// <summary>
         /// 站台 1 = 林業自然保育署, 2 = 林業試驗所
         /// </summary>
-        public WebsiteEnum Website { get; set; }
-
-        /// <summary>
-        /// 廣告位置 1 = 橫幅, 2 = 首頁
-        /// </summary>
-        public PositionEnum Position { get; set; }
+        public List<string> Website { get; set; } = new();
 
         /// <summary>
         /// PC圖片

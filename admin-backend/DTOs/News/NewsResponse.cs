@@ -1,5 +1,7 @@
 ﻿using admin_backend.Enums;
 using CommonLibrary.DTOs;
+using CommonLibrary.Extensions;
+using System.Text.Json.Serialization;
 
 namespace admin_backend.DTOs.News
 {
@@ -48,11 +50,13 @@ namespace admin_backend.DTOs.News
         /// <summary>
         /// 排程開始時間
         /// </summary>
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime StartTime { get; set; }
 
         /// <summary>
         /// 排程結束時間
         /// </summary>
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime EndTime { get; set; }
 
         /// <summary>

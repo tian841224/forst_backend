@@ -91,6 +91,7 @@ namespace admin_backend.Services
 
                 var newsResponse = new NewsResponse
                 {
+                    Id = item.Id,
                     AdminUserId = item.AdminUserId,
                     AdminUserName = adminUserName,
                     Title = item.Title,
@@ -102,6 +103,8 @@ namespace admin_backend.Services
                     EndTime = item.EndTime,
                     Status = item.Status, 
                     WebsiteReleases = item.WebsiteReleases,
+                    UpdateTime = item.UpdateTime,
+                    CreateTime = item.CreateTime,
                 };
 
                 newsResponses.Add(newsResponse);

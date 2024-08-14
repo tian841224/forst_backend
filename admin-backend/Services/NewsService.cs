@@ -48,6 +48,7 @@ namespace admin_backend.Services
                 if (adminUserName == null) continue;
 
                 item.AdminUserName = adminUserName;
+                item.Type = await news.Where(x => x.Id == item.Id).Select(x => x.Type.GetDescription()).FirstOrDefaultAsync();
                 item.WebsiteReleases = await news.Where(x => x.Id == item.Id).Select(x => x.WebsiteReleases).FirstOrDefaultAsync();
             }
 
@@ -95,7 +96,7 @@ namespace admin_backend.Services
                     AdminUserId = item.AdminUserId,
                     AdminUserName = adminUserName,
                     Title = item.Title,
-                    Type = item.Type, 
+                    Type = item.Type.GetDescription(), 
                     Content = item.Content,
                     Pinned = item.Pinned,
                     Schedule = item.Schedule,

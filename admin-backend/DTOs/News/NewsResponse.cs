@@ -25,7 +25,7 @@ namespace admin_backend.DTOs.News
         /// <summary>
         /// 公告類型 一般公告 = 1, 重要公告 = 2, 活動公告 = 3, 跑馬燈 = 4
         /// </summary>
-        public AnnouncementEnum Type { get; set; }
+        public string Type { get; set; } = string.Empty;
 
         /// <summary>
         /// 發佈內容

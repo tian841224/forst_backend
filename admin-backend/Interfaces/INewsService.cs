@@ -4,6 +4,9 @@ using CommonLibrary.Extensions;
 
 namespace admin_backend.Interfaces
 {
+    /// <summary>
+    /// 最新消息
+    /// </summary>
     public interface INewsService
     {
         /// <summary>取得最新消息 </summary>

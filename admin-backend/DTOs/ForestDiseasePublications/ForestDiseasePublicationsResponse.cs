@@ -8,7 +8,7 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// <summary>
         /// 出版品類型 林業叢刊 = 1, 相關摺頁 = 2
         /// </summary>
-        public int Type { get; set; }
+        public string Type { get; set; } = string.Empty;
 
         /// <summary>
         /// 出版品名稱

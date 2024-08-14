@@ -4,6 +4,9 @@ using CommonLibrary.Extensions;
 
 namespace admin_backend.Interfaces
 {
+    /// <summary>
+    /// 林木疫情出版品
+    /// </summary>
     public interface IForestDiseasePublicationsService
     {
         Task<PagedResult<ForestDiseasePublicationsResponse>> Get(int? Id = null, PagedOperationDto? dto = null);

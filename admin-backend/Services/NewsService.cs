@@ -49,7 +49,12 @@ namespace admin_backend.Services
 
                 item.AdminUserName = adminUserName;
                 item.Type = await news.Where(x => x.Id == item.Id).Select(x => x.Type.GetDescription()).FirstOrDefaultAsync();
-                item.WebsiteReleases = await news.Where(x => x.Id == item.Id).Select(x => x.WebsiteReleases).FirstOrDefaultAsync();
+                item.WebsiteReleases = await news
+                                        .Where(x => x.Id == item.Id)
+                                        .Select(x => x.WebsiteReleases
+                                            .Select(y => y.GetDescription())
+                                            .ToList())
+                                        .FirstOrDefaultAsync() ?? new List<string>();
             }
 
             //分頁處理
@@ -103,7 +108,7 @@ namespace admin_backend.Services
                     StartTime = item.StartTime,
                     EndTime = item.EndTime,
                     Status = item.Status, 
-                    WebsiteReleases = item.WebsiteReleases,
+                    WebsiteReleases = item.WebsiteReleases.Select(x => x.GetDescription()).ToList(),
                     UpdateTime = item.UpdateTime,
                     CreateTime = item.CreateTime,
                 };

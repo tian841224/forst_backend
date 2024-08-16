@@ -68,6 +68,13 @@ namespace admin_backend.Services
                 faq =faq.Where(x => x.Status == dto.Status);
 
             var faqResponse = _mapper.Map<List<FAQResponse>>(faq);
+            foreach (var item in faqResponse)
+            {
+                var adminUserName = await _context.AdminUser.Where(x => x.Id == item.AdminUserId).Select(x => x.Name).FirstOrDefaultAsync();
+                if (adminUserName == null) continue;
+
+                item.AdminUserName = adminUserName;
+            }
             //分頁處理
             return faqResponse.GetPaged(dto.Page!);
         }

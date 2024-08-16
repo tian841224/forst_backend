@@ -60,7 +60,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Add(AddNewsDto dto)
         {
             return Ok(await _newsService.Add(dto));

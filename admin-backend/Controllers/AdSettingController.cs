@@ -49,7 +49,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(GetdSettingDto dto)
         {
             return Ok(await _adSettingService.Get(dto));

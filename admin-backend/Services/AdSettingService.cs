@@ -66,12 +66,12 @@ namespace admin_backend.Services
 
                 if (!string.IsNullOrEmpty(adSetting.PhotoPc))
                 {
-                    adSetting.PhotoPc = _fileService.Value.GetFile(adSetting.PhotoPc);
+                    adSetting.PhotoPc = _fileService.Value.GetFile(adSetting.PhotoPc, "image");
                 }
 
                 if (!string.IsNullOrEmpty(adSetting.PhotoMobile))
                 {
-                    adSetting.PhotoMobile = _fileService.Value.GetFile(adSetting.PhotoMobile);
+                    adSetting.PhotoMobile = _fileService.Value.GetFile(adSetting.PhotoMobile, "image");
                 }
             }
 
@@ -112,12 +112,12 @@ namespace admin_backend.Services
 
                 if (!string.IsNullOrEmpty(adSetting.PhotoPc))
                 {
-                    adSetting.PhotoPc = _fileService.Value.GetFile(adSetting.PhotoPc);
+                    adSetting.PhotoPc = _fileService.Value.GetFile(adSetting.PhotoPc, "image");
                 }
 
                 if (!string.IsNullOrEmpty(adSetting.PhotoMobile))
                 {
-                    adSetting.PhotoMobile = _fileService.Value.GetFile(adSetting.PhotoMobile);
+                    adSetting.PhotoMobile = _fileService.Value.GetFile(adSetting.PhotoMobile, "image");
                 }
             }
 

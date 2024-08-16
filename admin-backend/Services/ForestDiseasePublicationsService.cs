@@ -49,7 +49,12 @@ namespace admin_backend.Services
                     if (!string.IsNullOrEmpty(item.File)) {
                         var fileUpload = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(item.File);
                         if (fileUpload != null)
-                            fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }));
+                        {
+                            if (item.Type == 1)
+                                fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File, "image") }));
+                            else
+                                fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }));
+                        }
                     }
                     result.Add(new ForestDiseasePublicationsResponse
                     {
@@ -105,7 +110,12 @@ namespace admin_backend.Services
                 {
                     var fileUpload = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(item.File);
                     if (fileUpload != null)
-                        fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }));
+                    {
+                        if (item.Type == 1)
+                            fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File, "image") }));
+                        else
+                            fileList.AddRange(fileUpload.Select(x => new ForestDiseasePublicationsFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }));
+                    }
                 }
 
                 result.Add(new ForestDiseasePublicationsResponse

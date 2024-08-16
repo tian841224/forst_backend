@@ -10,7 +10,7 @@ namespace admin_backend.Entities
     public class ForestDiseasePublications : SortDefaultEntity
     {
         /// <summary>
-        /// 出版品類型
+        /// 出版品類型 林業叢刊 = 1, 相關摺頁 = 2
         /// </summary>
         [Comment("出版品類型 林業叢刊 = 1, 相關摺頁 = 2")]
         public int Type { get; set; }

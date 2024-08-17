@@ -13,6 +13,7 @@ namespace admin_backend.DTOs.Documentation
 
         /// <summary>
         /// 使用條款類型 1 = 同意書, 2 = 使用說明
+        /// </summary>
         public string TypeName => Type.GetDescription();
 
         /// <summary>

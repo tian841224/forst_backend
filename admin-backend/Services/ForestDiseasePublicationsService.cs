@@ -295,7 +295,7 @@ namespace admin_backend.Services
 
             if (!string.IsNullOrEmpty(forestDiseasePublications.File))
             {
-                var oldFile = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(forestDiseasePublications.File);
+                var oldFile = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(forestDiseasePublications.File) ?? new List<ForestDiseasePublicationsFileDto>();
                 fileUploadList.AddRange(oldFile);
                 id = oldFile.Select(x => x.Id).Max();
             }

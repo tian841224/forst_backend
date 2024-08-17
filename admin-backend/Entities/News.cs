@@ -79,6 +79,6 @@ namespace admin_backend.Entities
         public StatusEnum Status { get; set; }
 
         [ForeignKey("AdminUserId")]
-        public virtual AdminUser AdminUser { get; set; }
+        public virtual AdminUser AdminUser { get; set; } = null!;
     }
 }

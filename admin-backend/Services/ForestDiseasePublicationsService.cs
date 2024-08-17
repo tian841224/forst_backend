@@ -59,7 +59,8 @@ namespace admin_backend.Services
                     result.Add(new ForestDiseasePublicationsResponse
                     {
                         Id = item.Id,
-                        Type = item.Type == 1 ? "林業叢刊" : "相關摺頁",
+                        Type = item.Type,
+                        TypeName = item.Type == 1 ? "林業叢刊" : "相關摺頁",
                         Name = item.Name,
                         Authors = string.IsNullOrEmpty(item.Author) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(item.Author)!,
                         Date = item.Date,
@@ -121,7 +122,8 @@ namespace admin_backend.Services
                 result.Add(new ForestDiseasePublicationsResponse
                 {
                     Id = item.Id,
-                    Type = item.Type == 1 ? "林業叢刊" : "相關摺頁",
+                    Type = item.Type,
+                    TypeName = item.Type == 1 ? "林業叢刊" : "相關摺頁",
                     Name = item.Name,
                     Authors = string.IsNullOrEmpty(item.Author) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(item.Author)!,
                     Date = item.Date,
@@ -220,7 +222,8 @@ namespace admin_backend.Services
             result.Authors = dto.Authors!.Count == 0 ? new List<string>() : dto.Authors;
             result.Link = dto.Link ?? string.Empty;
             result.Date = dto.Date!.Value;
-            result.Type = dto.Type == 1 ? "林業叢刊" : "相關摺頁";
+            result.Type = dto.Type;
+            result.TypeName = dto.Type == 1 ? "林業叢刊" : "相關摺頁";
             result.Status = dto.Status;
             result.Sort = dto.Sort;
             //result.File = fileUploadList;

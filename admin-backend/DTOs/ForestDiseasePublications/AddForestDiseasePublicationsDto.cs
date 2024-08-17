@@ -1,6 +1,7 @@
 ﻿using admin_backend.Enums;
 using CommonLibrary.DTOs;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace admin_backend.DTOs.ForestDiseasePublications
 {

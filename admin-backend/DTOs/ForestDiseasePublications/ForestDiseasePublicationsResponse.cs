@@ -1,5 +1,7 @@
 ﻿using admin_backend.Enums;
 using CommonLibrary.DTOs;
+using System.Text.Json.Serialization;
+using CommonLibrary.Extensions;
 
 namespace admin_backend.DTOs.ForestDiseasePublications
 {
@@ -8,7 +10,12 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// <summary>
         /// 出版品類型 林業叢刊 = 1, 相關摺頁 = 2
         /// </summary>
-        public string Type { get; set; } = string.Empty;
+        public int Type { get; set; }
+
+        /// <summary>
+        /// 出版品類型 林業叢刊 = 1, 相關摺頁 = 2
+        /// </summary>
+        public string TypeName { get; set; } = string.Empty;
 
         /// <summary>
         /// 出版品名稱
@@ -18,6 +25,7 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// <summary>
         /// 出版品日期
         /// </summary>
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime Date { get; set; }
 
         /// <summary>

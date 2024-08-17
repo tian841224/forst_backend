@@ -4,6 +4,9 @@ using CommonLibrary.Extensions;
 
 namespace admin_backend.Interfaces
 {
+    /// <summary>
+    /// 林班位置
+    /// </summary>
     public interface IForestCompartmentLocationService
     {
         Task<PagedResult<ForestCompartmentLocationResponse>> Get(int? Id = null, PagedOperationDto? dto = null);

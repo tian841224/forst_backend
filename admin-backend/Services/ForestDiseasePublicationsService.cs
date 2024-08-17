@@ -144,7 +144,7 @@ namespace admin_backend.Services
 
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.Name == dto.Name).FirstOrDefaultAsync();
+            var forestDiseasePublications = await _context.ForestDiseasePublications.Where(x => x.Name == dto.Name && x.Type == dto.Type).FirstOrDefaultAsync();
 
             if (forestDiseasePublications != null)
             {

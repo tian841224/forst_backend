@@ -1,5 +1,4 @@
 ﻿using admin_backend.Data;
-using admin_backend.DTOs.EpidemicSummary;
 using admin_backend.DTOs.FAQ;
 using admin_backend.DTOs.OperationLog;
 using admin_backend.Entities;
@@ -7,10 +6,9 @@ using admin_backend.Enums;
 using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.DTOs;
+using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
-using CommonLibrary.Extensions;
-using admin_backend.DTOs.DamageType;
 
 
 namespace admin_backend.Services
@@ -64,8 +62,8 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.Question))
                 faq = faq.Where(x => x.Question.Contains(dto.Question));
 
-            if(dto.Status.HasValue)
-                faq =faq.Where(x => x.Status == dto.Status);
+            if (dto.Status.HasValue)
+                faq = faq.Where(x => x.Status == dto.Status);
 
             var faqResponse = _mapper.Map<List<FAQResponse>>(faq);
             foreach (var item in faqResponse)
@@ -87,12 +85,19 @@ namespace admin_backend.Services
             //if (adminUser == null)
             //    throw new ApiException($"無此後台帳號-{dto.AdminUserId}");
 
+            var fAQ = await _context.FAQ.Where(x => x.Question == dto.Question).FirstOrDefaultAsync();
+
+            if (fAQ != null)
+            {
+                throw new ApiException($"此問題已存在-{dto.Question}");
+            }
+
             //取得當前使用者身分
             var adminUser = await _adminUserServices.Get();
             if (adminUser == null)
             { throw new ApiException($"無法取得當前使用者身分"); }
 
-            var fAQ = new FAQ
+            fAQ = new FAQ
             {
                 AdminUserId = adminUser.Id,
                 Question = dto.Question,
@@ -123,10 +128,10 @@ namespace admin_backend.Services
             await using var _context = await _contextFactory.CreateDbContextAsync();
             var faq = await _context.FAQ.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
-            if(faq == null)
+            if (faq == null)
                 throw new ApiException($"無此資料-{Id}");
 
-            if(!string.IsNullOrEmpty(dto.Question))
+            if (!string.IsNullOrEmpty(dto.Question))
                 faq.Question = dto.Question;
 
             if (!string.IsNullOrEmpty(dto.Answer))

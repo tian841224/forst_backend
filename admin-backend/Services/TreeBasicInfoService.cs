@@ -62,7 +62,14 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var treeBasicInfo = new TreeBasicInfo
+            var treeBasicInfo = await _context.TreeBasicInfo.Where(x => x.Name == dto.Name).FirstOrDefaultAsync();
+
+            if (treeBasicInfo != null)
+            {
+                throw new ApiException($"此名稱已存在-{dto.Name}");
+            }
+
+             treeBasicInfo = new TreeBasicInfo
             {
                 ScientificName = dto.ScientificName,
                 Name = dto.Name,

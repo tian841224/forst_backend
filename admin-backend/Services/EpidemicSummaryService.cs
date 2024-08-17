@@ -5,6 +5,7 @@ using admin_backend.Entities;
 using admin_backend.Enums;
 using admin_backend.Interfaces;
 using AutoMapper;
+using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 
@@ -36,7 +37,14 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var epidemicSummary = new EpidemicSummary
+            var epidemicSummary = await _context.EpidemicSummary.Where(x => x.Title == dto.Title).FirstOrDefaultAsync();
+
+            if (epidemicSummary != null)
+            {
+                throw new ApiException($"此標題已存在-{dto.Title}");
+            }
+
+             epidemicSummary = new EpidemicSummary
             {
                 Title = dto.Title,
                 Content = dto.Content,

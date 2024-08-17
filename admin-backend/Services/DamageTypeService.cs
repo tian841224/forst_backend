@@ -70,7 +70,14 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var damageType = new DamageType
+            var damageType = await _context.DamageType.Where(x => x.Name == dto.Name).FirstOrDefaultAsync();
+
+            if (damageType != null)
+            {
+                throw new ApiException($"此名稱已存在-{dto.Name}");
+            }
+
+            damageType = new DamageType
             {
                 Name = dto.Name,
                 Status = dto.Status,

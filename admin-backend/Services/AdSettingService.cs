@@ -10,6 +10,7 @@ using CommonLibrary.Extensions;
 using CommonLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
+using System.Xml.Linq;
 
 namespace admin_backend.Services
 {
@@ -130,13 +131,20 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
+            var adSetting = await _context.AdSetting.Where(x => x.Name == dto.Name).FirstOrDefaultAsync();
+
+            if (adSetting != null)
+            {
+                throw new ApiException($"此名稱已存在-{dto.Name}");
+            }
+
             //取得當前使用者身分
             var adminUser = await _adminUserServices.Get();
             if (adminUser == null)
             { throw new ApiException($"無法取得當前使用者身分"); }
 
 
-            var adSettings = new AdSetting
+            adSetting = new AdSetting
             {
                 AdminUserId = adminUser.Id,
                 Name = dto.Name,
@@ -149,7 +157,7 @@ namespace admin_backend.Services
                 //上傳檔案
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PhotoMobile.FileName)}";
                 await _fileService.Value.UploadFile(fileName, dto.PhotoMobile);
-                adSettings.PhotoMobile = fileName;
+                adSetting.PhotoMobile = fileName;
             }
 
             if (dto.PhotoPc != null && dto.PhotoPc.Length > 0)
@@ -157,11 +165,11 @@ namespace admin_backend.Services
                 //上傳檔案
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PhotoPc.FileName)}";
                 await _fileService.Value.UploadFile(fileName, dto.PhotoPc);
-                adSettings.PhotoPc = fileName;
+                adSetting.PhotoPc = fileName;
             }
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            await _context.AdSetting.AddAsync(adSettings);
+            await _context.AdSetting.AddAsync(adSetting);
 
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
@@ -169,11 +177,11 @@ namespace admin_backend.Services
                 await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
-                    Content = $"新增官網廣告版位：{adSettings.Name}",
+                    Content = $"新增官網廣告版位：{adSetting.Name}",
                 });
             };
             scope.Complete();
-            return _mapper.Map<AdSettingResponse>(adSettings);
+            return _mapper.Map<AdSettingResponse>(adSetting);
         }
 
         public async Task<AdSettingResponse> Update(int Id, UpdateAdSettingDto dto)

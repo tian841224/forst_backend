@@ -48,7 +48,7 @@ namespace admin_backend.Services
                 if (adminUserName == null) continue;
 
                 item.AdminUserName = adminUserName;
-                item.Type =  (await news.ToListAsync()).Where(x => x.Id == item.Id).Select(x => x.Type.GetDescription()).FirstOrDefault();
+                item.Type = (await news.ToListAsync()).Where(x => x.Id == item.Id).Select(x => x.Type.GetDescription()).FirstOrDefault();
                 item.WebsiteReleases = (await news.ToListAsync())
                                         .Where(x => x.Id == item.Id)
                                         .Select(x => x.WebsiteReleases
@@ -101,13 +101,13 @@ namespace admin_backend.Services
                     AdminUserId = item.AdminUserId,
                     AdminUserName = adminUserName,
                     Title = item.Title,
-                    Type = item.Type.GetDescription(), 
+                    Type = item.Type.GetDescription(),
                     Content = item.Content,
                     Pinned = item.Pinned,
                     Schedule = item.Schedule,
                     StartTime = item.StartTime,
                     EndTime = item.EndTime,
-                    Status = item.Status, 
+                    Status = item.Status,
                     WebsiteReleases = item.WebsiteReleases.Select(x => x.GetDescription()).ToList(),
                     UpdateTime = item.UpdateTime,
                     CreateTime = item.CreateTime,
@@ -123,12 +123,19 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
+            var news = await _context.News.Where(x => x.Title == dto.Title).FirstOrDefaultAsync();
+
+            if (news != null)
+            {
+                throw new ApiException($"此標題已存在-{dto.Title}");
+            }
+
             //取得當前使用者身分
             var adminUser = await _adminUserServices.Get();
             if (adminUser == null)
             { throw new ApiException($"無法取得當前使用者身分"); }
 
-            var news = new News
+            news = new News
             {
                 AdminUserId = adminUser.Id,
                 Content = dto.Content,

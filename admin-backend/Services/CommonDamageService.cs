@@ -155,6 +155,13 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
+            var commonDamage = await _context.CommonDamage.Where(x => x.Name == dto.Name).FirstOrDefaultAsync();
+
+            if (commonDamage != null)
+            {
+                throw new ApiException($"此名稱已存在-{dto.Name}");
+            }
+
             var damageClass = await _context.DamageClass.Where(x => x.Id == dto.DamageClassId).AnyAsync();
             if (!damageClass)
                 throw new ApiException($"此危害種類不存在-{dto.DamageClassId}");
@@ -190,7 +197,7 @@ namespace admin_backend.Services
 
             var jsonResult = JsonSerializer.Serialize(fileUploadList);
 
-            var commonDamage = new CommonDamage
+            commonDamage = new CommonDamage
             {
                 DamageTypeId = dto.DamageTypeId,
                 DamageClassId = dto.DamageClassId,

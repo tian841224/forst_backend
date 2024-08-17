@@ -1,6 +1,5 @@
 ﻿using admin_backend.Data;
 using admin_backend.DTOs.DamageClass;
-using admin_backend.DTOs.DamageType;
 using admin_backend.DTOs.OperationLog;
 using admin_backend.Entities;
 using admin_backend.Enums;
@@ -34,14 +33,14 @@ namespace admin_backend.Services
 
         public async Task<PagedResult<DamageClassResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
         {
-            if(dto == null) dto = new PagedOperationDto();
+            if (dto == null) dto = new PagedOperationDto();
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
             IQueryable<DamageClass> damageClassList = _context.DamageClass;
 
             if (Id.HasValue)
                 damageClassList = _context.DamageClass.Where(x => x.Id == Id);
-            
+
             var damageClassListResponse = _mapper.Map<List<DamageClassResponse>>(damageClassList);
             //分頁處理
             return damageClassListResponse.GetPaged(dto!);
@@ -65,7 +64,14 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var damageClasses = new DamageClass
+            var damageClasses = await _context.DamageClass.Where(x => x.Name == dto.Name).FirstOrDefaultAsync();
+
+            if (damageClasses != null)
+            {
+                throw new ApiException($"此名稱已存在-{dto.Name}");
+            }
+
+            damageClasses = new DamageClass
             {
                 Name = dto.Name,
                 DamageTypeId = dto.DamageTypeId,
@@ -89,7 +95,7 @@ namespace admin_backend.Services
             return _mapper.Map<DamageClassResponse>(damageClasses);
         }
 
-        public async Task<DamageClassResponse> Update(int Id,UpdateDamageClassDto dto)
+        public async Task<DamageClassResponse> Update(int Id, UpdateDamageClassDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 

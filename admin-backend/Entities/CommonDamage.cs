@@ -33,7 +33,7 @@ namespace admin_backend.Entities
         /// </summary>
         [Required]
         [Comment("危害部位")]
-        public List<TreePartEnum> DamagePart { get; set; } = new();
+        public List<DamagedPartEnum> DamagePart { get; set; } = new();
 
         /// <summary>
         /// 危害特徵

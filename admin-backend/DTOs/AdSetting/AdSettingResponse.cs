@@ -1,5 +1,6 @@
 ﻿using admin_backend.Enums;
 using CommonLibrary.DTOs;
+using CommonLibrary.Extensions;
 
 namespace admin_backend.DTOs.AdSetting
 {
@@ -23,7 +24,12 @@ namespace admin_backend.DTOs.AdSetting
         /// <summary>
         /// 站台 1 = 林業自然保育署, 2 = 林業試驗所
         /// </summary>
-        public List<string> Website { get; set; } = new();
+        public List<WebsiteEnum> Website { get; set; } = new();
+
+        /// <summary>
+        /// 站台名稱
+        /// </summary>
+        public List<string> WebsiteName => Website.Select(w => w.GetDescription()).ToList();
 
         /// <summary>
         /// PC圖片

@@ -93,7 +93,6 @@ namespace admin_backend.Services
                 var role = (await _roleService.Get(new GetRoleDto { Id = x.RoleId })).Items.FirstOrDefault() ?? new RoleResponse();
                 x.RoleName = role.Name;
 
-                // 如果需要處理其他屬性，可以在這裡添加
             });
 
             // 等待所有任務完成

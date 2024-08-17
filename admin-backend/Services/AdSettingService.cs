@@ -10,7 +10,6 @@ using CommonLibrary.Extensions;
 using CommonLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
-using System.Xml.Linq;
 
 namespace admin_backend.Services
 {
@@ -51,7 +50,7 @@ namespace admin_backend.Services
                 Name = x.Name,
                 AdminUserId = x.AdminUserId,
                 Status = x.Status,
-                Website = x.Website.Select(e => e.GetDescription()).ToList(),
+                Website = x.Website,
                 PhotoPc = x.PhotoPc,
                 PhotoMobile = x.PhotoMobile,
                 CreateTime = x.CreateTime,
@@ -97,7 +96,7 @@ namespace admin_backend.Services
                 Name = x.Name,
                 AdminUserId = x.AdminUserId,
                 Status = x.Status,
-                Website = x.Website.Select(e => e.GetDescription()).ToList(),
+                Website = x.Website,
                 PhotoPc = x.PhotoPc,
                 PhotoMobile = x.PhotoMobile,
                 CreateTime = x.CreateTime,

@@ -19,14 +19,16 @@ namespace admin_backend.Services
         private readonly IMapper _mapper;
         private readonly Lazy<IOperationLogService> _operationLogService;
         private readonly IAdminUserServices _adminUserServices;
+        private readonly ICommonServicecs _commonServicecs;
 
-        public NewsService(ILogger<NewsService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IOperationLogService> operationLogService, IAdminUserServices adminUserServices)
+        public NewsService(ILogger<NewsService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IOperationLogService> operationLogService, IAdminUserServices adminUserServices, ICommonServicecs commonServicecs)
         {
             _log = log;
             _contextFactory = contextFactory;
             _mapper = mapper;
             _operationLogService = operationLogService;
             _adminUserServices = adminUserServices;
+            _commonServicecs = commonServicecs;
         }
 
         public async Task<PagedResult<NewsResponse>> Get(int? Id = null, PagedOperationDto? dto = null)
@@ -44,17 +46,8 @@ namespace admin_backend.Services
 
             foreach (var item in newsResponse)
             {
-                var adminUserName = await _context.AdminUser.Where(x => x.Id == item.AdminUserId).Select(x => x.Name).FirstOrDefaultAsync();
-                if (adminUserName == null) continue;
-
-                item.AdminUserName = adminUserName;
-                item.Type = (await news.ToListAsync()).Where(x => x.Id == item.Id).Select(x => x.Type.GetDescription()).FirstOrDefault();
-                item.WebsiteReleases = (await news.ToListAsync())
-                                        .Where(x => x.Id == item.Id)
-                                        .Select(x => x.WebsiteReleases
-                                            .Select(y => y.GetDescription())
-                                            .ToList())
-                                        .FirstOrDefault() ?? new List<string>();
+                item.AdminUserName = await _commonServicecs.GetAdminUserNameAsync(item.AdminUserId);
+                item.WebsiteReleases = news.FirstOrDefault(x => x.Id == item.Id)?.WebsiteReleases ?? new List<WebsiteEnum>();
             }
 
             //分頁處理
@@ -86,8 +79,6 @@ namespace admin_backend.Services
                 news = news.Where(x => x.Type == dto.Type);
             }
 
-            //var newsResponse = _mapper.Map<List<NewsResponse>>(news);
-
             var newsResponses = new List<NewsResponse>();
 
             foreach (var item in await news.ToListAsync())
@@ -99,16 +90,16 @@ namespace admin_backend.Services
                 {
                     Id = item.Id,
                     AdminUserId = item.AdminUserId,
-                    AdminUserName = adminUserName,
+                    AdminUserName = await _commonServicecs.GetAdminUserNameAsync(item.AdminUserId),
                     Title = item.Title,
-                    Type = item.Type.GetDescription(),
+                    Type = item.Type,
                     Content = item.Content,
                     Pinned = item.Pinned,
                     Schedule = item.Schedule,
                     StartTime = item.StartTime,
                     EndTime = item.EndTime,
                     Status = item.Status,
-                    WebsiteReleases = item.WebsiteReleases.Select(x => x.GetDescription()).ToList(),
+                    WebsiteReleases = item.WebsiteReleases,
                     UpdateTime = item.UpdateTime,
                     CreateTime = item.CreateTime,
                 };

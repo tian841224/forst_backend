@@ -31,7 +31,7 @@ namespace admin_backend.Services
 
             var result = new List<DocumentationResponse>();
             var consentForm = await _context.Documentation.Where(x => x.Type == DocumentationEnum.ConsentForm).OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new Documentation { Type = DocumentationEnum.ConsentForm, Content = null! };
-            var userGuide = await _context.Documentation.Where(x => x.Type == DocumentationEnum.UserGuide).OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new Documentation { Type = DocumentationEnum.ConsentForm, Content = null! };
+            var userGuide = await _context.Documentation.Where(x => x.Type == DocumentationEnum.UserGuide).OrderByDescending(x => x.Id).FirstOrDefaultAsync() ?? new Documentation { Type = DocumentationEnum.UserGuide, Content = null! };
 
             result.Add(_mapper.Map<DocumentationResponse>(consentForm));
             result.Add(_mapper.Map<DocumentationResponse>(userGuide));

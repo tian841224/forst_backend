@@ -25,7 +25,12 @@ namespace admin_backend.DTOs.News
         /// <summary>
         /// 公告類型 一般公告 = 1, 重要公告 = 2, 活動公告 = 3, 跑馬燈 = 4
         /// </summary>
-        public string Type { get; set; } = string.Empty;
+        public AnnouncementEnum Type { get; set; } 
+
+        /// <summary>
+        /// 公告類型 一般公告 = 1, 重要公告 = 2, 活動公告 = 3, 跑馬燈 = 4
+        /// </summary>
+        public string TypeName => Type.GetDescription();
 
         /// <summary>
         /// 發佈內容
@@ -40,7 +45,12 @@ namespace admin_backend.DTOs.News
         /// <summary>
         /// 發佈網站 1 = 林業自然保育署, 2 = 林業試驗所
         /// </summary>
-        public List<string> WebsiteReleases { get; set; } = new();
+        public List<WebsiteEnum> WebsiteReleases { get; set; } = new();
+
+        /// <summary>
+        /// 發佈網站名稱
+        /// </summary>
+        public List<string> WebsiteReleaseNames => WebsiteReleases.Select(w => w.GetDescription()).ToList();
 
         /// <summary>
         /// 是否開啟排程

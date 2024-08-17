@@ -1,5 +1,6 @@
 ﻿using admin_backend.Enums;
 using CommonLibrary.DTOs;
+using CommonLibrary.Extensions;
 
 namespace admin_backend.DTOs.MailConfig
 {
@@ -19,6 +20,8 @@ namespace admin_backend.DTOs.MailConfig
         /// 加密方式 1 = SSL, 2 = TSL
         /// </summary>
         public EncryptedEnum Encrypted { get; set; }
+
+        public string EncryptedName => Encrypted.GetDescription();
 
         /// <summary>
         /// 寄信帳號

@@ -83,7 +83,7 @@ namespace admin_backend.Controllers
         /// <summary>
         /// 上傳官網廣告版位圖片
         /// </summary>
-        /// <param name="Id"></param>
+        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("{id}")]

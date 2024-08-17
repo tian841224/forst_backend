@@ -31,7 +31,7 @@ namespace admin_backend.DTOs.CommonDamage
         /// </summary>
         [Required]
         [FromForm]
-        public List<TreePartEnum> DamagePart { get; set; } = null!;
+        public List<DamagedPartEnum> DamagePart { get; set; } = null!;
 
         /// <summary>
         /// 危害特徵

@@ -10,7 +10,7 @@ namespace admin_backend.Enums
         CementSurface = 1,
 
         [EnumMember(Value = "柏油面")]
-        [Description("        [EnumMember(Value = \"柏油面\")]\r\n")]
+        [Description("柏油面")]
         AsphaltSurface = 2,
 
         [EnumMember(Value = "植被泥土面 (地表有草皮或鬆潤木)")]

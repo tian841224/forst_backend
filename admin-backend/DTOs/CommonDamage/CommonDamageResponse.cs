@@ -1,5 +1,6 @@
 ﻿using admin_backend.Enums;
 using CommonLibrary.DTOs;
+using CommonLibrary.Extensions;
 
 namespace admin_backend.DTOs.CommonDamage
 {
@@ -33,7 +34,12 @@ namespace admin_backend.DTOs.CommonDamage
         /// <summary>
         /// 危害部位
         /// </summary>
-        public List<string> DamagePart { get; set; } = new();
+        public List<DamagedPartEnum> DamagePart { get; set; } = new();
+
+        /// <summary>
+        /// 危害部位名稱
+        /// </summary>
+        public List<string> DamagePartName  => DamagePart.Select(w => w.GetDescription()).ToList();
 
         /// <summary>
         /// 危害特徵

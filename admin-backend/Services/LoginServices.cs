@@ -83,7 +83,7 @@ namespace admin_backend.Services
             try
             {
                 //更新登入時間
-                adminUser.LoginTime = DateTime.UtcNow;
+                adminUser.LoginTime = DateTime.Now;
                 _context.AdminUser.Update(adminUser);
                 await _context.SaveChangesAsync();
 

@@ -1,5 +1,4 @@
-﻿using admin_backend.DTOs.DamageType;
-using admin_backend.Enums;
+﻿using admin_backend.Enums;
 using CommonLibrary.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -48,6 +47,7 @@ namespace admin_backend.DTOs.CommonDamage
         /// <summary>
         /// 病蟲封面照片
         /// </summary>
+        [Required]
         [FromForm]
         public List<IFormFile> File { get; set; } = new();
 

@@ -8,6 +8,7 @@ using AutoMapper;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Transactions;
 
 namespace admin_backend.Services
@@ -126,6 +127,16 @@ namespace admin_backend.Services
             if (adminUser == null)
             { throw new ApiException($"無法取得當前使用者身分"); }
 
+            if (!DateTime.TryParse(dto.StartTime, out DateTime StartTime))
+            {
+                throw new ArgumentException("Invalid date format", nameof(dto.StartTime));
+            }
+
+            if (!DateTime.TryParse(dto.EndTime, out DateTime EndTime))
+            {
+                throw new ArgumentException("Invalid date format", nameof(dto.EndTime));
+            }
+
             news = new News
             {
                 AdminUserId = adminUser.Id,
@@ -133,8 +144,8 @@ namespace admin_backend.Services
                 Pinned = dto.Pinned,
                 Schedule = dto.Schedule,
                 Status = dto.Status,
-                StartTime = dto.StartTime,
-                EndTime = dto.EndTime,
+                StartTime = StartTime,
+                EndTime = EndTime,
                 Title = dto.Title,
                 Type = dto.Type,
                 WebsiteReleases = dto.WebsiteReleases,
@@ -197,14 +208,22 @@ namespace admin_backend.Services
                 news.Schedule = dto.Schedule.Value;
             }
 
-            if (dto.StartTime.HasValue)
+            if (!string.IsNullOrEmpty(dto.StartTime))
             {
-                news.StartTime = dto.StartTime.Value;
+                if (!DateTime.TryParse(dto.StartTime, out DateTime StartTime))
+                {
+                    throw new ArgumentException("Invalid date format", nameof(dto.StartTime));
+                }
+                news.StartTime = StartTime;
             }
 
-            if (dto.EndTime.HasValue)
+            if (!string.IsNullOrEmpty(dto.EndTime))
             {
-                news.EndTime = dto.EndTime.Value;
+                if (!DateTime.TryParse(dto.EndTime, out DateTime EndTime))
+                {
+                    throw new ArgumentException("Invalid date format", nameof(dto.EndTime));
+                }
+                news.EndTime = EndTime;
             }
 
             if (dto.Status.HasValue)

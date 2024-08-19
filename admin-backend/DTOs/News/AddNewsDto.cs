@@ -42,12 +42,12 @@ namespace admin_backend.DTOs.News
         /// <summary>
         /// 排程開始時間
         /// </summary>
-        public DateTime StartTime { get; set; }
+        public string StartTime { get; set; } = string.Empty;
 
         /// <summary>
         /// 排程結束時間
         /// </summary>
-        public DateTime EndTime { get; set; }
+        public string EndTime { get; set; } = string.Empty;
 
         /// <summary>
         /// 發佈狀態 0 = 未發佈, 1 = 發佈

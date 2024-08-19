@@ -25,7 +25,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(int id)
         {
             return Ok(await _newsService.Get(id));
@@ -48,7 +48,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(GetNewsDto dto)
         {
             return Ok(await _newsService.Get(dto));
@@ -60,7 +60,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> Add(AddNewsDto dto)
         {
             return Ok(await _newsService.Add(dto));

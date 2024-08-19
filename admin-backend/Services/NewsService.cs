@@ -8,7 +8,6 @@ using AutoMapper;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.Transactions;
 
 namespace admin_backend.Services
@@ -49,6 +48,17 @@ namespace admin_backend.Services
             {
                 item.AdminUserName = await _commonServicecs.GetAdminUserNameAsync(item.AdminUserId);
                 item.WebsiteReleases = news.FirstOrDefault(x => x.Id == item.Id)?.WebsiteReleases ?? new List<WebsiteEnum>();
+
+                if (item.Schedule)
+                {
+                    item.StartTime = item.StartTime != DateTime.MinValue ? item.StartTime : null;
+                    item.EndTime = item.EndTime != DateTime.MinValue ? item.EndTime : null;
+                }
+                else
+                {
+                    item.StartTime = null;
+                    item.EndTime = null;
+                }
             }
 
             //分頁處理
@@ -80,9 +90,17 @@ namespace admin_backend.Services
                 news = news.Where(x => x.Type == dto.Type);
             }
 
+            var newsList = await news.ToListAsync();
+
+            if (dto.WebsiteReleases.HasValue)
+            {
+                var websiteRelease = dto.WebsiteReleases.Value;
+                newsList = newsList.Where(x => x.WebsiteReleases.Any(w => w == dto.WebsiteReleases)).ToList();
+            }
+
             var newsResponses = new List<NewsResponse>();
 
-            foreach (var item in await news.ToListAsync())
+            foreach (var item in newsList)
             {
                 var adminUserName = await _context.AdminUser.Where(x => x.Id == item.AdminUserId).Select(x => x.Name).FirstOrDefaultAsync();
                 if (adminUserName == null) continue;
@@ -97,8 +115,8 @@ namespace admin_backend.Services
                     Content = item.Content,
                     Pinned = item.Pinned,
                     Schedule = item.Schedule,
-                    StartTime = item.StartTime,
-                    EndTime = item.EndTime,
+                    StartTime = item.Schedule ? (item.StartTime != DateTime.MinValue ? item.StartTime : null) : null,
+                    EndTime = item.Schedule ? (item.EndTime != DateTime.MinValue ? item.EndTime : null) : null,
                     Status = item.Status,
                     WebsiteReleases = item.WebsiteReleases,
                     UpdateTime = item.UpdateTime,
@@ -127,14 +145,23 @@ namespace admin_backend.Services
             if (adminUser == null)
             { throw new ApiException($"無法取得當前使用者身分"); }
 
-            if (!DateTime.TryParse(dto.StartTime, out DateTime StartTime))
-            {
-                throw new ArgumentException("Invalid date format", nameof(dto.StartTime));
-            }
+            DateTime StartTime = DateTime.MinValue;
+            DateTime EndTime = DateTime.MinValue;
 
-            if (!DateTime.TryParse(dto.EndTime, out DateTime EndTime))
+            if (dto.Schedule)
             {
-                throw new ArgumentException("Invalid date format", nameof(dto.EndTime));
+                if (string.IsNullOrEmpty(dto.StartTime) || string.IsNullOrEmpty(dto.EndTime))
+                    throw new ApiException($"若需設定排程，請輸入起始結束時間");
+
+                if (!DateTime.TryParse(dto.StartTime, out StartTime))
+                {
+                    throw new ArgumentException("Invalid date format", nameof(dto.StartTime));
+                }
+
+                if (!DateTime.TryParse(dto.EndTime, out EndTime))
+                {
+                    throw new ArgumentException("Invalid date format", nameof(dto.EndTime));
+                }
             }
 
             news = new News
@@ -208,21 +235,25 @@ namespace admin_backend.Services
                 news.Schedule = dto.Schedule.Value;
             }
 
-            if (!string.IsNullOrEmpty(dto.StartTime))
+            var StartTime = DateTime.MinValue;
+            var EndTime = DateTime.MinValue;
+
+            if (dto.Schedule.HasValue && dto.Schedule.Value)
             {
-                if (!DateTime.TryParse(dto.StartTime, out DateTime StartTime))
+                if (string.IsNullOrEmpty(dto.StartTime) || string.IsNullOrEmpty(dto.EndTime))
+                    throw new ApiException($"若需設定排程，請輸入起始結束時間");
+
+                if (!DateTime.TryParse(dto.StartTime, out StartTime))
                 {
                     throw new ArgumentException("Invalid date format", nameof(dto.StartTime));
                 }
-                news.StartTime = StartTime;
-            }
 
-            if (!string.IsNullOrEmpty(dto.EndTime))
-            {
-                if (!DateTime.TryParse(dto.EndTime, out DateTime EndTime))
+                if (!DateTime.TryParse(dto.EndTime, out EndTime))
                 {
                     throw new ArgumentException("Invalid date format", nameof(dto.EndTime));
                 }
+
+                news.StartTime = StartTime;
                 news.EndTime = EndTime;
             }
 

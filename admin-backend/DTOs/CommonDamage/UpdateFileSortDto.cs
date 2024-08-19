@@ -5,10 +5,10 @@ namespace admin_backend.DTOs.CommonDamage
     public class UpdateFileSortDto
     {
         /// <summary>
-        /// 檔案名稱
+        /// 檔案ID
         /// </summary>
         [Required]
-        public string Name { get; set; } = string.Empty;
+        public int FileId { get; set; } 
 
         /// <summary>
         /// 排序

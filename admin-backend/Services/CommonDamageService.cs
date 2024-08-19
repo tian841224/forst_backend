@@ -56,7 +56,7 @@ namespace admin_backend.Services
                 if (!string.IsNullOrEmpty(commonDamage.Photo))
                     photo = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo);
 
-                photo = photo!.Select(x => new CommonDamagePhotoResponse { File = _fileService.Value.GetFile(x.File, "image"), Sort = x.Sort }).ToList();
+                photo = photo.Select(x => new CommonDamagePhotoResponse {Id = x.Id, File = _fileService.Value.GetFile(x.File, "image"), Sort = x.Sort }).ToList();
 
                 var damageTypeName = await _context.DamageType.Where(x => x.Id == commonDamage.DamageTypeId).Select(x => x.Name).FirstOrDefaultAsync();
                 if (damageTypeName == null)
@@ -102,7 +102,7 @@ namespace admin_backend.Services
                 if (!string.IsNullOrEmpty(value.Photo))
                 {
                     photo = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(value.Photo);
-                    photo = photo!.Select(x => new CommonDamagePhotoResponse { File = _fileService.Value.GetFile(x.File, "image"), Sort = x.Sort }).ToList();
+                    photo = photo!.Select(x => new CommonDamagePhotoResponse {Id = x.Id, File = _fileService.Value.GetFile(x.File, "image"), Sort = x.Sort }).ToList();
                 }
 
                 var damageTypeName = await _context.DamageType.Where(x => x.Id == value.DamageTypeId).Select(x => x.Name).FirstOrDefaultAsync();
@@ -190,11 +190,12 @@ namespace admin_backend.Services
 
             var fileUploadList = new List<CommonDamagePhotoResponse>();
             var sort = 0;
+            var id = 0;
             foreach (var file in dto.File)
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
                 var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
-                fileUploadList.Add(new CommonDamagePhotoResponse { Sort = ++sort, File = fileName });
+                fileUploadList.Add(new CommonDamagePhotoResponse { Id = ++id, Sort = ++sort, File = fileName });
             }
 
             var jsonResult = JsonSerializer.Serialize(fileUploadList);
@@ -227,7 +228,26 @@ namespace admin_backend.Services
             }
             scope.Complete();
 
-            return _mapper.Map<CommonDamageResponse>(commonDamage);
+            var commonDamageResponse = new CommonDamageResponse
+            {
+                Id = commonDamage.Id,
+                DamageTypeId = commonDamage.DamageTypeId,
+                DamageClassId = commonDamage.DamageClassId,
+                Name = commonDamage.Name,
+                DamagePart = commonDamage.DamagePart,
+                DamageFeatures = commonDamage.DamageFeatures,
+                Suggestions = commonDamage.Suggestions,
+                Photo = fileUploadList.Select(x => new CommonDamagePhotoResponse
+                {
+                    Id = x.Id,
+                    File = _fileService.Value.GetFile(x.File, "image"),
+                    Sort = x.Sort,
+                }).ToList(),
+                Status = commonDamage.Status,
+                Sort = commonDamage.Sort,
+            };
+
+            return commonDamageResponse;
         }
 
         public async Task<CommonDamageResponse> Update(int Id, UpdateCommonDamageDto dto)
@@ -362,19 +382,17 @@ namespace admin_backend.Services
                 throw new ApiException($"找不到此資料-{Id}");
 
             var result = new List<CommonDamagePhotoResponse>();
+            var commonDamagePhotoList = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo) ?? new List<CommonDamagePhotoResponse>();
 
             foreach (var value in dto)
             {
-                if (commonDamage.Photo.Contains(value.Name))
-                {
-                    var commonDamagePhotoList = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo);
-                    var commonDamagePhoto = commonDamagePhotoList!.Where(x => x.File.Contains(value.Name)).FirstOrDefault();
+                var commonDamagePhoto = commonDamagePhotoList.Where(x => x.Id == value.FileId).FirstOrDefault();
+                if (commonDamagePhoto == null) continue;
 
-                    commonDamagePhoto!.Sort = value.Sort;
-                    commonDamagePhoto.File = commonDamagePhoto.File;
 
-                    result.Add(commonDamagePhoto);
-                }
+                commonDamagePhoto.Sort = value.Sort;
+                //commonDamagePhoto.File = commonDamagePhoto.File;
+                result.Add(commonDamagePhoto);
             }
 
             commonDamage.Photo = JsonSerializer.Serialize(result);
@@ -397,20 +415,25 @@ namespace admin_backend.Services
         public async Task<List<CommonDamagePhotoResponse>> UploadFile(int Id, CommonDamagePhotoDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            var commonDamage = await _context.CommonDamage.Where(x => x.Id == Id).FirstOrDefaultAsync();
+            var commonDamage = await _context.CommonDamage.FirstOrDefaultAsync(x => x.Id == Id);
 
             if (commonDamage == null)
                 throw new ApiException($"找不到此資料-{Id}");
 
             var result = new List<CommonDamagePhotoResponse> { };
+            var id = 0;
 
             if (!string.IsNullOrEmpty(commonDamage.Photo))
-                result.AddRange(JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo)!);
+            {
+                var oldFile = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo) ?? new List<CommonDamagePhotoResponse>();
+                result.AddRange(oldFile);
+                id = oldFile.Select(x => x.Id).Max();
+            }
 
             //上傳檔案
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto!.Photo.FileName)}";
             await _fileService.Value.UploadFile(fileName, dto.Photo);
-            result.Add(new CommonDamagePhotoResponse { Sort = dto.Sort, File = fileName });
+            result.Add(new CommonDamagePhotoResponse { Id = ++id, Sort = dto.Sort, File = fileName });
 
             var photo = JsonSerializer.Serialize(result);
             commonDamage.Photo = photo;
@@ -429,6 +452,14 @@ namespace admin_backend.Services
                 });
             }
             scope.Complete();
+
+            //回傳檔案完整路徑
+            result = result.Select(x => new CommonDamagePhotoResponse
+            {
+                Id = x.Id,
+                File = _fileService.Value.GetFile(x.File, "image"),
+                Sort = x.Sort,
+            }).ToList();
 
             return result;
         }
@@ -461,23 +492,22 @@ namespace admin_backend.Services
             return _mapper.Map<CommonDamageResponse>(commonDamage);
         }
 
-        public async Task DeleteFile(int Id, string fileId)
+        public async Task DeleteFile(int Id, int fileId)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var commonDamage = await _context.CommonDamage.Where(x => x.Id == Id).FirstOrDefaultAsync();
+            var commonDamage = await _context.CommonDamage.FirstOrDefaultAsync(x => x.Id == Id);
 
             if (commonDamage == null)
             {
                 throw new ApiException($"找不到此資料-{Id}");
             }
 
-            var fileList = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo);
-            if (fileList!.Where(x => x.File.Contains(fileId)).Any())
-            {
-                var removeFile = fileList!.Where(x => x.File.Contains(fileId)).FirstOrDefault();
-                fileList!.Remove(removeFile!);
-            }
+            var fileList = JsonSerializer.Deserialize<List<CommonDamagePhotoResponse>>(commonDamage.Photo) ?? new List<CommonDamagePhotoResponse>();
+            var removeFile = fileList.Where(x => x.Id == fileId).FirstOrDefault();
+            if (removeFile == null)
+                throw new ApiException($"找不到此檔案ID-{fileId}");
+            fileList.Remove(removeFile);
 
             var jsonResult = JsonSerializer.Serialize(fileList);
             commonDamage.Photo = jsonResult;

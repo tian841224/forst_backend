@@ -27,6 +27,6 @@ namespace admin_backend.Interfaces
         /// <summary> 刪除常見病蟲害 </summary>
         Task<CommonDamageResponse> Delete(int Id);
         /// <summary> 刪除圖片 </summary>
-        Task DeleteFile(int Id, string fileId);
+        Task DeleteFile(int Id, int fileId);
     }
 }

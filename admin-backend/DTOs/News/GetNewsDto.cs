@@ -16,6 +16,11 @@ namespace admin_backend.DTOs.News
         public AnnouncementEnum? Type { get; set; }
 
         /// <summary>
+        /// 發佈網站 1 = 林業自然保育署, 2 = 林業試驗所
+        /// </summary>
+        public WebsiteEnum? WebsiteReleases { get; set; } 
+
+        /// <summary>
         /// 狀態 0 = 關閉, 1 = 開啟
         /// </summary>
         public StatusEnum? Status { get; set; }

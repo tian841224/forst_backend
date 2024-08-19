@@ -61,13 +61,13 @@ namespace admin_backend.DTOs.News
         /// 排程開始時間
         /// </summary>
         [JsonConverter(typeof(DateTimeConverter))]
-        public DateTime StartTime { get; set; }
+        public DateTime? StartTime { get; set; }
 
         /// <summary>
         /// 排程結束時間
         /// </summary>
         [JsonConverter(typeof(DateTimeConverter))]
-        public DateTime EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
 
         /// <summary>
         /// 發佈狀態 0 = 未發佈, 1 = 發佈

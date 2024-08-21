@@ -28,7 +28,7 @@ namespace admin_backend.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(int id)
         {
             return Ok(await _commonDamageService.Get(id));
@@ -51,7 +51,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(GetCommonDamageDto dto)
         {
             return Ok(await _commonDamageService.Get(dto));

@@ -25,7 +25,7 @@ namespace admin_backend.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(int id)
         {
             return Ok(await _forestDiseasePublicationsService.Get(id));
@@ -37,7 +37,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
             return Ok(await _forestDiseasePublicationsService.Get(dto: dto));
@@ -49,7 +49,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(GetForestDiseasePublicationsDto dto)
         {
             return Ok(await _forestDiseasePublicationsService.Get(dto));

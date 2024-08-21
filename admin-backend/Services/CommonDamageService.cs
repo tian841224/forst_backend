@@ -9,6 +9,7 @@ using AutoMapper;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
@@ -509,8 +510,12 @@ namespace admin_backend.Services
                 throw new ApiException($"找不到此檔案ID-{fileId}");
             fileList.Remove(removeFile);
 
-            var jsonResult = JsonSerializer.Serialize(fileList);
-            commonDamage.Photo = jsonResult;
+            if (fileList.Any())
+            {
+                var jsonResult = JsonSerializer.Serialize(fileList);
+                commonDamage.Photo = jsonResult;
+            }
+            else commonDamage.Photo = string.Empty;
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 

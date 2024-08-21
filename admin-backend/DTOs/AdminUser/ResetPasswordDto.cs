@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace admin_backend.DTOs.Login
+namespace admin_backend.DTOs.AdminUser
 {
     public class ResetPasswordDto
     {

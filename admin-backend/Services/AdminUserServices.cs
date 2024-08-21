@@ -5,9 +5,14 @@ using admin_backend.Entities;
 using admin_backend.Enums;
 using admin_backend.Interfaces;
 using AutoMapper;
+using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 using CommonLibrary.Interfaces;
+using CommonLibrary.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace admin_backend.Services
 {
@@ -20,8 +25,10 @@ namespace admin_backend.Services
         private readonly Lazy<IIdentityService> _identityService;
         private readonly Lazy<IFileService> _fileService;
         private readonly IRoleService _roleService;
+        private readonly IMailConfigService _mailConfigService;
+        private readonly IEmailService _emailService;
 
-        public AdminUserServices(IDbContextFactory<MysqlDbContext> contextFactory, IHttpContextAccessor httpContextAccessor, ILogger<AdminUserServices> log, Lazy<IIdentityService> identityService, IMapper mapper, Lazy<IFileService> fileService, IRoleService roleService)
+        public AdminUserServices(IDbContextFactory<MysqlDbContext> contextFactory, IHttpContextAccessor httpContextAccessor, ILogger<AdminUserServices> log, Lazy<IIdentityService> identityService, IMapper mapper, Lazy<IFileService> fileService, IRoleService roleService, IMailConfigService mailConfigService, IEmailService emailService)
         {
             _contextFactory = contextFactory;
             _httpContextAccessor = httpContextAccessor;
@@ -30,6 +37,8 @@ namespace admin_backend.Services
             _mapper = mapper;
             _fileService = fileService;
             _roleService = roleService;
+            _mailConfigService = mailConfigService;
+            _emailService = emailService;
         }
 
         public async Task<AdminUserResponse> Get()
@@ -267,5 +276,61 @@ namespace admin_backend.Services
                 throw;
             }
         }
+        public async Task ResetPassword(ResetPasswordDto dto)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            var adminUser = await _context.AdminUser.Where(x => x.Email == dto.Email).FirstOrDefaultAsync();
+
+            if (adminUser == null)
+            {
+                throw new ApiException("帳號錯誤");
+            }
+
+            //修改密碼
+            char[] AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
+
+            var password = new StringBuilder();
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                var buffer = new byte[8];
+
+                rng.GetBytes(buffer);
+
+                for (int i = 0; i < 8; i++)
+                {
+                    var index = buffer[i] % AllowedChars.Length;
+                    password.Append(AllowedChars[index]);
+                }
+            }
+
+            await Update(adminUser.Id, new UpdateAdminUserDto
+            {
+                OldKey = adminUser.Password,
+                pKey = password.ToString()
+            });
+
+            //取得寄件設定
+            var emailConfig = await _mailConfigService.Get();
+
+            //發送新密碼
+            await _emailService.SendEmail(new SendEmailDto
+            {
+                Host = emailConfig.Host,
+                Port = emailConfig.Port,
+                Account = emailConfig.Account,
+                Password = emailConfig.Pkey,
+                EnableSsl = emailConfig.Encrypted == EncryptedEnum.SSL,
+                MailMessage = new MailMessage
+                {
+                    From = new MailAddress(emailConfig.Account, emailConfig.Name),
+                    Subject = "重置密碼信件",
+                    Body = $"新密碼：{password.ToString()}，請妥善保管",
+                    IsBodyHtml = true,
+                },
+                Recipient = adminUser.Email,
+            });
+        }
+
     }
 }

@@ -1,5 +1,4 @@
 ﻿using admin_backend.Enums;
-using Microsoft.AspNetCore.Http;
 
 namespace admin_backend.DTOs.AdminUser
 {

@@ -1,3 +1,4 @@
+using admin_backend.DTOs.AdminUser;
 using admin_backend.DTOs.Login;
 using admin_backend.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -21,27 +22,25 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
-        /// 登入
+        /// 登入後台
         /// </summary>
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginDto dto)
+        public async Task<IActionResult> LoginBackEnd(LoginDto dto)
         {
-            return Ok(await _loginServices.Login(dto));
+            return Ok(await _loginServices.LoginBackEnd(dto));
         }
 
         /// <summary>
-        /// 忘記密碼
+        /// 登入前台
         /// </summary>
-        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult ResetPassword(ResetPasswordDto dto)
+        public async Task<IActionResult> LoginFrontEnd(LoginFrontEndDto dto)
         {
-            _loginServices.ResetPassword(dto);
-            return Ok();
+            return Ok(await _loginServices.LoginFrontEnd(dto));
         }
     }
 }

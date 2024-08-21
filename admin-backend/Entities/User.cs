@@ -17,6 +17,13 @@ namespace admin_backend.Entities
         public string Account { get; set; } = string.Empty;
 
         /// <summary>
+        /// 密碼
+        /// </summary>
+        [Required]
+        [Comment("密碼")]
+        public string Password { get; set; } = string.Empty;
+
+        /// <summary>
         /// 使用者名稱
         /// </summary>
         [Required]

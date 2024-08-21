@@ -16,5 +16,11 @@ namespace admin_backend.DTOs.User
         /// </summary>
         [Required]
         public string Name { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 密碼
+        /// </summary>
+        [Required]
+        public string PKey { get; set; } = string.Empty;
     }
 }

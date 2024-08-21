@@ -39,11 +39,6 @@ namespace admin_backend.Services
 
             var epidemicSummary = await _context.EpidemicSummary.Where(x => x.Title == dto.Title).FirstOrDefaultAsync();
 
-            if (epidemicSummary != null)
-            {
-                throw new ApiException($"此標題已存在-{dto.Title}");
-            }
-
              epidemicSummary = new EpidemicSummary
             {
                 Title = dto.Title,

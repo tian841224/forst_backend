@@ -11,6 +11,7 @@ using CommonLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace admin_backend.Services
 {
@@ -46,7 +47,8 @@ namespace admin_backend.Services
                 foreach (var item in forestDiseasePublications)
                 {
                     var fileList = new List<ForestDiseasePublicationsFileDto>();
-                    if (!string.IsNullOrEmpty(item.File)) {
+                    if (!string.IsNullOrEmpty(item.File))
+                    {
                         var fileUpload = JsonSerializer.Deserialize<List<ForestDiseasePublicationsFileDto>>(item.File);
                         if (fileUpload != null)
                         {
@@ -97,6 +99,11 @@ namespace admin_backend.Services
                     x.Author.ToLower().Contains(keyword) ||
                     x.Id.ToString().Contains(keyword)
                 );
+            }
+
+            if(dto.Type.HasValue)
+            {
+                forestDiseasePublications = forestDiseasePublications.Where(x => x.Type == dto.Type.Value);
             }
 
             if (dto.Status.HasValue)
@@ -166,21 +173,31 @@ namespace admin_backend.Services
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
                 var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
-                fileUploadList.Add(new ForestDiseasePublicationsFileDto { Id = ++id , File = fileName });
+                fileUploadList.Add(new ForestDiseasePublicationsFileDto { Id = ++id, File = fileName });
             }
 
             var jsonResult = JsonSerializer.Serialize(fileUploadList);
             forestDiseasePublications.File = jsonResult;
+            var date = DateTime.MinValue;
 
             if (dto.Type == 1)
             {
-                if (dto.Authors!.Count == 0 || !dto.Date.HasValue || string.IsNullOrEmpty(dto.Link))
+                if (dto.Authors!.Count == 0 || string.IsNullOrEmpty(dto.Date) || string.IsNullOrEmpty(dto.Link))
                 {
                     throw new ApiException($"請輸入作者、日期、連結");
                 }
+
+                if (string.IsNullOrEmpty(dto.Date))
+                    throw new ApiException($"若需設定排程，請輸入起始結束時間");
+
+                if (!DateTime.TryParse(dto.Date, out date))
+                {
+                    throw new ArgumentException("Invalid date format", nameof(dto.Date));
+                }
+
                 forestDiseasePublications.Name = dto.Name;
                 forestDiseasePublications.Link = dto.Link;
-                forestDiseasePublications.Date = dto.Date.Value;
+                forestDiseasePublications.Date = date;
                 forestDiseasePublications.Author = JsonSerializer.Serialize(dto.Authors);
                 forestDiseasePublications.Type = dto.Type;
                 forestDiseasePublications.Status = dto.Status;
@@ -221,7 +238,7 @@ namespace admin_backend.Services
             result.Unit = dto.Unit ?? string.Empty;
             result.Authors = dto.Authors!.Count == 0 ? new List<string>() : dto.Authors;
             result.Link = dto.Link ?? string.Empty;
-            result.Date = dto.Date!.Value;
+            result.Date = date;
             result.Type = dto.Type;
             result.TypeName = dto.Type == 1 ? "林業叢刊" : "相關摺頁";
             result.Status = dto.Status;
@@ -259,8 +276,17 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.Link))
                 forestDiseasePublications.Link = dto.Link;
 
-            if (dto.Date.HasValue)
-                forestDiseasePublications.Date = dto.Date.Value;
+            var date = DateTime.MinValue;
+
+            if (string.IsNullOrEmpty(dto.Date))
+                throw new ApiException($"若需設定排程，請輸入起始結束時間");
+
+            if (!DateTime.TryParse(dto.Date, out date))
+            {
+                throw new ArgumentException("Invalid date format", nameof(dto.Date));
+            }
+
+            forestDiseasePublications.Date = date;
 
             forestDiseasePublications.Status = dto.Status;
 
@@ -408,13 +434,19 @@ namespace admin_backend.Services
             if (fileList!.Where(x => x.Id == fileId).Any())
             {
                 var removeFile = fileList!.Where(_x => _x.Id == fileId).FirstOrDefault();
-                if(removeFile != null)
+                if (removeFile != null)
                     fileList!.Remove(removeFile!);
             }
 
-            var jsonResult = JsonSerializer.Serialize(fileList);
-            forestDiseasePublications.File = jsonResult;
-
+            if (fileList.Any())
+            {
+                var jsonResult = JsonSerializer.Serialize(fileList);
+                forestDiseasePublications.File = jsonResult;
+            }
+            else
+            {
+                forestDiseasePublications.File = string.Empty;
+            }
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             _context.ForestDiseasePublications.Update(forestDiseasePublications);

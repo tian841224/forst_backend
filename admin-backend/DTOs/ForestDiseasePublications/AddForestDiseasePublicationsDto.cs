@@ -22,7 +22,7 @@ namespace admin_backend.DTOs.ForestDiseasePublications
         /// <summary>
         /// 出版品日期
         /// </summary>
-        public DateTime? Date { get; set; } = DateTime.MinValue;
+        public string? Date { get; set; } = string.Empty;
 
         /// <summary>
         /// 出版品連結

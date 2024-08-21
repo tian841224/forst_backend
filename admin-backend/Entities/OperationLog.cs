@@ -11,11 +11,18 @@ namespace admin_backend.Entities
     public class OperationLog : DefaultEntity
     {
         /// <summary>
+        /// 後台使用者ID
+        /// </summary>
+        [Required]
+        [Comment("後台使用者ID")]
+        public int AdminUserId { get; set; }
+
+        /// <summary>
         /// 使用者ID
         /// </summary>
         [Required]
         [Comment("使用者ID")]
-        public int AdminUserId { get; set; }
+        public int UserId { get; set; }
 
         /// <summary>
         /// 異動類型

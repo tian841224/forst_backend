@@ -48,6 +48,9 @@ namespace admin_backend.Services
                 throw new ApiException("帳號密碼錯誤");
             }
 
+            if (adminUser.Status == StatusEnum.Close || adminUser.Status == StatusEnum.Stop)
+                throw new ApiException("帳號已停用");
+
             //取得身分
             var role = await _context.Role.Where(x => x.Id == adminUser.RoleId).FirstOrDefaultAsync();
 
@@ -129,6 +132,9 @@ namespace admin_backend.Services
             {
                 throw new ApiException("帳號密碼錯誤");
             }
+
+            if(user.Status == StatusEnum.Close || user.Status == StatusEnum.Stop)
+                throw new ApiException("會員已停用");
 
             //取得Token
             var token = _identityService.Value.GenerateToken(new GenerateTokenDto

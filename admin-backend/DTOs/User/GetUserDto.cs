@@ -5,8 +5,6 @@ namespace admin_backend.DTOs.User
 {
     public class GetUserDto 
     {
-        public int? Id { get; set; }
-
         /// <summary>
         /// 帳號
         /// </summary>

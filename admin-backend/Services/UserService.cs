@@ -39,16 +39,19 @@ namespace admin_backend.Services
             _emailService = emailService;
         }
 
+
+        public async Task<UserResponse> Get(int Id)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            var user = await _context.User.FirstOrDefaultAsync(x => x.Id == Id);
+            return _mapper.Map<UserResponse>(user);
+        }
+
         public async Task<PagedResult<UserResponse>> Get(GetUserDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
             IQueryable<User> user = _context.User;
-
-            if (dto.Id.HasValue)
-            {
-                user = user.Where(x => x.Id == dto.Id);
-            }
 
             if (!string.IsNullOrEmpty(dto.Account))
             {
@@ -88,7 +91,7 @@ namespace admin_backend.Services
             user = new User
             {
                 Account = dto.Account,
-                //Password = dto.PKey,
+                Password = dto.PKey,
                 Name = dto.Name,
                 Status = StatusEnum.Open,
             };

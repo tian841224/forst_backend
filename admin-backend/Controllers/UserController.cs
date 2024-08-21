@@ -24,6 +24,18 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Get(int id)
+        {
+            return Ok(await _userService.Get(id));
+        }
+
+        /// <summary>
+        /// 取得會員
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Get(GetUserDto dto)

@@ -9,6 +9,9 @@ namespace admin_backend.Interfaces
     /// </summary>
     public interface IUserService
     {
+        /// <summary> 取得單筆會員 </summary>
+        Task<UserResponse> Get(int Id);
+
         /// <summary> 取得會員 </summary>
         Task<PagedResult<UserResponse>> Get(GetUserDto dto);
 

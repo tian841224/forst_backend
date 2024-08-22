@@ -1,6 +1,5 @@
 ﻿using admin_backend.Enums;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,16 +8,37 @@ namespace admin_backend.Entities
     public class Case : DefaultEntity
     {
         /// <summary>
+        /// 案件編號
+        /// </summary>
+        [Required]
+        [Comment("案件編號")]
+        public string CaseNumber { get; set; } = string.Empty;
+
+        /// <summary>
         /// 指派人
         /// </summary>
         [Comment("指派人")]
         public int AdminUserId { get; set; }
 
         /// <summary>
+        /// 申請人
+        /// </summary>
+        [Required]
+        [Comment("申請人")]
+        public int UserId { get; set; }
+
+        /// <summary>
         /// 單位名稱
         /// </summary>
         [Comment("單位名稱")]
         public string UnitName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 縣市
+        /// </summary>
+        [Required]
+        [Comment("縣市")]
+        public string City { get; set; } = string.Empty;
 
         /// <summary>
         /// 地址
@@ -54,7 +74,21 @@ namespace admin_backend.Entities
         [Comment("受害樹木地址")]
         public string CaseAddress { get; set; } = string.Empty;
 
-        /// 林班地位置
+        /// <summary>
+        /// 位置
+        /// </summary>
+        [Required]
+        [Comment("位置")]
+        [StringLength(100)]
+        public string Postion { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 所屬管理處
+        /// </summary>
+        [Required]
+        [Comment("所屬管理處")]
+        [StringLength(100)]
+        public string AffiliatedUnit { get; set; } = string.Empty;
 
         /// <summary>
         /// 林班
@@ -98,6 +132,13 @@ namespace admin_backend.Entities
         [Required]
         [Comment("樹木基本資料")]
         public int TreeBasicInfoId { get; set; }
+
+        /// <summary>
+        /// 其他
+        /// </summary>
+        [Comment("其他")]
+        public string Others { get; set; }
+
 
         /// <summary>
         /// 受害部位
@@ -159,8 +200,18 @@ namespace admin_backend.Entities
         [Comment("圖片")]
         public string Photo { get; set; } = string.Empty;
 
+        /// <summary>
+        /// 案件狀態
+        /// </summary>
+        [Comment("案件狀態")]
+        public CaseStatusEnum CaseStatus { get; set; } 
+        
+
         [ForeignKey("AdminUserId")]
         public virtual AdminUser AdminUser { get; set; } = null!;
+
+        [ForeignKey("UserId")]
+        public virtual User User { get; set; } = null!;
 
         [ForeignKey("TreeBasicInfoId")]
         public virtual TreeBasicInfo TreeBasicInfo { get; set; } = null!;

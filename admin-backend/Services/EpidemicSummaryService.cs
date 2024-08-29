@@ -5,7 +5,6 @@ using admin_backend.Entities;
 using admin_backend.Enums;
 using admin_backend.Interfaces;
 using AutoMapper;
-using CommonLibrary.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 
@@ -39,7 +38,7 @@ namespace admin_backend.Services
 
             var epidemicSummary = await _context.EpidemicSummary.Where(x => x.Title == dto.Title).FirstOrDefaultAsync();
 
-             epidemicSummary = new EpidemicSummary
+            epidemicSummary = new EpidemicSummary
             {
                 Title = dto.Title,
                 Content = dto.Content,

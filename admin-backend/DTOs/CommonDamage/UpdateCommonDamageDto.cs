@@ -1,5 +1,4 @@
-﻿using admin_backend.DTOs.DamageType;
-using admin_backend.Enums;
+﻿using admin_backend.Enums;
 
 namespace admin_backend.DTOs.CommonDamage
 {

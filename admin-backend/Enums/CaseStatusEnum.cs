@@ -6,11 +6,11 @@ namespace admin_backend.Enums
     public enum CaseStatusEnum
     {
         /// <summary>
-        /// 不限
+        /// 未設定
         /// </summary>
-        [EnumMember(Value = "不限")]
-        [Description("不限")]
-        All = 0,
+        [EnumMember(Value = "未設定")]
+        [Description("未設定")]
+        None = 0,
 
         /// <summary>
         /// 暫存
@@ -53,5 +53,12 @@ namespace admin_backend.Enums
         [EnumMember(Value = "退回")]
         [Description("退回")]
         Return = 6,
+
+        ///// <summary>
+        ///// 不限
+        ///// </summary>
+        //[EnumMember(Value = "全部")]
+        //[Description("全部")]
+        //All = 99,
     }
 }

@@ -70,6 +70,7 @@ try
     builder.Services.AddScoped<INewsService, NewsService>();
     builder.Services.AddScoped<IAdSettingService, AdSettingService>();
     builder.Services.AddScoped<ICommonServicecs, CommonServicecs>();
+    builder.Services.AddScoped<ICaseService, CaseService>();
     
     //©µ¿ð¸ü¤J
     builder.Services.AddScoped(provider =>

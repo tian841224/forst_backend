@@ -18,7 +18,7 @@ namespace admin_backend.Entities
         /// 指派人
         /// </summary>
         [Comment("指派人")]
-        public int AdminUserId { get; set; }
+        public int? AdminUserId { get; set; }
 
         /// <summary>
         /// 申請人
@@ -38,13 +38,13 @@ namespace admin_backend.Entities
         /// 單位名稱
         /// </summary>
         [Comment("單位名稱")]
-        public string UnitName { get; set; } = string.Empty;
+        public string? UnitName { get; set; } 
 
         /// <summary>
         /// 聯絡人縣市
         /// </summary>
         [Required]
-        [Comment("聯絡人樹木縣市")]
+        [Comment("聯絡人縣市")]
         public string County { get; set; } = string.Empty;
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace admin_backend.Entities
         /// 傳真
         /// </summary>
         [Comment("傳真")]
-        public string Fax { get; set; } = string.Empty;
+        public string? Fax { get; set; } 
 
         /// <summary>
         /// Email
@@ -108,76 +108,67 @@ namespace admin_backend.Entities
         /// </summary>
         [Required]
         [Comment("林班位置")]
-        [StringLength(100)]
-        public string ForestSectionLocation { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 所屬管理處
-        /// </summary>
-        [Required]
-        [Comment("所屬管理處")]
-        [StringLength(100)]
-        public string AffiliatedUnit { get; set; } = string.Empty;
+        public int ForestCompartmentLocationId { get; set; }
 
         /// <summary>
         /// 林班
         /// </summary>
         [Comment("林班")]
-        public string ForestSection { get; set; } = string.Empty;
+        public string? ForestSection { get; set; }
 
         /// <summary>
         /// 小班
         /// </summary>
         [Comment("小班")]
-        public string ForestSubsection { get; set; } = string.Empty;
+        public string? ForestSubsection { get; set; }
 
         /// <summary>
         /// 緯度/TGOS
         /// </summary>
         [Comment("緯度/TGOS")]
-        public string LatitudeTgos { get; set; }
+        public string? LatitudeTgos { get; set; }
 
         /// <summary>
         /// 緯度/Google
         /// </summary>
         [Comment("緯度/Google")]
-        public string LatitudeGoogle { get; set; }
+        public string? LatitudeGoogle { get; set; }
 
         /// <summary>
         /// 經度/TGOS
         /// </summary>
         [Comment("經度/TGOS")]
-        public string LongitudeTgos { get; set; }
+        public string? LongitudeTgos { get; set; }
 
         /// <summary>
         /// 經度/Google
         /// </summary>
         [Comment("經度/Google")]
-        public string LongitudeGoogle { get; set; }
+        public string? LongitudeGoogle { get; set; }
 
         /// <summary>
         /// 受損面積
         /// </summary>
         [Comment("受損面積")]
-        public decimal DamagedArea { get; set; }
+        public decimal? DamagedArea { get; set; }
 
         /// <summary>
         /// 受損數量
         /// </summary>
         [Comment("受損數量")]
-        public int DamagedCount { get; set; }
+        public int? DamagedCount { get; set; }
 
         /// <summary>
         /// 種植面積
         /// </summary>
         [Comment("種植面積")]
-        public decimal PlantedArea { get; set; }
+        public decimal? PlantedArea { get; set; }
 
         /// <summary>
         /// 種植數量
         /// </summary>
         [Comment("種植數量")]
-        public int PlantedCount { get; set; }
+        public int? PlantedCount { get; set; }
 
         /// <summary>
         /// 樹木基本資料
@@ -190,7 +181,7 @@ namespace admin_backend.Entities
         /// 其他
         /// </summary>
         [Comment("其他")]
-        public string Others { get; set; }
+        public string? Others { get; set; }
 
         /// <summary>
         /// 受害部位
@@ -199,32 +190,31 @@ namespace admin_backend.Entities
         [Comment("受害部位 1 = 根, 莖、4 = 枝條, 6 = 樹葉, 7 = 花果, 8 = 全株")]
         public List<TreePartEnum> DamagedPart { get; set; } = new();
 
-
         /// <summary>
         /// 樹木高度
         /// </summary>
         [Required]
         [Comment("樹木高度")]
-        public decimal TreeHeight { get; set; }
+        public string TreeHeight { get; set; }
 
         /// <summary>
         /// 樹木直徑
         /// </summary>
         [Required]
         [Comment("樹木直徑")]
-        public decimal TreeDiameter { get; set; }
+        public string TreeDiameter { get; set; }
 
         /// <summary>
         /// 現地種植時間
         /// </summary>
         [Comment("現地種植時間")]
-        public int LocalPlantingTime { get; set; }
+        public string? LocalPlantingTime { get; set; }
 
         /// <summary>
         /// 首次發現受害時間
         /// </summary>
         [Comment("首次發現受害時間")]
-        public DateTime FirstDiscoveryDate { get; set; }
+        public DateTime? FirstDiscoveryDate { get; set; }
 
         /// <summary>
         /// 受害症狀描述
@@ -254,99 +244,20 @@ namespace admin_backend.Entities
         public string Photo { get; set; } = string.Empty;
 
         /// <summary>
-        /// 案件狀態
+        /// 案件狀態 1 = 暫存, 2 = 待指派, 3 = 待簽核, 4 = 已結案, 5 = 已刪除, 6 = 退回
         /// </summary>
-        [Comment("案件狀態")]
+        [Required]
+        [Comment("案件狀態 1 = 暫存, 2 = 待指派, 3 = 待簽核, 4 = 已結案, 5 = 已刪除, 6 = 退回")]
         public CaseStatusEnum CaseStatus { get; set; }
-
-        /// <summary>
-        /// 送件方式
-        /// </summary>
-        [Comment("送件方式")]
-        public List<SubmissionMethodEnum>? SubmissionMethod { get; set; } = new();
-
-        /// <summary>
-        /// 送件方式
-        /// </summary>
-        [Comment("診斷方式")]
-        public List<DiagnosisMethodEnum>? DiagnosisMethod { get; set; } = new();
-
-        ///案件回覆////
-
-        /// <summary>
-        /// 危害狀況詳細描述
-        /// </summary>
-        [Comment("危害狀況詳細描述")]
-        public string? HarmPatternDescription { get; set; }
-
-        /// <summary>
-        /// 危害種類
-        /// </summary>
-        [Comment("危害種類")]
-        public string? DamageTypeName { get; set; }
-
-        /// <summary>
-        /// 危害類別
-        /// </summary>
-        [Comment("危害類別")]
-        public string? DamageClassName { get; set; }
-
-        /// <summary>
-        /// 危害病蟲名稱
-        /// </summary>
-        [Comment("危害病蟲名稱")]
-        public string? CommonDamageName { get; set; }
-
-        /// <summary>
-        /// 防治建議
-        /// </summary>
-        [Comment("防治建議")]
-        public string? PreventionSuggestion { get; set; }
-
-        /// <summary>
-        /// 防治建議圖片
-        /// </summary>
-        [Comment("防治建議圖片")]
-        public string? PreventionSuggestionPhoto { get; set; }
-
-        /// <summary>
-        /// 危害病蟲名稱(舊)
-        /// </summary>
-        [Comment("危害病蟲名稱(舊)")]
-        public string? OldCommonDamageName { get; set; }
-
-        /// <summary>
-        /// 學名
-        /// </summary>
-        [Comment("學名")]
-        public string? ScientificName {  get; set; }
-
-        /// <summary>
-        /// 呈報建議
-        /// </summary>
-        [Comment("呈報建議")]
-        public string? ReportingSuggestion { get; set; }
-
-        /// <summary>
-        /// 呈報建議圖片
-        /// </summary>
-        [Comment("呈報建議圖片")]
-        public string? ReportingSuggestionPhoto { get; set; }
-
-        /// <summary>
-        /// 退回原因
-        /// </summary>
-        [Comment("退回原因")]
-        public string? ReturnReason { get; set; }  
-
-
-        [ForeignKey("AdminUserId")]
-        public virtual AdminUser AdminUser { get; set; } = null!;
 
         [ForeignKey("UserId")]
         public virtual User User { get; set; } = null!;
 
         [ForeignKey("TreeBasicInfoId")]
         public virtual TreeBasicInfo TreeBasicInfo { get; set; } = null!;
+
+        [ForeignKey("ForestCompartmentLocationId")]
+        public virtual ForestCompartmentLocation ForestCompartmentLocation { get; set; } = null!;
+        
     }
 }

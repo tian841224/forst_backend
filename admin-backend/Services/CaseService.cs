@@ -21,7 +21,6 @@ namespace admin_backend.Services
         private readonly Lazy<IFileService> _fileService;
         private readonly IOperationLogService _operationLogService;
 
-
         public CaseService(ILogger<AdSettingService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, IOperationLogService operationLogService)
         {
             _log = log;
@@ -53,49 +52,56 @@ namespace admin_backend.Services
 
             var treeBasicInfoId = await _context.TreeBasicInfo.FirstOrDefaultAsync(x => x.Id == caseEntity.TreeBasicInfoId) ?? new TreeBasicInfo();
             var user = await _context.User.FirstOrDefaultAsync(x => x.Id == caseEntity.UserId) ?? new User();
-            var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == caseEntity.AdminUserId) ?? new AdminUser();
+            var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == caseEntity.AdminUserId);
+            var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.Id == caseEntity.ForestCompartmentLocationId) ?? new ForestCompartmentLocation();
 
             var result = new CaseResponse
             {
-                ApplicationDate = caseEntity.ApplicationDate,
+                Id = caseEntity.Id,
+                CreateTime = caseEntity.CreateTime,
+                UpdateTime = caseEntity.UpdateTime,
+                CaseNumber = caseEntity.CaseNumber,
                 AdminUserId = caseEntity.AdminUserId,
-                AdminUserName = adminUser.Name,
+                AdminUserName = adminUser?.Name,
                 UserId = caseEntity.UserId,
                 UserName = user.Name,
-                TreeBasicInfoId = caseEntity.TreeBasicInfoId,
-                TreeBasicInfoName = treeBasicInfoId.Name,
-                ScientificName = treeBasicInfoId.ScientificName,
-                CaseNumber = caseEntity.CaseNumber,
-                ForestSectionLocation = caseEntity.ForestSectionLocation,
-                CaseAddress = caseEntity.DamageTreeAddress,
-                District = caseEntity.District,
+                ApplicationDate = caseEntity.ApplicationDate,
+                UnitName = caseEntity.UnitName,
                 County = caseEntity.County,
+                District = caseEntity.District,
                 Address = caseEntity.Address,
-                BaseCondition = caseEntity.BaseCondition,
-                DamagedCount = caseEntity.DamagedCount,
-                PlantedCount = caseEntity.PlantedCount,
-                AffiliatedUnit = caseEntity.AffiliatedUnit,
-                DamagedArea = caseEntity.DamagedArea,
-                DamageDescription = caseEntity.DamageDescription,
-                DamagedPart = caseEntity.DamagedPart,
-                Email = caseEntity.Email,
+                Phone = caseEntity.Phone,
                 Fax = caseEntity.Fax,
-                FirstDiscoveryDate = caseEntity.FirstDiscoveryDate,
+                Email = caseEntity.Email,
+                DamageTreeCounty = caseEntity.DamageTreeCounty,
+                DamageTreeDistrict = caseEntity.DamageTreeDistrict,
+                DamageTreeAddress = caseEntity.DamageTreeAddress,
+                ForestCompartmentLocationId = caseEntity.ForestCompartmentLocationId,
+                ForestPostion = forestCompartmentLocation.Postion,
+                AffiliatedUnit = forestCompartmentLocation.AffiliatedUnit,
                 ForestSection = caseEntity.ForestSection,
                 ForestSubsection = caseEntity.ForestSubsection,
-                LocalPlantingTime = caseEntity.LocalPlantingTime,
-                TreeDiameter = caseEntity.TreeDiameter,
-                LocationType = caseEntity.LocationType,
-                Others = caseEntity.Others,
-                Phone = caseEntity.Phone,
-                Photo = fileList,
-                PlantedArea = caseEntity.PlantedArea,
-                TreeHeight = caseEntity.TreeHeight,
-                UnitName = caseEntity.UnitName,
                 LatitudeGoogle = caseEntity.LatitudeGoogle,
                 LatitudeTgos = caseEntity.LatitudeTgos,
                 LongitudeGoogle = caseEntity.LongitudeGoogle,
                 LongitudeTgos = caseEntity.LongitudeTgos,
+                DamagedArea = caseEntity.DamagedArea,
+                DamagedCount = caseEntity.DamagedCount,
+                PlantedArea = caseEntity.PlantedArea,
+                PlantedCount = caseEntity.PlantedCount,
+                TreeBasicInfoId = caseEntity.TreeBasicInfoId,
+                ScientificName = treeBasicInfoId.ScientificName,
+                TreeName = treeBasicInfoId.Name,
+                Others = caseEntity.Others,
+                DamagedPart = caseEntity.DamagedPart,
+                TreeHeight = caseEntity.TreeHeight,
+                TreeDiameter = caseEntity.TreeDiameter,
+                LocalPlantingTime = caseEntity.LocalPlantingTime,
+                FirstDiscoveryDate = caseEntity.FirstDiscoveryDate,
+                DamageDescription = caseEntity.DamageDescription,
+                LocationType = caseEntity.LocationType,
+                BaseCondition = caseEntity.BaseCondition,
+                Photo = fileList,
                 CaseStatus = caseEntity.CaseStatus,
             };
 
@@ -119,9 +125,23 @@ namespace admin_backend.Services
             //    );
             //}
 
-            if (dto.StartTime.HasValue && dto.EndDate.HasValue)
+            if(dto.CaseNumber.HasValue)
             {
-                caseEntity = caseEntity.Where(x => x.ApplicationDate >= dto.StartTime.Value && x.ApplicationDate < dto.EndDate.Value);
+                caseEntity = caseEntity.Where(x => x.CaseNumber == dto.CaseNumber.Value);
+            }
+
+            if (!string.IsNullOrEmpty(dto.StartTime) && !string.IsNullOrEmpty(dto.EndTime))
+            {
+                //處理時間格式
+                if (!DateTime.TryParse(dto.StartTime, out var StartTime))
+                {
+                    throw new ArgumentException("Invalid date format", nameof(dto.StartTime));
+                }
+                if (!DateTime.TryParse(dto.EndTime, out var EndTime))
+                {
+                    throw new ArgumentException("Invalid date format", nameof(dto.EndTime));
+                }
+                caseEntity = caseEntity.Where(x => x.ApplicationDate >= StartTime && x.ApplicationDate < EndTime);
             }
 
             if (dto.CaseStatus.HasValue)
@@ -129,7 +149,7 @@ namespace admin_backend.Services
                 caseEntity = caseEntity.Where(x => x.CaseStatus == dto.CaseStatus.Value);
             }
 
-            foreach (var item in caseEntity)
+            foreach (var item in await caseEntity.ToListAsync())
             {
                 //處理上傳檔案
                 var fileList = new List<CaseFileDto>();
@@ -145,51 +165,55 @@ namespace admin_backend.Services
                 var treeBasicInfoId = await _context.TreeBasicInfo.FirstOrDefaultAsync(x => x.Id == item.TreeBasicInfoId) ?? new TreeBasicInfo();
                 var user = await _context.User.FirstOrDefaultAsync(x => x.Id == item.UserId) ?? new User();
                 var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == item.AdminUserId) ?? new AdminUser();
+                var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.Id == item.ForestCompartmentLocationId) ?? new ForestCompartmentLocation();
 
                 result.Add(new CaseResponse
                 {
                     Id = item.Id,
                     CreateTime = item.CreateTime,
                     UpdateTime = item.UpdateTime,
-                    ApplicationDate = item.ApplicationDate,
+                    CaseNumber = item.CaseNumber,
                     AdminUserId = item.AdminUserId,
                     AdminUserName = adminUser.Name,
                     UserId = item.UserId,
                     UserName = user.Name,
-                    ForestSectionLocation = item.ForestSectionLocation,
-                    TreeBasicInfoId = item.TreeBasicInfoId,
-                    TreeBasicInfoName = treeBasicInfoId.Name,
-                    ScientificName = treeBasicInfoId.ScientificName,
-                    CaseNumber = item.CaseNumber,
-                    CaseAddress = item.DamageTreeAddress,
-                    District = item.District,
+                    ApplicationDate = item.ApplicationDate,
+                    UnitName = item.UnitName,
                     County = item.County,
+                    District = item.District,
                     Address = item.Address,
-                    BaseCondition = item.BaseCondition,
-                    DamagedCount = item.DamagedCount,
-                    PlantedCount = item.PlantedCount,
-                    AffiliatedUnit = item.AffiliatedUnit,
-                    DamagedArea = item.DamagedArea,
-                    DamageDescription = item.DamageDescription,
-                    DamagedPart = item.DamagedPart,
-                    Email = item.Email,
+                    Phone = item.Phone,
                     Fax = item.Fax,
-                    FirstDiscoveryDate = item.FirstDiscoveryDate,
+                    Email = item.Email,
+                    DamageTreeCounty = item.DamageTreeCounty,
+                    DamageTreeDistrict = item.DamageTreeDistrict,
+                    DamageTreeAddress = item.DamageTreeAddress,
+                    ForestCompartmentLocationId = item.ForestCompartmentLocationId,
+                    ForestPostion = forestCompartmentLocation.Postion,
+                    AffiliatedUnit = forestCompartmentLocation.AffiliatedUnit,
                     ForestSection = item.ForestSection,
                     ForestSubsection = item.ForestSubsection,
-                    LocalPlantingTime = item.LocalPlantingTime,
-                    TreeDiameter = item.TreeDiameter,
-                    LocationType = item.LocationType,
-                    Others = item.Others,
-                    Phone = item.Phone,
-                    Photo = fileList,
-                    PlantedArea = item.PlantedArea,
-                    TreeHeight = item.TreeHeight,
-                    UnitName = item.UnitName,
                     LatitudeGoogle = item.LatitudeGoogle,
                     LatitudeTgos = item.LatitudeTgos,
                     LongitudeGoogle = item.LongitudeGoogle,
                     LongitudeTgos = item.LongitudeTgos,
+                    DamagedArea = item.DamagedArea,
+                    DamagedCount = item.DamagedCount,
+                    PlantedArea = item.PlantedArea,
+                    PlantedCount = item.PlantedCount,
+                    TreeBasicInfoId = item.TreeBasicInfoId,
+                    ScientificName = treeBasicInfoId.ScientificName,
+                    TreeName = treeBasicInfoId.Name,
+                    Others = item.Others,
+                    DamagedPart = item.DamagedPart,
+                    TreeHeight = item.TreeHeight,
+                    TreeDiameter = item.TreeDiameter,
+                    LocalPlantingTime = item.LocalPlantingTime,
+                    FirstDiscoveryDate = item.FirstDiscoveryDate,
+                    DamageDescription = item.DamageDescription,
+                    LocationType = item.LocationType,
+                    BaseCondition = item.BaseCondition,
+                    Photo = fileList,
                     CaseStatus = item.CaseStatus,
                 });
             }
@@ -223,42 +247,54 @@ namespace admin_backend.Services
             }
             var jsonResult = JsonSerializer.Serialize(fileUploadList);
 
+            //處理時間格式
+            if (!DateTime.TryParse(dto.ApplicationDate, out var ApplicationDate))
+            {
+                throw new ArgumentException("Invalid date format", nameof(dto.ApplicationDate));
+            }
+            if (!DateTime.TryParse(dto.FirstDiscoveryDate, out var FirstDiscoveryDate))
+            {
+                throw new ArgumentException("Invalid date format", nameof(dto.FirstDiscoveryDate));
+            }
+
             var caseEntity = new Case
             {
-                ApplicationDate = dto.ApplicationDate,
-                UserId = dto.UserId,
-                TreeBasicInfoId = dto.TreeBasicInfoId,
                 CaseNumber = maxCaseNumber,
-                //CaseAddress = dto.CaseAddress,
-                District = dto.City,
-                ForestSectionLocation = dto.ForestSectionLocation,
-                BaseCondition = dto.BaseCondition,
-                DamagedCount = dto.DamagedCount,
-                PlantedCount = dto.PlantedCount,
+                UserId = dto.UserId,
+                ApplicationDate = ApplicationDate,
+                UnitName = dto.UnitName,
+                County = dto.County,
+                District = dto.District,
                 Address = dto.Address,
-                AffiliatedUnit = dto.AffiliatedUnit,
-                DamagedArea = dto.DamagedArea,
-                DamageDescription = dto.DamageDescription,
-                DamagedPart = dto.DamagedPart,
-                Email = dto.Email,
+                Phone = dto.Phone,
                 Fax = dto.Fax,
-                FirstDiscoveryDate = dto.FirstDiscoveryDate,
+                Email = dto.Email,
+                DamageTreeCounty = dto.DamageTreeCounty,
+                DamageTreeDistrict = dto.DamageTreeDistrict,
+                DamageTreeAddress = dto.DamageTreeAddress,
+                ForestCompartmentLocationId = dto.ForestCompartmentLocationId,
                 ForestSection = dto.ForestSection,
                 ForestSubsection = dto.ForestSubsection,
-                LocalPlantingTime = dto.LocalPlantingTime,
-                TreeDiameter = dto.TreeDiameter,
-                LocationType = dto.LocationType,
-                Others = dto.Others,
-                Phone = dto.Phone,
-                Photo = jsonResult,
-                PlantedArea = dto.PlantedArea,
-                TreeHeight = dto.TreeHeight,
-                UnitName = dto.UnitName,
-                LatitudeGoogle = dto.LatitudeGoogle,
                 LatitudeTgos = dto.LatitudeTgos,
-                LongitudeGoogle = dto.LongitudeGoogle,
+                LatitudeGoogle = dto.LatitudeGoogle,
                 LongitudeTgos = dto.LongitudeTgos,
-                CaseStatus = CaseStatusEnum.Pending_Assignment,
+                LongitudeGoogle = dto.LongitudeGoogle,
+                DamagedArea = dto.DamagedArea,
+                DamagedCount = dto.DamagedCount,
+                PlantedArea = dto.PlantedArea,
+                PlantedCount = dto.PlantedCount,
+                TreeBasicInfoId = dto.TreeBasicInfoId,
+                Others = dto.Others,
+                DamagedPart = dto.DamagedPart,
+                TreeHeight = dto.TreeHeight,
+                TreeDiameter = dto.TreeDiameter,
+                LocalPlantingTime = dto.LocalPlantingTime,
+                FirstDiscoveryDate = FirstDiscoveryDate,
+                DamageDescription = dto.DamageDescription,
+                LocationType = dto.LocationType,
+                BaseCondition = dto.BaseCondition,
+                Photo = jsonResult,
+                CaseStatus = dto.CaseStatus,
             };
 
             await _context.Case.AddAsync(caseEntity);
@@ -278,17 +314,26 @@ namespace admin_backend.Services
             }
 
             // 更新資料
-            if (dto.UserId.HasValue)
-                caseEntity.UserId = dto.UserId.Value;
+            if (dto.AdminUserId.HasValue)
+                caseEntity.AdminUserId = dto.AdminUserId.Value;
 
-            if (dto.ApplicationDate.HasValue)
-                caseEntity.ApplicationDate = dto.ApplicationDate.Value;
+            if (!string.IsNullOrEmpty(dto.ApplicationDate))
+            {
+                if (!DateTime.TryParse(dto.ApplicationDate, out var ApplicationDate))
+                {
+                    throw new ArgumentException("Invalid date format", nameof(dto.ApplicationDate));
+                }
+                caseEntity.ApplicationDate = ApplicationDate;
+            }
 
             if (!string.IsNullOrEmpty(dto.UnitName))
                 caseEntity.UnitName = dto.UnitName;
 
-            if (!string.IsNullOrEmpty(dto.City))
-                caseEntity.District = dto.City;
+            if (!string.IsNullOrEmpty(dto.District))
+                caseEntity.District = dto.District;
+
+            if (!string.IsNullOrEmpty(dto.County))
+                caseEntity.County = dto.County;
 
             if (!string.IsNullOrEmpty(dto.Address))
                 caseEntity.Address = dto.Address;
@@ -302,11 +347,17 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.Email))
                 caseEntity.Email = dto.Email;
 
-            if (!string.IsNullOrEmpty(dto.CaseAddress))
-                //caseEntity.CaseAddress = dto.CaseAddress;
+            if (!string.IsNullOrEmpty(dto.DamageTreeCounty))
+                caseEntity.DamageTreeCounty = dto.DamageTreeCounty;
 
-            if (!string.IsNullOrEmpty(dto.AffiliatedUnit))
-                caseEntity.AffiliatedUnit = dto.AffiliatedUnit;
+            if (!string.IsNullOrEmpty(dto.DamageTreeDistrict))
+                caseEntity.DamageTreeDistrict = dto.DamageTreeDistrict;
+
+            if (!string.IsNullOrEmpty(dto.DamageTreeAddress))
+                caseEntity.DamageTreeAddress = dto.DamageTreeAddress;
+
+            if (dto.ForestCompartmentLocationId.HasValue)
+                caseEntity.ForestCompartmentLocationId = dto.ForestCompartmentLocationId.Value;
 
             if (!string.IsNullOrEmpty(dto.ForestSection))
                 caseEntity.ForestSection = dto.ForestSection;
@@ -347,17 +398,23 @@ namespace admin_backend.Services
             if (dto.DamagedPart != null && dto.DamagedPart.Count > 0)
                 caseEntity.DamagedPart = dto.DamagedPart;
 
-            if (dto.TreeHeight.HasValue)
-                caseEntity.TreeHeight = dto.TreeHeight.Value;
+            if (!string.IsNullOrEmpty(dto.TreeHeight))
+                caseEntity.TreeHeight = dto.TreeHeight;
 
-            if (dto.TreeDiameter.HasValue)
-                caseEntity.TreeDiameter = dto.TreeDiameter.Value;
+            if (!string.IsNullOrEmpty(dto.TreeDiameter))
+                caseEntity.TreeDiameter = dto.TreeDiameter;
 
-            if (dto.LocalPlantingTime.HasValue)
-                caseEntity.LocalPlantingTime = dto.LocalPlantingTime.Value;
+            if (!string.IsNullOrEmpty(dto.LocalPlantingTime))
+                caseEntity.LocalPlantingTime = dto.LocalPlantingTime;
 
-            if (dto.FirstDiscoveryDate.HasValue)
-                caseEntity.FirstDiscoveryDate = dto.FirstDiscoveryDate.Value;
+            if (!string.IsNullOrEmpty(dto.FirstDiscoveryDate))
+            {
+                if (!DateTime.TryParse(dto.FirstDiscoveryDate, out var FirstDiscoveryDate))
+                {
+                    throw new ArgumentException("Invalid date format", nameof(dto.FirstDiscoveryDate));
+                }
+                caseEntity.FirstDiscoveryDate = FirstDiscoveryDate;
+            }
 
             if (!string.IsNullOrEmpty(dto.DamageDescription))
                 caseEntity.DamageDescription = dto.DamageDescription;

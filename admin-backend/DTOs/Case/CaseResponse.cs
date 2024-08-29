@@ -1,6 +1,7 @@
 ﻿using admin_backend.Enums;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -16,12 +17,12 @@ namespace admin_backend.DTOs.Case
         /// <summary>
         /// 指派人ID
         /// </summary>
-        public int AdminUserId { get; set; }
+        public int? AdminUserId { get; set; }
 
         /// <summary>
         /// 指派人
         /// </summary>
-        public string AdminUserName { get; set; } = string.Empty;
+        public string? AdminUserName { get; set; }
 
         /// <summary>
         /// 申請人ID
@@ -31,34 +32,32 @@ namespace admin_backend.DTOs.Case
         /// <summary>
         /// 申請人
         /// </summary>
-        public string UserName { get; set; } = string.Empty;
+        public string? UserName { get; set; }
 
         /// <summary>
         /// 申請日期
         /// </summary>
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime ApplicationDate { get; set; }
 
         /// <summary>
         /// 單位名稱
         /// </summary>
-        public string UnitName { get; set; } = string.Empty;
+        public string? UnitName { get; set; }
 
         /// <summary>
-        /// 受害樹木縣市
+        /// 聯絡人縣市
         /// </summary>
-        [Required]
         public string County { get; set; } = string.Empty;
 
         /// <summary>
-        /// 受害樹木區域
+        /// 聯絡人區域
         /// </summary>
-        [Required]
         public string District { get; set; } = string.Empty;
 
         /// <summary>
-        /// 受害樹木地址
+        /// 聯絡人地址
         /// </summary>
-        [Required]
         public string Address { get; set; } = string.Empty;
 
         /// <summary>
@@ -69,7 +68,7 @@ namespace admin_backend.DTOs.Case
         /// <summary>
         /// 傳真
         /// </summary>
-        public string Fax { get; set; } = string.Empty;
+        public string? Fax { get; set; }
 
         /// <summary>
         /// Email
@@ -77,14 +76,29 @@ namespace admin_backend.DTOs.Case
         public string Email { get; set; } = string.Empty;
 
         /// <summary>
+        /// 受害樹木縣市
+        /// </summary>
+        public string DamageTreeCounty { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 受害樹木區域
+        /// </summary>
+        public string DamageTreeDistrict { get; set; } = string.Empty;
+
+        /// <summary>
         /// 受害樹木地址
         /// </summary>
-        public string CaseAddress { get; set; } = string.Empty;
+        public string DamageTreeAddress { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 林班位置ID
+        /// </summary>
+        public int ForestCompartmentLocationId { get; set; }
 
         /// <summary>
         /// 林班位置
         /// </summary>
-        public string ForestSectionLocation { get; set; } = string.Empty;
+        public string ForestPostion { get; set; } = string.Empty;
 
         /// <summary>
         /// 所屬管理處
@@ -94,55 +108,55 @@ namespace admin_backend.DTOs.Case
         /// <summary>
         /// 林班
         /// </summary>
-        public string ForestSection { get; set; } = string.Empty;
+        public string? ForestSection { get; set; }
 
         /// <summary>
         /// 小班
         /// </summary>
-        public string ForestSubsection { get; set; } = string.Empty;
+        public string? ForestSubsection { get; set; }
 
         /// <summary>
         /// 緯度/TGOS
         /// </summary>
-        public string LatitudeTgos { get; set; }
+        public string? LatitudeTgos { get; set; }
 
         /// <summary>
         /// 緯度/Google
         /// </summary>
-        public string LatitudeGoogle { get; set; }
+        public string? LatitudeGoogle { get; set; }
 
         /// <summary>
         /// 經度/TGOS
         /// </summary>
-        public string LongitudeTgos { get; set; }
+        public string? LongitudeTgos { get; set; }
 
         /// <summary>
         /// 經度/Google
         /// </summary>
-        public string LongitudeGoogle { get; set; }
+        public string? LongitudeGoogle { get; set; }
 
         /// <summary>
         /// 受損面積
         /// </summary>
-        public decimal DamagedArea { get; set; }
+        public decimal? DamagedArea { get; set; }
 
         /// <summary>
         /// 受損數量
         /// </summary>
-        public int DamagedCount { get; set; }
+        public int? DamagedCount { get; set; }
 
         /// <summary>
         /// 種植面積
         /// </summary>
-        public decimal PlantedArea { get; set; }
+        public decimal? PlantedArea { get; set; }
 
         /// <summary>
         /// 種植數量
         /// </summary>
-        public int PlantedCount { get; set; }
+        public int? PlantedCount { get; set; }
 
         /// <summary>
-        /// 樹木基本資料
+        /// 樹木基本資料ID
         /// </summary>
         public int TreeBasicInfoId { get; set; }
 
@@ -152,46 +166,47 @@ namespace admin_backend.DTOs.Case
         public string ScientificName { get; set; } = string.Empty;
 
         /// <summary>
-        /// 樹木名稱名稱
+        /// 樹木名稱
         /// </summary>
-        public string TreeBasicInfoName { get; set; } = string.Empty;
+        public string TreeName { get; set; } = string.Empty;
 
         /// <summary>
         /// 其他
         /// </summary>
-        public string Others { get; set; }
+        public string? Others { get; set; }
 
         /// <summary>
-        /// 受害部位
+        /// 受害部位 1 = 根, 莖、4 = 枝條, 6 = 樹葉, 7 = 花果, 8 = 全株
         /// </summary>
-        [Required]
         public List<TreePartEnum> DamagedPart { get; set; } = new();
 
         /// <summary>
-        /// 受害部位
+        /// 受害部位 1 = 根, 莖、4 = 枝條, 6 = 樹葉, 7 = 花果, 8 = 全株
         /// </summary>
         public List<string> DamagedPartName => DamagedPart.Select(x => x.GetDescription()).ToList();
 
         /// <summary>
         /// 樹木高度
         /// </summary>
-        public decimal TreeHeight { get; set; }
+        [Required]
+        public string TreeHeight { get; set; } = string.Empty ;
 
         /// <summary>
         /// 樹木直徑
         /// </summary>
-        public decimal TreeDiameter { get; set; }
+        [Required]
+        public string TreeDiameter { get; set; } = string.Empty ;
 
         /// <summary>
         /// 現地種植時間
         /// </summary>
-        public int LocalPlantingTime { get; set; }
+        public string? LocalPlantingTime { get; set; }
 
         /// <summary>
         /// 首次發現受害時間
         /// </summary>
         [JsonConverter(typeof(DateTimeConverter))]
-        public DateTime FirstDiscoveryDate { get; set; }
+        public DateTime? FirstDiscoveryDate { get; set; }
 
         /// <summary>
         /// 受害症狀描述
@@ -224,7 +239,7 @@ namespace admin_backend.DTOs.Case
         public List<CaseFileDto> Photo { get; set; } = new();
 
         /// <summary>
-        /// 案件狀態
+        /// 案件狀態 1 = 暫存, 2 = 待指派, 3 = 待簽核, 4 = 已結案, 5 = 已刪除, 6 = 退回
         /// </summary>
         public CaseStatusEnum CaseStatus { get; set; }
 

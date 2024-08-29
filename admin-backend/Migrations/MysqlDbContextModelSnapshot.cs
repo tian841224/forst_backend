@@ -66,7 +66,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("AdminUserId");
 
-                    b.ToTable("AdSetting");
+                    b.ToTable("AdSetting", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.AdminUser", b =>
@@ -130,7 +130,197 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AdminUser");
+                    b.ToTable("AdminUser", (string)null);
+                });
+
+            modelBuilder.Entity("admin_backend.Entities.Case", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("聯絡人地址");
+
+                    b.Property<int?>("AdminUserId")
+                        .HasColumnType("int")
+                        .HasComment("指派人");
+
+                    b.Property<DateTime>("ApplicationDate")
+                        .HasColumnType("datetime(6)")
+                        .HasComment("申請日期");
+
+                    b.Property<string>("BaseCondition")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("樹基部狀況 1 = 水泥面 = 2, 柏油面 = 3, 植被泥土面 (地表有草皮或鬆潤木) = 4, 花台內 = 5, 人工鋪面 (水泥面、柏油面以外) = 6");
+
+                    b.Property<int>("CaseNumber")
+                        .HasColumnType("int")
+                        .HasComment("案件編號");
+
+                    b.Property<int>("CaseStatus")
+                        .HasColumnType("int")
+                        .HasComment("案件狀態 1 = 暫存, 2 = 待指派, 3 = 待簽核, 4 = 已結案, 5 = 已刪除, 6 = 退回");
+
+                    b.Property<string>("County")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("聯絡人縣市");
+
+                    b.Property<DateTime>("CreateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasComment("建立日期");
+
+                    b.Property<string>("DamageDescription")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("受害症狀描述");
+
+                    b.Property<string>("DamageTreeAddress")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("受害樹木地址");
+
+                    b.Property<string>("DamageTreeCounty")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("受害樹木縣市");
+
+                    b.Property<string>("DamageTreeDistrict")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("受害樹木區域");
+
+                    b.Property<decimal?>("DamagedArea")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("受損面積");
+
+                    b.Property<int?>("DamagedCount")
+                        .HasColumnType("int")
+                        .HasComment("受損數量");
+
+                    b.Property<string>("DamagedPart")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("受害部位 1 = 根, 莖、4 = 枝條, 6 = 樹葉, 7 = 花果, 8 = 全株");
+
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("聯絡人區域");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("Email");
+
+                    b.Property<string>("Fax")
+                        .HasColumnType("longtext")
+                        .HasComment("傳真");
+
+                    b.Property<DateTime?>("FirstDiscoveryDate")
+                        .HasColumnType("datetime(6)")
+                        .HasComment("首次發現受害時間");
+
+                    b.Property<int>("ForestCompartmentLocationId")
+                        .HasColumnType("int")
+                        .HasComment("林班位置");
+
+                    b.Property<string>("ForestSection")
+                        .HasColumnType("longtext")
+                        .HasComment("林班");
+
+                    b.Property<string>("ForestSubsection")
+                        .HasColumnType("longtext")
+                        .HasComment("小班");
+
+                    b.Property<string>("LatitudeGoogle")
+                        .HasColumnType("longtext")
+                        .HasComment("緯度/Google");
+
+                    b.Property<string>("LatitudeTgos")
+                        .HasColumnType("longtext")
+                        .HasComment("緯度/TGOS");
+
+                    b.Property<string>("LocalPlantingTime")
+                        .HasColumnType("longtext")
+                        .HasComment("現地種植時間");
+
+                    b.Property<string>("LocationType")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("立地種類 1 = 公園、校園, 人行道 = 2, 花台內 = 3, 建築周邊 = 4, 林地 = 5, 苗圃 = 6, 農地 = 7 , 空地 = 8");
+
+                    b.Property<string>("LongitudeGoogle")
+                        .HasColumnType("longtext")
+                        .HasComment("經度/Google");
+
+                    b.Property<string>("LongitudeTgos")
+                        .HasColumnType("longtext")
+                        .HasComment("經度/TGOS");
+
+                    b.Property<string>("Others")
+                        .HasColumnType("longtext")
+                        .HasComment("其他");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("電話");
+
+                    b.Property<string>("Photo")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("圖片");
+
+                    b.Property<decimal?>("PlantedArea")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("種植面積");
+
+                    b.Property<int?>("PlantedCount")
+                        .HasColumnType("int")
+                        .HasComment("種植數量");
+
+                    b.Property<int>("TreeBasicInfoId")
+                        .HasColumnType("int")
+                        .HasComment("樹木基本資料");
+
+                    b.Property<string>("TreeDiameter")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("樹木直徑");
+
+                    b.Property<string>("TreeHeight")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("樹木高度");
+
+                    b.Property<string>("UnitName")
+                        .HasColumnType("longtext")
+                        .HasComment("單位名稱");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(6)")
+                        .HasComment("更新時間");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasComment("申請人");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ForestCompartmentLocationId");
+
+                    b.HasIndex("TreeBasicInfoId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Case", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.CommonDamage", b =>
@@ -196,7 +386,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("DamageTypeId");
 
-                    b.ToTable("CommonDamage");
+                    b.ToTable("CommonDamage", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.CommonPest", b =>
@@ -263,7 +453,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("DamageTypeId");
 
-                    b.ToTable("CommonPest");
+                    b.ToTable("CommonPest", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.DamageClass", b =>
@@ -300,7 +490,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("DamageTypeId");
 
-                    b.ToTable("DamageClass");
+                    b.ToTable("DamageClass", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.DamageType", b =>
@@ -335,7 +525,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DamageType");
+                    b.ToTable("DamageType", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.Documentation", b =>
@@ -365,7 +555,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Documentation");
+                    b.ToTable("Documentation", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.EpidemicSummary", b =>
@@ -396,7 +586,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EpidemicSummary");
+                    b.ToTable("EpidemicSummary", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.FAQ", b =>
@@ -441,7 +631,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("AdminUserId");
 
-                    b.ToTable("FAQ");
+                    b.ToTable("FAQ", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.ForestCompartmentLocation", b =>
@@ -478,7 +668,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ForestCompartmentLocation");
+                    b.ToTable("ForestCompartmentLocation", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.ForestDiseasePublications", b =>
@@ -542,7 +732,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ForestDiseasePublications");
+                    b.ToTable("ForestDiseasePublications", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.Log", b =>
@@ -572,7 +762,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Log");
+                    b.ToTable("Log", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.MailConfig", b =>
@@ -623,7 +813,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MailConfig");
+                    b.ToTable("MailConfig", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.News", b =>
@@ -689,7 +879,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("AdminUserId");
 
-                    b.ToTable("News");
+                    b.ToTable("News", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.OperationLog", b =>
@@ -734,7 +924,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("AdminUserId");
 
-                    b.ToTable("OperationLog");
+                    b.ToTable("OperationLog", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.Permission", b =>
@@ -765,7 +955,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permission");
+                    b.ToTable("Permission", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.Role", b =>
@@ -791,7 +981,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role");
+                    b.ToTable("Role", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.RolePermission", b =>
@@ -844,7 +1034,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RolePermission");
+                    b.ToTable("RolePermission", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.TreeBasicInfo", b =>
@@ -881,7 +1071,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TreeBasicInfo");
+                    b.ToTable("TreeBasicInfo", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.User", b =>
@@ -925,7 +1115,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("admin_backend.Entities.AdSetting", b =>
@@ -948,6 +1138,33 @@ namespace CommonLibrary.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("admin_backend.Entities.Case", b =>
+                {
+                    b.HasOne("admin_backend.Entities.ForestCompartmentLocation", "ForestCompartmentLocation")
+                        .WithMany()
+                        .HasForeignKey("ForestCompartmentLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("admin_backend.Entities.TreeBasicInfo", "TreeBasicInfo")
+                        .WithMany()
+                        .HasForeignKey("TreeBasicInfoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("admin_backend.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ForestCompartmentLocation");
+
+                    b.Navigation("TreeBasicInfo");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.CommonDamage", b =>

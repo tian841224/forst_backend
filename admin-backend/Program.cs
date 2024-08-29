@@ -71,7 +71,8 @@ try
     builder.Services.AddScoped<IAdSettingService, AdSettingService>();
     builder.Services.AddScoped<ICommonServicecs, CommonServicecs>();
     builder.Services.AddScoped<ICaseService, CaseService>();
-    
+    builder.Services.AddScoped<ICaseDiagnosisResultService, CaseDiagnosisResultService>();
+
     //©µ¿ð¸ü¤J
     builder.Services.AddScoped(provider =>
         new Lazy<IOperationLogService>(() => provider.GetRequiredService<IOperationLogService>()));

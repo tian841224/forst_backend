@@ -38,11 +38,15 @@ namespace admin_backend.Services
 
             IQueryable<News> news = _context.News;
 
-            if (Id != null)
-                news = news.Where(x => x.Id == Id);
+            news = news.Where(x => x.Id == Id);
+
+            //將排程過期的資料改為停用
+            var today = DateTime.Today;
+            await news
+                .Where(x => x.Schedule && (x.StartTime.Date > today || x.EndTime.Date < today))
+                .ExecuteUpdateAsync(s => s.SetProperty(b => b.Status, b => StatusEnum.Stop));
 
             var newsResponse = _mapper.Map<List<NewsResponse>>(news);
-
 
             foreach (var item in newsResponse)
             {
@@ -70,6 +74,12 @@ namespace admin_backend.Services
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
             IQueryable<News> news = _context.News;
+
+            //將排程過期的資料改為停用
+            var today = DateTime.Today;
+            await news
+                .Where(x => x.Schedule && (x.StartTime.Date > today || x.EndTime.Date < today))
+                .ExecuteUpdateAsync(s => s.SetProperty(b => b.Status, b => StatusEnum.Stop));
 
             if (!string.IsNullOrEmpty(dto.Keyword))
             {

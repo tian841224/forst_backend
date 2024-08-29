@@ -1,4 +1,5 @@
-﻿using admin_backend.DTOs.CommonDamage;
+﻿using admin_backend.DTOs.Case;
+using admin_backend.DTOs.CommonDamage;
 using admin_backend.DTOs.ForestDiseasePublications;
 using admin_backend.Entities;
 using AutoMapper;
@@ -49,6 +50,9 @@ namespace admin_backend.Extensions
              .ForMember(dest => dest.Photo, opt => opt.Ignore())
              .ForMember(dest => dest.DamageClassName, opt => opt.Ignore())
              .ForMember(dest => dest.DamageTypeName, opt => opt.Ignore());
+
+            CreateMap<Case, CaseResponse>()
+                .ForMember(dest => dest.Photo, opt => opt.Ignore());
         }
     }
 }

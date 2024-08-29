@@ -14,3 +14,5 @@ CommonLibrary/bin/
 admin-backend/Files/
 admin-backend/Properties/PublishProfiles/IISProfile.pubxml.user
 admin-backend/.vscode/
+obj/admin-backend.csproj.EntityFrameworkCore.targets
+src/admin-backend/obj/admin-backend.csproj.EntityFrameworkCore.targets

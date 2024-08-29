@@ -15,13 +15,13 @@ namespace admin_backend.Services
 {
     public class CaseService : ICaseService
     {
-        private readonly ILogger<AdSettingService> _log;
+        private readonly ILogger<CaseService> _log;
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly IMapper _mapper;
         private readonly Lazy<IFileService> _fileService;
-        private readonly IOperationLogService _operationLogService;
+        private readonly Lazy<IOperationLogService> _operationLogService;
 
-        public CaseService(ILogger<AdSettingService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, IOperationLogService operationLogService)
+        public CaseService(ILogger<CaseService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, Lazy<IOperationLogService> operationLogService)
         {
             _log = log;
             _contextFactory = contextFactory;
@@ -297,8 +297,20 @@ namespace admin_backend.Services
                 CaseStatus = dto.CaseStatus,
             };
 
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             await _context.Case.AddAsync(caseEntity);
-            await _context.SaveChangesAsync();
+
+            // 新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Value.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Add,
+                    Content = $"新增案件 {caseEntity.CaseNumber}",
+                });
+            }
+            scope.Complete();
+
             return _mapper.Map<CaseResponse>(caseEntity);
         }
 
@@ -435,7 +447,7 @@ namespace admin_backend.Services
             // 新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Edit,
                     Content = $"修改案件 {caseEntity.Id}",
@@ -464,7 +476,7 @@ namespace admin_backend.Services
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
-                await _operationLogService.Add(new AddOperationLogDto
+                await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Delete,
                     Content = $"刪除案件-{caseEntity.Id}",

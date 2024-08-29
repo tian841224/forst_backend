@@ -5,6 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace admin_backend.Entities
 {
+    /// <summary>
+    /// 常見病蟲害
+    /// </summary>
     public class CommonDamage : SortDefaultEntity
     {
         /// <summary>

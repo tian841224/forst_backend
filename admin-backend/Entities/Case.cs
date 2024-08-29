@@ -5,6 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace admin_backend.Entities
 {
+    /// <summary>
+    /// 案件
+    /// </summary>
     public class Case : DefaultEntity
     {
         /// <summary>

@@ -3,6 +3,9 @@ using CommonLibrary.Extensions;
 
 namespace admin_backend.Interfaces
 {
+    /// <summary>
+    /// 案件
+    /// </summary>
     public interface ICaseService
     {
         /// <summary>取得單筆案件</summary>

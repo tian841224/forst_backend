@@ -24,11 +24,11 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
-        [Authorize]
-        public async Task<IActionResult> Get(int id)
+        [HttpGet("{account}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Get(string account)
         {
-            return Ok(await _userService.Get(id));
+            return Ok(await _userService.Get(account));
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Add(AddUserDto dto)
         {
             return Ok(await _userService.Add(dto));

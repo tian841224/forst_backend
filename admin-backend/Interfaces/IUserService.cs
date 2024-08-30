@@ -10,7 +10,7 @@ namespace admin_backend.Interfaces
     public interface IUserService
     {
         /// <summary> 取得單筆會員 </summary>
-        Task<UserResponse> Get(int Id);
+        Task<UserResponse> Get(string account);
 
         /// <summary> 取得會員 </summary>
         Task<PagedResult<UserResponse>> Get(GetUserDto dto);

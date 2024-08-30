@@ -40,10 +40,10 @@ namespace admin_backend.Services
         }
 
 
-        public async Task<UserResponse> Get(int Id)
+        public async Task<UserResponse> Get(string account)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            var user = await _context.User.FirstOrDefaultAsync(x => x.Id == Id);
+            var user = await _context.User.FirstOrDefaultAsync(x => x.Account == account);
             return _mapper.Map<UserResponse>(user);
         }
 

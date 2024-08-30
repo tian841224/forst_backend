@@ -125,7 +125,12 @@ namespace admin_backend.Services
             //    );
             //}
 
-            if(dto.CaseNumber.HasValue)
+            if (dto.AdminUserId.HasValue)
+            {
+                caseEntity = caseEntity.Where(x => x.AdminUserId == dto.AdminUserId.Value);
+            }
+
+            if (dto.CaseNumber.HasValue)
             {
                 caseEntity = caseEntity.Where(x => x.CaseNumber == dto.CaseNumber.Value);
             }

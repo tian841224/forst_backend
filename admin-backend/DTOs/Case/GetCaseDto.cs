@@ -13,6 +13,11 @@ namespace admin_backend.DTOs.Case
         //public string? Keyword { get; set; } = string.Empty;
 
         /// <summary>
+        /// 指派人ID
+        /// </summary>
+        public int? AdminUserId { get; set; }
+
+        /// <summary>
         /// 案件編號
         /// </summary>
         public int? CaseNumber { get; set; }

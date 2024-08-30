@@ -1,4 +1,5 @@
 ﻿using admin_backend.DTOs.Case;
+using admin_backend.DTOs.CaseDiagnosisResult;
 using admin_backend.DTOs.CommonDamage;
 using admin_backend.DTOs.ForestDiseasePublications;
 using admin_backend.Entities;
@@ -35,21 +36,31 @@ namespace admin_backend.Extensions
 
                 if (dtoType != null)
                 {
-                    CreateMap(entityType, dtoType).ReverseMap();
+                    var map = CreateMap(entityType, dtoType)
+                        .ReverseMap();
+
+                    //忽略映射File和Photo
+                    var properties = dtoType.GetProperties()
+                        .Where(p => p.Name == "File" || p.Name == "Photo");
+
+                    foreach (var property in properties)
+                    {
+                        map.ForMember(property.Name, opt => opt.Ignore());
+                    }
                 }
             }
 
             //忽略File
             CreateMap<ForestDiseasePublications, ForestDiseasePublicationsResponse>()
-             .ForMember(dest => dest.File, opt => opt.Ignore())
-             .IgnoreAllPropertiesWithAnInaccessibleSetter()
-             .IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
+                 .ForMember(dest => dest.File, opt => opt.Ignore())
+                 .IgnoreAllPropertiesWithAnInaccessibleSetter()
+                 .IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
 
             //忽略File
             CreateMap<CommonDamage, CommonDamageResponse>()
-             .ForMember(dest => dest.Photo, opt => opt.Ignore())
-             .ForMember(dest => dest.DamageClassName, opt => opt.Ignore())
-             .ForMember(dest => dest.DamageTypeName, opt => opt.Ignore());
+                 .ForMember(dest => dest.Photo, opt => opt.Ignore())
+                 .ForMember(dest => dest.DamageClassName, opt => opt.Ignore())
+                 .ForMember(dest => dest.DamageTypeName, opt => opt.Ignore());
 
             CreateMap<Case, CaseResponse>()
                 .ForMember(dest => dest.Photo, opt => opt.Ignore());

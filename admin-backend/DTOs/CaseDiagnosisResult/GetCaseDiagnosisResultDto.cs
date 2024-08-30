@@ -1,5 +1,4 @@
-﻿using admin_backend.Enums;
-using CommonLibrary.DTOs;
+﻿using CommonLibrary.DTOs;
 
 namespace admin_backend.DTOs.CaseDiagnosisResult
 {

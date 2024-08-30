@@ -1,7 +1,7 @@
-﻿using admin_backend.Enums;
+﻿using admin_backend.DTOs.CaseDiagnosisResult;
+using admin_backend.Enums;
 using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -189,13 +189,13 @@ namespace admin_backend.DTOs.Case
         /// 樹木高度
         /// </summary>
         [Required]
-        public string TreeHeight { get; set; } = string.Empty ;
+        public string TreeHeight { get; set; } = string.Empty;
 
         /// <summary>
         /// 樹木直徑
         /// </summary>
         [Required]
-        public string TreeDiameter { get; set; } = string.Empty ;
+        public string TreeDiameter { get; set; } = string.Empty;
 
         /// <summary>
         /// 現地種植時間
@@ -247,5 +247,10 @@ namespace admin_backend.DTOs.Case
         /// 案件狀態
         /// </summary>
         public string CaseStatusName => CaseStatus.GetDescription();
+
+        /// <summary>
+        /// 案件回覆
+        /// </summary>
+        public CaseDiagnosisResultResponse? CaseDiagnosisResultResponse { get; set; }
     }
 }

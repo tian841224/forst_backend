@@ -31,5 +31,6 @@ namespace admin_backend.Data
         public DbSet<ForestDiseasePublications> ForestDiseasePublications { get; set; }
         public DbSet<CommonDamage> CommonDamage { get; set; }
         public DbSet<Case> Case { get; set; }
+        public DbSet<CaseDiagnosisResult> CaseDiagnosisResult { get; set; }
     }
 }

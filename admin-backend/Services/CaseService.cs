@@ -1,5 +1,6 @@
 ﻿using admin_backend.Data;
 using admin_backend.DTOs.Case;
+using admin_backend.DTOs.CaseDiagnosisResult;
 using admin_backend.DTOs.OperationLog;
 using admin_backend.Entities;
 using admin_backend.Enums;
@@ -20,14 +21,16 @@ namespace admin_backend.Services
         private readonly IMapper _mapper;
         private readonly Lazy<IFileService> _fileService;
         private readonly Lazy<IOperationLogService> _operationLogService;
+        private readonly ICaseDiagnosisResultService _caseDiagnosisResultService;
 
-        public CaseService(ILogger<CaseService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, Lazy<IOperationLogService> operationLogService)
+        public CaseService(ILogger<CaseService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, Lazy<IOperationLogService> operationLogService, ICaseDiagnosisResultService caseDiagnosisResultService)
         {
             _log = log;
             _contextFactory = contextFactory;
             _mapper = mapper;
             _fileService = fileService;
             _operationLogService = operationLogService;
+            _caseDiagnosisResultService = caseDiagnosisResultService;
         }
 
         public async Task<CaseResponse> Get(int Id)
@@ -54,6 +57,8 @@ namespace admin_backend.Services
             var user = await _context.User.FirstOrDefaultAsync(x => x.Id == caseEntity.UserId) ?? new User();
             var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == caseEntity.AdminUserId);
             var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.Id == caseEntity.ForestCompartmentLocationId) ?? new ForestCompartmentLocation();
+            //案件回覆
+            var caseDiagnosisResult = (await _caseDiagnosisResultService.Get(new GetCaseDiagnosisResultDto { CaseId = caseEntity .Id})).Items.FirstOrDefault();
 
             var result = new CaseResponse
             {
@@ -102,6 +107,7 @@ namespace admin_backend.Services
                 LocationType = caseEntity.LocationType,
                 BaseCondition = caseEntity.BaseCondition,
                 Photo = fileList,
+                CaseDiagnosisResultResponse = caseDiagnosisResult ,
                 CaseStatus = caseEntity.CaseStatus,
             };
 
@@ -171,6 +177,8 @@ namespace admin_backend.Services
                 var user = await _context.User.FirstOrDefaultAsync(x => x.Id == item.UserId) ?? new User();
                 var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == item.AdminUserId) ?? new AdminUser();
                 var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.Id == item.ForestCompartmentLocationId) ?? new ForestCompartmentLocation();
+                //案件回覆
+                var caseDiagnosisResult = (await _caseDiagnosisResultService.Get(new GetCaseDiagnosisResultDto { CaseId = item.Id })).Items.FirstOrDefault();
 
                 result.Add(new CaseResponse
                 {
@@ -219,6 +227,7 @@ namespace admin_backend.Services
                     LocationType = item.LocationType,
                     BaseCondition = item.BaseCondition,
                     Photo = fileList,
+                    CaseDiagnosisResultResponse = caseDiagnosisResult,
                     CaseStatus = item.CaseStatus,
                 });
             }

@@ -60,20 +60,23 @@ namespace admin_backend.Services
 
         public async Task<PagedResult<CaseDiagnosisResultResponse>> Get(GetCaseDiagnosisResultDto dto)
         {
-            await using var _context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<CaseDiagnosisResult> caseDiagnoses = _context.CaseDiagnosisResult;
+            var query = context.CaseDiagnosisResult
+                .AsNoTracking()
+                .AsQueryable();
 
             if (dto.CaseId.HasValue)
             {
-                caseDiagnoses = caseDiagnoses.Where(x => x.CaseId == dto.CaseId.Value);
+                query = query.Where(x => x.CaseId == dto.CaseId.Value);
             }
 
             if (dto.CommonDamageId.HasValue)
             {
-                caseDiagnoses = caseDiagnoses.Where(x => x.CommonDamageId == dto.CommonDamageId.Value);
+                query = query.Where(x => x.CommonDamageId == dto.CommonDamageId.Value);
             }
 
+            var caseDiagnoses = await query.ToListAsync();
             var caseDiagnosisResultResponse = _mapper.Map<List<CaseDiagnosisResultResponse>>(caseDiagnoses);
 
 
@@ -81,12 +84,14 @@ namespace admin_backend.Services
             {
                 var commonDamage = (await _commonDamageService.Get(caseDto.CommonDamageId)).Items.FirstOrDefault();
 
-
                 caseDto.CommonDamageName = commonDamage?.Name;
                 caseDto.DamageClassName = commonDamage?.DamageClassName;
                 caseDto.DamageTypeName = commonDamage?.DamageTypeName;
-            }
 
+                var caseDiagnosis = caseDiagnoses.FirstOrDefault(x => x.Id == caseDto.Id);
+                caseDto.SubmissionMethod = caseDiagnosis?.SubmissionMethod;
+                caseDto.DiagnosisMethod = caseDiagnosis?.DiagnosisMethod;
+            }
             return caseDiagnosisResultResponse.GetPaged(dto.Page);
         }
 
@@ -165,13 +170,30 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.ScientificName))
                 caseDiagnosis.ScientificName = dto.ScientificName;
 
-            if (!string.IsNullOrEmpty(dto.ReturnReason))
-                caseDiagnosis.ReturnReason = dto.ReturnReason;
-
-            if (!string.IsNullOrEmpty(dto.ReportingSuggestion))
-                caseDiagnosis.ReportingSuggestion = dto.ReportingSuggestion;
-
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            //若被退回則修改案件狀態
+            if (!string.IsNullOrEmpty(dto.ReturnReason))
+            {
+                caseDiagnosis.ReturnReason = dto.ReturnReason;
+                var caseEntity = await _context.Case.FirstOrDefaultAsync(x => x.Id == caseDiagnosis.CaseId);
+                if (caseEntity != null)
+                {
+                    caseEntity.CaseStatus = CaseStatusEnum.Return;
+                    _context.Case.Update(caseEntity);
+
+                    // 新增操作紀錄
+                    if (await _context.SaveChangesAsync() > 0)
+                    {
+                        await _operationLogService.Value.Add(new AddOperationLogDto
+                        {
+                            Type = ChangeTypeEnum.Edit,
+                            Content = $"修改案件狀態 {caseEntity.Id}-{caseEntity.CaseStatus}",
+                        });
+                    }
+                    scope.Complete();
+                }
+            }
 
             _context.CaseDiagnosisResult.Update(caseDiagnosis);
 

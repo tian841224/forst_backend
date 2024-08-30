@@ -168,6 +168,9 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.ReturnReason))
                 caseDiagnosis.ReturnReason = dto.ReturnReason;
 
+            if (!string.IsNullOrEmpty(dto.ReportingSuggestion))
+                caseDiagnosis.ReportingSuggestion = dto.ReportingSuggestion;
+
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             _context.CaseDiagnosisResult.Update(caseDiagnosis);

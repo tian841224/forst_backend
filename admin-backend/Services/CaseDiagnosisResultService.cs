@@ -89,8 +89,8 @@ namespace admin_backend.Services
                 caseDto.DamageTypeName = commonDamage?.DamageTypeName;
 
                 var caseDiagnosis = caseDiagnoses.FirstOrDefault(x => x.Id == caseDto.Id);
-                caseDto.SubmissionMethod = caseDiagnosis?.SubmissionMethod;
-                caseDto.DiagnosisMethod = caseDiagnosis?.DiagnosisMethod;
+                caseDto.SubmissionMethod = caseDiagnosis?.SubmissionMethod ?? new List<SubmissionMethodEnum>();
+                caseDto.DiagnosisMethod = caseDiagnosis?.DiagnosisMethod ?? new List<DiagnosisMethodEnum>();
             }
             return caseDiagnosisResultResponse.GetPaged(dto.Page);
         }
@@ -191,7 +191,6 @@ namespace admin_backend.Services
                             Content = $"修改案件狀態 {caseEntity.Id}-{caseEntity.CaseStatus}",
                         });
                     }
-                    scope.Complete();
                 }
             }
 

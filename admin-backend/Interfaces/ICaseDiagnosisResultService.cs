@@ -1,4 +1,5 @@
-﻿using admin_backend.DTOs.CaseDiagnosisResult;
+﻿using admin_backend.DTOs.Case;
+using admin_backend.DTOs.CaseDiagnosisResult;
 using CommonLibrary.Extensions;
 
 namespace admin_backend.Interfaces
@@ -19,6 +20,9 @@ namespace admin_backend.Interfaces
 
         /// <summary>修改案件回覆</summary>
         Task<CaseDiagnosisResultResponse> Update(int Id, UpdateCaseDiagnosisResultDto dto);
+
+        /// <summary>上傳圖片</summary>
+        Task<List<CaseFileDto>> UploadPhoto(List<IFormFile> photo);
 
         /// <summary>刪除案件回覆</summary>
         Task<CaseDiagnosisResultResponse> Delete(int Id);

@@ -1,5 +1,6 @@
 ﻿using admin_backend.DTOs.CaseDiagnosisResult;
 using admin_backend.Interfaces;
+using admin_backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,6 +61,17 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Update(int id, UpdateCaseDiagnosisResultDto dto)
         {
             return Ok(await _caseDiagnosisResultService.Update(id, dto));
+        }
+
+        /// <summary>
+        /// 上傳檔案
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> UploadPhoto(List<IFormFile> photo)
+        {
+            return Ok(await _caseDiagnosisResultService.UploadPhoto(photo));
         }
 
         /// <summary>

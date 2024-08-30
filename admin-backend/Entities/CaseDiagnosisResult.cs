@@ -77,12 +77,12 @@ namespace admin_backend.Entities
         [Required]
         public string ReportingSuggestion { get; set; } = string.Empty;
 
-        /// <summary>
-        /// 呈報建議圖片
-        /// </summary>
-        [Comment("呈報建議圖片")]
-        [Required]
-        public string ReportingSuggestionPhoto { get; set; } = string.Empty;
+        ///// <summary>
+        ///// 呈報建議圖片
+        ///// </summary>
+        //[Comment("呈報建議圖片")]
+        //[Required]
+        //public string ReportingSuggestionPhoto { get; set; } = string.Empty;
 
         /// <summary>
         /// 退回原因
@@ -93,14 +93,7 @@ namespace admin_backend.Entities
         [ForeignKey("CaseId")]
         public virtual Case Case { get; set; } = null!;
 
-        [ForeignKey("AdminUserId")]
-        public virtual AdminUser AdminUser { get; set; } = null!;
-
-        [ForeignKey("UserId")]
-        public virtual User User { get; set; } = null!;
-
         [ForeignKey("CommonDamageId")]
         public virtual CommonDamage CommonDamage { get; set; } = null!;
-
     }
 }

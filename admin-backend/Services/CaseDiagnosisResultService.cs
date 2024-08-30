@@ -1,4 +1,5 @@
 ﻿using admin_backend.Data;
+using admin_backend.DTOs.Case;
 using admin_backend.DTOs.CaseDiagnosisResult;
 using admin_backend.DTOs.OperationLog;
 using admin_backend.Entities;
@@ -6,6 +7,7 @@ using admin_backend.Enums;
 using admin_backend.Interfaces;
 using AutoMapper;
 using CommonLibrary.Extensions;
+using CommonLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 
@@ -20,13 +22,17 @@ namespace admin_backend.Services
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly Lazy<IOperationLogService> _operationLogService;
         private readonly IMapper _mapper;
+        private readonly Lazy<IFileService> _fileService;
+        private readonly ICommonDamageService _commonDamageService;
 
-        public CaseDiagnosisResultService(ILogger<CaseDiagnosisResultService> log, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService, IMapper mapper)
+        public CaseDiagnosisResultService(ILogger<CaseDiagnosisResultService> log, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService, IMapper mapper, Lazy<IFileService> fileService, ICommonDamageService commonDamageService)
         {
             _log = log;
             _contextFactory = contextFactory;
             _operationLogService = operationLogService;
             _mapper = mapper;
+            _fileService = fileService;
+            _commonDamageService = commonDamageService;
         }
 
         public async Task<CaseDiagnosisResultResponse> Get(int Id)
@@ -39,20 +45,15 @@ namespace admin_backend.Services
                 throw new ApiException($"找不到此案件回覆資料 - {Id}");
             }
 
-            var commonDamage = await _context.CommonDamage.FirstOrDefaultAsync(x => x.Id == caseDiagnosis.CommonDamageId);
-            var damageClass = new DamageClass();
-            var damageType = new DamageType();
-            if (commonDamage != null)
-            {
-                damageClass = await _context.DamageClass.FirstOrDefaultAsync(x => x.Id == commonDamage.DamageClassId);
-                damageType = await _context.DamageType.FirstOrDefaultAsync(x => x.Id == commonDamage.DamageTypeId);
-            }
-
+            var commonDamage = (await _commonDamageService.Get(caseDiagnosis.CommonDamageId)).Items.FirstOrDefault();
 
             var caseDiagnosisResultResponse = _mapper.Map<CaseDiagnosisResultResponse>(caseDiagnosis);
 
             caseDiagnosisResultResponse.CommonDamageName = commonDamage?.Name;
-            caseDiagnosisResultResponse.DamageClassName = damageClass?.Name;
+            caseDiagnosisResultResponse.DamageClassName = commonDamage?.DamageClassName;
+            caseDiagnosisResultResponse.DamageTypeName = commonDamage?.DamageTypeName;
+            caseDiagnosisResultResponse.SubmissionMethod = caseDiagnosis.SubmissionMethod;
+            caseDiagnosisResultResponse.DiagnosisMethod = caseDiagnosis.DiagnosisMethod;
 
             return caseDiagnosisResultResponse;
         }
@@ -78,17 +79,12 @@ namespace admin_backend.Services
 
             foreach (var caseDto in caseDiagnosisResultResponse)
             {
-                var commonDamage = await _context.CommonDamage.FirstOrDefaultAsync(x => x.Id == caseDto.CommonDamageId);
-                var damageClass = new DamageClass();
-                var damageType = new DamageType();
-                if (commonDamage != null)
-                {
-                    damageClass = await _context.DamageClass.FirstOrDefaultAsync(x => x.Id == commonDamage.DamageClassId);
-                    damageType = await _context.DamageType.FirstOrDefaultAsync(x => x.Id == commonDamage.DamageTypeId);
-                }
+                var commonDamage = (await _commonDamageService.Get(caseDto.CommonDamageId)).Items.FirstOrDefault();
+
 
                 caseDto.CommonDamageName = commonDamage?.Name;
-                caseDto.DamageClassName = damageClass?.Name;
+                caseDto.DamageClassName = commonDamage?.DamageClassName;
+                caseDto.DamageTypeName = commonDamage?.DamageTypeName;
             }
 
             return caseDiagnosisResultResponse.GetPaged(dto.Page);
@@ -133,7 +129,7 @@ namespace admin_backend.Services
             }
             scope.Complete();
 
-            return _mapper.Map<CaseDiagnosisResultResponse>(caseEntity);
+            return _mapper.Map<CaseDiagnosisResultResponse>(caseDiagnosisResult);
         }
 
         public async Task<CaseDiagnosisResultResponse> Update(int Id, UpdateCaseDiagnosisResultDto dto)
@@ -188,6 +184,22 @@ namespace admin_backend.Services
             scope.Complete();
 
             return _mapper.Map<CaseDiagnosisResultResponse>(caseDiagnosis);
+        }
+
+        public async Task<List<CaseFileDto>> UploadPhoto(List<IFormFile> photo)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            var fileUploadList = new List<CaseFileDto> { };
+
+            foreach (var file in photo)
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
+                fileUploadList.Add(new CaseFileDto { File = _fileService.Value.GetFile(fileName, "image") });
+            }
+
+            return fileUploadList;
         }
 
         public async Task<CaseDiagnosisResultResponse> Delete(int Id)

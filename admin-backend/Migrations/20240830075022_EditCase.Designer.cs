@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using admin_backend.Data;
 
@@ -10,9 +11,11 @@ using admin_backend.Data;
 namespace CommonLibrary.Migrations
 {
     [DbContext(typeof(MysqlDbContext))]
-    partial class MysqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240830075022_EditCase")]
+    partial class EditCase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,7 +69,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("AdminUserId");
 
-                    b.ToTable("AdSetting", (string)null);
+                    b.ToTable("AdSetting");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.AdminUser", b =>
@@ -130,7 +133,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AdminUser", (string)null);
+                    b.ToTable("AdminUser");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.Case", b =>
@@ -320,7 +323,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Case", (string)null);
+                    b.ToTable("Case");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.CaseDiagnosisResult", b =>
@@ -393,7 +396,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("CommonDamageId");
 
-                    b.ToTable("CaseDiagnosisResult", (string)null);
+                    b.ToTable("CaseDiagnosisResult");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.CommonDamage", b =>
@@ -459,7 +462,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("DamageTypeId");
 
-                    b.ToTable("CommonDamage", (string)null);
+                    b.ToTable("CommonDamage");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.CommonPest", b =>
@@ -526,7 +529,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("DamageTypeId");
 
-                    b.ToTable("CommonPest", (string)null);
+                    b.ToTable("CommonPest");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.DamageClass", b =>
@@ -563,7 +566,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("DamageTypeId");
 
-                    b.ToTable("DamageClass", (string)null);
+                    b.ToTable("DamageClass");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.DamageType", b =>
@@ -598,7 +601,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DamageType", (string)null);
+                    b.ToTable("DamageType");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.Documentation", b =>
@@ -628,7 +631,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Documentation", (string)null);
+                    b.ToTable("Documentation");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.EpidemicSummary", b =>
@@ -659,7 +662,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EpidemicSummary", (string)null);
+                    b.ToTable("EpidemicSummary");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.FAQ", b =>
@@ -704,7 +707,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("AdminUserId");
 
-                    b.ToTable("FAQ", (string)null);
+                    b.ToTable("FAQ");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.ForestCompartmentLocation", b =>
@@ -741,7 +744,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ForestCompartmentLocation", (string)null);
+                    b.ToTable("ForestCompartmentLocation");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.ForestDiseasePublications", b =>
@@ -805,7 +808,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ForestDiseasePublications", (string)null);
+                    b.ToTable("ForestDiseasePublications");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.Log", b =>
@@ -835,7 +838,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Log", (string)null);
+                    b.ToTable("Log");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.MailConfig", b =>
@@ -886,7 +889,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MailConfig", (string)null);
+                    b.ToTable("MailConfig");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.News", b =>
@@ -952,7 +955,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("AdminUserId");
 
-                    b.ToTable("News", (string)null);
+                    b.ToTable("News");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.OperationLog", b =>
@@ -997,7 +1000,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("AdminUserId");
 
-                    b.ToTable("OperationLog", (string)null);
+                    b.ToTable("OperationLog");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.Permission", b =>
@@ -1028,7 +1031,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permission", (string)null);
+                    b.ToTable("Permission");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.Role", b =>
@@ -1054,7 +1057,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.RolePermission", b =>
@@ -1107,7 +1110,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RolePermission", (string)null);
+                    b.ToTable("RolePermission");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.TreeBasicInfo", b =>
@@ -1144,7 +1147,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TreeBasicInfo", (string)null);
+                    b.ToTable("TreeBasicInfo");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.User", b =>
@@ -1188,7 +1191,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.AdSetting", b =>

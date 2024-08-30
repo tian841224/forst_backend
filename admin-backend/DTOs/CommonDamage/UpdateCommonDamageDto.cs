@@ -1,4 +1,5 @@
-﻿using admin_backend.Enums;
+﻿using admin_backend.DTOs.DamageType;
+using admin_backend.Enums;
 
 namespace admin_backend.DTOs.CommonDamage
 {
@@ -34,10 +35,10 @@ namespace admin_backend.DTOs.CommonDamage
         /// </summary>
         public string? Suggestions { get; set; } = string.Empty;
 
-        ///// <summary>
-        ///// 病蟲封面照片
-        ///// </summary>
-        //public List<IFormFile>? File { get; set; }
+        /// <summary>
+        /// 病蟲封面照片
+        /// </summary>
+        public List<CommonDamagePhotoDto>? File { get; set; }
 
         /// <summary>
         /// 狀態 0 = 關閉, 1 = 開啟

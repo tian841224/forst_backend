@@ -1,6 +1,7 @@
 ﻿using admin_backend.Data;
 using admin_backend.DTOs.CommonDamage;
 using admin_backend.DTOs.DamageType;
+using admin_backend.DTOs.ForestDiseasePublications;
 using admin_backend.DTOs.OperationLog;
 using admin_backend.Entities;
 using admin_backend.Enums;
@@ -172,16 +173,6 @@ namespace admin_backend.Services
             if (!damageType)
                 throw new ApiException($"此危害類型不存在-{dto.DamageTypeId}");
 
-            ////上傳圖片
-            //var fileUploadList = new List<string>();
-            //foreach (var file in dto.File)
-            //{
-            //    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Photo.FileName)}";
-            //    var fileUploadDto = await _fileService.Value.UploadFile(fileName, file.Photo);
-            //    fileUploadList.Add(fileName);
-            //}
-            //var jsonResult = JsonSerializer.Serialize(fileUploadList);
-
             //上傳圖片
             if (dto.File == null)
             {
@@ -193,8 +184,8 @@ namespace admin_backend.Services
             var id = 0;
             foreach (var file in dto.File)
             {
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Photo.FileName)}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file.Photo);
                 fileUploadList.Add(new CommonDamagePhotoResponse { Id = ++id, Sort = ++sort, File = fileName });
             }
 
@@ -301,23 +292,23 @@ namespace admin_backend.Services
                 commonDamage.Status = dto.Status.Value;
             }
 
-            ////上傳圖片
-            //if (dto.File == null)
-            //{
-            //    throw new ApiException($"請上傳檔案");
-            //}
+            //上傳圖片
+            if (dto.File == null)
+            {
+                throw new ApiException($"請上傳檔案");
+            }
 
-            //var fileUploadList = new List<CommonDamagePhotoResponse>();
-            //var sort = 0;
-            //foreach (var file in dto.File)
-            //{
-            //    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Photo.FileName)}";
-            //    var fileUploadDto = await _fileService.Value.UploadFile(fileName, file.Photo);
-            //    fileUploadList.Add(new CommonDamagePhotoResponse { Sort = ++sort, File = fileName });
-            //}
+            var fileUploadList = new List<ForestDiseasePublicationsFileDto>();
+            var id = 0;
+            foreach (var file in dto.File)
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Photo.FileName)}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file.Photo);
+                fileUploadList.Add(new ForestDiseasePublicationsFileDto { Id = ++id, File = fileName });
+            }
 
-            //var jsonResult = JsonSerializer.Serialize(fileUploadList);
-            //commonDamage.Photo = jsonResult;
+            var jsonResult = JsonSerializer.Serialize(fileUploadList);
+            commonDamage.Photo = jsonResult;
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 

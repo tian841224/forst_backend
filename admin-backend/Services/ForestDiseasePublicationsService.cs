@@ -11,7 +11,6 @@ using CommonLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Transactions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace admin_backend.Services
 {
@@ -101,7 +100,7 @@ namespace admin_backend.Services
                 );
             }
 
-            if(dto.Type.HasValue)
+            if (dto.Type.HasValue)
             {
                 forestDiseasePublications = forestDiseasePublications.Where(x => x.Type == dto.Type.Value);
             }

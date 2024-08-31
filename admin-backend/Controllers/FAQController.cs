@@ -28,7 +28,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(int id)
         {
             return Ok(await fAQService.Get(id));

@@ -26,7 +26,7 @@ namespace admin_backend.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(int id)
         {
             return Ok(await _adSettingService.Get(id));

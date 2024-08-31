@@ -25,7 +25,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(int id)
         {
             return Ok(await _treeBasicInfoService.Get(id));
@@ -37,7 +37,7 @@ namespace admin_backend.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll(PagedOperationDto? dto = null)
         {
             return Ok(await _treeBasicInfoService.Get(dto: dto));
@@ -48,7 +48,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(GetTreeBasicInfoDto dto)
         {
             return Ok(await _treeBasicInfoService.Get(dto));

@@ -23,7 +23,7 @@ namespace admin_backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Get()
         {
             return Ok(await _documentationService.Get());

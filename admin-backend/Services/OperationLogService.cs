@@ -47,8 +47,14 @@ namespace admin_backend.Services
                 if (adminUser.Items.Any())
                 {
                     var adminUserIds = adminUser.Items.Select(y => y.Id).ToList();
-                    operationLog = operationLog.Where(x => adminUserIds.Contains(x.AdminUserId));
+                    operationLog = operationLog.Where(x => x.AdminUserId.HasValue && adminUserIds.Contains(x.AdminUserId.Value));
                 }
+
+                if (dto.AdminUserId.HasValue)
+                {
+                    operationLog = operationLog.Where(x => x.AdminUserId == dto.AdminUserId);
+                }
+
             }
 
             if (dto.AdminUserId.HasValue)
@@ -71,22 +77,22 @@ namespace admin_backend.Services
                 operationLog = operationLog.Where(x => x.CreateTime < dto.EndTime);
             }
 
-            foreach (var x in operationLog)
+            foreach (var item in await operationLog.ToListAsync())
             {
-                var adminUser = (await _adminUserServices.Get(new GetAdminUserDto { Id = x.AdminUserId })).Items.FirstOrDefault();
-                if (adminUser != null)
+                var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == item.AdminUserId);
+                var user = await _context.User.FirstOrDefaultAsync(x => x.Id == item.UserId);
+
+                result.Add(new OperationLogResponse
                 {
-                    var name = adminUser.Name;
-                    result.Add(new OperationLogResponse
-                    {
-                        AdminUserId = x.AdminUserId,
-                        AdminUserIdName = name,
-                        Type = x.Type.GetDisplayName(),
-                        Content = x.Content,
-                        Ip = x.Ip,
-                        Id = x.Id,
-                    });
-                }
+                    AdminUserId = item.AdminUserId,
+                    AdminUserIdName = adminUser?.Name,
+                    UserId = item.UserId,
+                    UserIdName = user?.Name,
+                    Type = item.Type.GetDisplayName(),
+                    Content = item.Content,
+                    Ip = item.Ip,
+                    Id = item.Id,
+                });
             }
             return result.GetPaged(dto.Page!);
         }
@@ -102,12 +108,18 @@ namespace admin_backend.Services
 
             var claimsDto = _identityService.Value.GetUser();
 
-            int.TryParse(claimsDto.UserId, out int AdminUserId);
+            int AdminUserId = 0, UserId = 0;
+         
+            if(claimsDto.RoleId == "99")
+                int.TryParse(claimsDto.UserId, out  UserId);
+            else
+                int.TryParse(claimsDto.UserId, out AdminUserId);
 
             //新增操作紀錄
             await _context.OperationLog.AddAsync(new OperationLog
             {
                 AdminUserId = AdminUserId,
+                UserId = UserId,
                 Type = dto.Type,
                 Content = dto.Content,
                 Ip = ipAddress!.ToString() ?? string.Empty,

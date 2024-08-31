@@ -144,6 +144,7 @@ namespace admin_backend.Services
                 //RefreshToken = refreshToken,
                 Claims = new ClaimDto
                 {
+                    RoleId = "99",
                     UserNane = user.Name,
                     Account = user.Account,
                 }

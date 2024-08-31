@@ -7,12 +7,22 @@ namespace admin_backend.DTOs.OperationLog
         /// <summary>
         /// 使用者ID
         /// </summary>
-        public int AdminUserId { get; set; }
+        public int? AdminUserId { get; set; }
 
         /// <summary>
         /// 使用者名稱
         /// </summary>
-        public string AdminUserIdName { get; set; } = string.Empty;
+        public string? AdminUserIdName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 使用者ID
+        /// </summary>
+        public int? UserId { get; set; }
+
+        /// <summary>
+        /// 使用者名稱
+        /// </summary>
+        public string? UserIdName { get; set; } = string.Empty;
 
         /// <summary>
         /// 異動類型 新增 = 1, 指派 = 2, 編輯 = 3, 刪除 = 4

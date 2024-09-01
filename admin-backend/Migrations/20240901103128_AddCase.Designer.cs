@@ -11,7 +11,7 @@ using admin_backend.Data;
 namespace CommonLibrary.Migrations
 {
     [DbContext(typeof(MysqlDbContext))]
-    [Migration("20240829102011_AddCase")]
+    [Migration("20240901103128_AddCase")]
     partial class AddCase
     {
         /// <inheritdoc />
@@ -136,7 +136,80 @@ namespace CommonLibrary.Migrations
                     b.ToTable("AdminUser");
                 });
 
-            modelBuilder.Entity("admin_backend.Entities.Case", b =>
+            modelBuilder.Entity("admin_backend.Entities.CaseDiagnosisResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("CaseId")
+                        .HasColumnType("int")
+                        .HasComment("案件編號");
+
+                    b.Property<int>("CommonDamageId")
+                        .HasColumnType("int")
+                        .HasComment("常見病蟲害");
+
+                    b.Property<DateTime>("CreateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasComment("建立日期");
+
+                    b.Property<string>("DiagnosisMethod")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("診斷方式");
+
+                    b.Property<string>("HarmPatternDescription")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("危害狀況詳細描述");
+
+                    b.Property<string>("OldCommonDamageName")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("危害病蟲名稱(舊)");
+
+                    b.Property<string>("PreventionSuggestion")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("防治建議");
+
+                    b.Property<string>("ReportingSuggestion")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("呈報建議");
+
+                    b.Property<string>("ReturnReason")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("退回原因");
+
+                    b.Property<string>("ScientificName")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("學名");
+
+                    b.Property<string>("SubmissionMethod")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("送件方式");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime(6)")
+                        .HasComment("更新時間");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
+
+                    b.HasIndex("CommonDamageId");
+
+                    b.ToTable("CaseDiagnosisResult");
+                });
+
+            modelBuilder.Entity("admin_backend.Entities.CaseRecord", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -150,6 +223,16 @@ namespace CommonLibrary.Migrations
                     b.Property<int?>("AdminUserId")
                         .HasColumnType("int")
                         .HasComment("指派人");
+
+                    b.Property<string>("ApplicantAccount")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("申請人帳號");
+
+                    b.Property<string>("ApplicantName")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("申請人姓名");
 
                     b.Property<DateTime>("ApplicationDate")
                         .HasColumnType("datetime(6)")
@@ -241,13 +324,9 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("longtext")
                         .HasComment("小班");
 
-                    b.Property<string>("LatitudeGoogle")
+                    b.Property<string>("Latitude")
                         .HasColumnType("longtext")
-                        .HasComment("緯度/Google");
-
-                    b.Property<string>("LatitudeTgos")
-                        .HasColumnType("longtext")
-                        .HasComment("緯度/TGOS");
+                        .HasComment("緯度");
 
                     b.Property<string>("LocalPlantingTime")
                         .HasColumnType("longtext")
@@ -258,13 +337,9 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("longtext")
                         .HasComment("立地種類 1 = 公園、校園, 人行道 = 2, 花台內 = 3, 建築周邊 = 4, 林地 = 5, 苗圃 = 6, 農地 = 7 , 空地 = 8");
 
-                    b.Property<string>("LongitudeGoogle")
+                    b.Property<string>("Longitude")
                         .HasColumnType("longtext")
-                        .HasComment("經度/Google");
-
-                    b.Property<string>("LongitudeTgos")
-                        .HasColumnType("longtext")
-                        .HasComment("經度/TGOS");
+                        .HasComment("經度");
 
                     b.Property<string>("Others")
                         .HasColumnType("longtext")
@@ -311,19 +386,13 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasComment("申請人");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ForestCompartmentLocationId");
 
                     b.HasIndex("TreeBasicInfoId");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Case");
+                    b.ToTable("CaseRecord");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.CommonDamage", b =>
@@ -1143,7 +1212,26 @@ namespace CommonLibrary.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("admin_backend.Entities.Case", b =>
+            modelBuilder.Entity("admin_backend.Entities.CaseDiagnosisResult", b =>
+                {
+                    b.HasOne("admin_backend.Entities.CaseRecord", "Case")
+                        .WithMany()
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("admin_backend.Entities.CommonDamage", "CommonDamage")
+                        .WithMany()
+                        .HasForeignKey("CommonDamageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Case");
+
+                    b.Navigation("CommonDamage");
+                });
+
+            modelBuilder.Entity("admin_backend.Entities.CaseRecord", b =>
                 {
                     b.HasOne("admin_backend.Entities.ForestCompartmentLocation", "ForestCompartmentLocation")
                         .WithMany()
@@ -1157,17 +1245,9 @@ namespace CommonLibrary.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("admin_backend.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("ForestCompartmentLocation");
 
                     b.Navigation("TreeBasicInfo");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("admin_backend.Entities.CommonDamage", b =>

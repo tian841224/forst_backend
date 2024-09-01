@@ -13,14 +13,15 @@ namespace CommonLibrary.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Case",
+                name: "CaseRecord",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     CaseNumber = table.Column<int>(type: "int", nullable: false, comment: "案件編號"),
                     AdminUserId = table.Column<int>(type: "int", nullable: true, comment: "指派人"),
-                    UserId = table.Column<int>(type: "int", nullable: false, comment: "申請人"),
+                    ApplicantAccount = table.Column<string>(type: "longtext", nullable: false, comment: "申請人帳號"),
+                    ApplicantName = table.Column<string>(type: "longtext", nullable: false, comment: "申請人姓名"),
                     ApplicationDate = table.Column<DateTime>(type: "datetime(6)", nullable: false, comment: "申請日期"),
                     UnitName = table.Column<string>(type: "longtext", nullable: true, comment: "單位名稱"),
                     County = table.Column<string>(type: "longtext", nullable: false, comment: "聯絡人縣市"),
@@ -35,10 +36,8 @@ namespace CommonLibrary.Migrations
                     ForestCompartmentLocationId = table.Column<int>(type: "int", nullable: false, comment: "林班位置"),
                     ForestSection = table.Column<string>(type: "longtext", nullable: true, comment: "林班"),
                     ForestSubsection = table.Column<string>(type: "longtext", nullable: true, comment: "小班"),
-                    LatitudeTgos = table.Column<string>(type: "longtext", nullable: true, comment: "緯度/TGOS"),
-                    LatitudeGoogle = table.Column<string>(type: "longtext", nullable: true, comment: "緯度/Google"),
-                    LongitudeTgos = table.Column<string>(type: "longtext", nullable: true, comment: "經度/TGOS"),
-                    LongitudeGoogle = table.Column<string>(type: "longtext", nullable: true, comment: "經度/Google"),
+                    Latitude = table.Column<string>(type: "longtext", nullable: true, comment: "緯度"),
+                    Longitude = table.Column<string>(type: "longtext", nullable: true, comment: "經度"),
                     DamagedArea = table.Column<decimal>(type: "decimal(18,2)", nullable: true, comment: "受損面積"),
                     DamagedCount = table.Column<int>(type: "int", nullable: true, comment: "受損數量"),
                     PlantedArea = table.Column<decimal>(type: "decimal(18,2)", nullable: true, comment: "種植面積"),
@@ -62,49 +61,38 @@ namespace CommonLibrary.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Case", x => x.Id);
+                    table.PrimaryKey("PK_CaseRecord", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Case_ForestCompartmentLocation_ForestCompartmentLocationId",
+                        name: "FK_CaseRecord_ForestCompartmentLocation_ForestCompartmentLocati~",
                         column: x => x.ForestCompartmentLocationId,
                         principalTable: "ForestCompartmentLocation",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Case_TreeBasicInfo_TreeBasicInfoId",
+                        name: "FK_CaseRecord_TreeBasicInfo_TreeBasicInfoId",
                         column: x => x.TreeBasicInfoId,
                         principalTable: "TreeBasicInfo",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Case_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
-
+          
             migrationBuilder.CreateIndex(
-                name: "IX_Case_ForestCompartmentLocationId",
-                table: "Case",
+                name: "IX_CaseRecord_ForestCompartmentLocationId",
+                table: "CaseRecord",
                 column: "ForestCompartmentLocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Case_TreeBasicInfoId",
-                table: "Case",
+                name: "IX_CaseRecord_TreeBasicInfoId",
+                table: "CaseRecord",
                 column: "TreeBasicInfoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Case_UserId",
-                table: "Case",
-                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Case");
+                name: "CaseRecord");
         }
     }
 }

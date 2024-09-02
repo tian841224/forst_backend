@@ -1,5 +1,6 @@
 ﻿using admin_backend.DTOs.Case;
 using admin_backend.Interfaces;
+using admin_backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,6 +63,17 @@ namespace admin_backend.Controllers
             return Ok(await _caseService.Update(id, dto));
         }
 
+        /// <summary>
+        /// 上傳檔案
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UploadFile(int id, List<IFormFile> file)
+        {
+            return Ok(await _caseService.UploadFile(id, file));
+        }
+
         ///// <summary>
         ///// 更新危害類型排序
         ///// </summary>
@@ -84,6 +96,20 @@ namespace admin_backend.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             return Ok(await _caseService.Delete(id));
+        }
+
+        /// <summary>
+        /// 刪除案件檔案
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="fileId"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteFile(int id, int fileId)
+        {
+            await _caseService.DeleteFile(id, fileId);
+            return Ok();
         }
     }
 }

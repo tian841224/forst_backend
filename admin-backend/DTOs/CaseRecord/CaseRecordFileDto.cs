@@ -2,7 +2,7 @@
 {
     public class CaseRecordFileDto
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
 
         public string File { get; set; } = string.Empty;
     }

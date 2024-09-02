@@ -22,5 +22,11 @@ namespace admin_backend.Interfaces
 
         /// <summary>刪除案件</summary>
         Task<CaseResponse> Delete(int Id);
+
+        /// <summary>修改案件檔案</summary>
+        Task<List<CaseRecordFileDto>> UploadFile(int Id, List<IFormFile> files);
+
+        /// <summary>刪除案件檔案</summary>
+        Task DeleteFile(int Id, int fileId);
     }
 }

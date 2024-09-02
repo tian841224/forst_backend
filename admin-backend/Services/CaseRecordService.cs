@@ -514,5 +514,98 @@ namespace admin_backend.Services
             scope.Complete();
             return _mapper.Map<CaseResponse>(caseEntity);
         }
+
+        public async Task<List<CaseRecordFileDto>> UploadFile(int Id, List<IFormFile> files)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            var caseRecord = await _context.CaseRecord.Where(x => x.Id == Id).FirstOrDefaultAsync();
+
+            if (caseRecord == null)
+            {
+                throw new ApiException($"找不到此資料-{Id}");
+            }
+
+            var fileUploadList = new List<CaseRecordFileDto> { };
+            var id = 0;
+
+            if (!string.IsNullOrEmpty(caseRecord.Photo))
+            {
+                var oldFile = JsonSerializer.Deserialize<List<CaseRecordFileDto>>(caseRecord.Photo) ?? new List<CaseRecordFileDto>();
+                fileUploadList.AddRange(oldFile);
+                id = oldFile.Select(x => x.Id).Max();
+            }
+
+            foreach (var file in files)
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
+                var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
+                fileUploadList.Add(new CaseRecordFileDto { Id = ++id, File = fileName });
+            }
+
+            var jsonResult = JsonSerializer.Serialize(fileUploadList);
+            caseRecord.Photo = jsonResult;
+
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            _context.CaseRecord.Update(caseRecord);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Value.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Edit,
+                    Content = $"修改案件附件{caseRecord.Id}",
+                });
+            }
+            scope.Complete();
+
+            return fileUploadList.Select(x => new CaseRecordFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File) }).ToList();
+        }
+
+        public async Task DeleteFile(int Id, int fileId)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+
+            var caseRecord = await _context.CaseRecord.Where(x => x.Id == Id).FirstOrDefaultAsync();
+
+            if (caseRecord == null)
+            {
+                throw new ApiException($"找不到此資料-{Id}");
+            }
+
+            var fileList = JsonSerializer.Deserialize<List<CaseRecordFileDto>>(caseRecord.Photo);
+            if (fileList!.Where(x => x.Id == fileId).Any())
+            {
+                var removeFile = fileList!.Where(_x => _x.Id == fileId).FirstOrDefault();
+                if (removeFile != null)
+                    fileList!.Remove(removeFile!);
+            }
+
+            if (fileList != null && fileList.Any())
+            {
+                var jsonResult = JsonSerializer.Serialize(fileList);
+                caseRecord.Photo = jsonResult;
+            }
+            else
+            {
+                caseRecord.Photo = string.Empty;
+            }
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            _context.CaseRecord.Update(caseRecord);
+
+            //新增操作紀錄
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await _operationLogService.Value.Add(new AddOperationLogDto
+                {
+                    Type = ChangeTypeEnum.Edit,
+                    Content = $"刪除案件附件-{caseRecord.Id}/{fileId}",
+                });
+            }
+            scope.Complete();
+        }
     }
 }

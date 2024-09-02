@@ -47,6 +47,16 @@ namespace admin_backend.Extensions
                     {
                         map.ForMember(property.Name, opt => opt.Ignore());
                     }
+
+                    // 為所有 DateTime 類型的屬性添加時區轉換
+                    var dateTimeProperties = dtoType.GetProperties()
+                        .Where(p => p.PropertyType == typeof(DateTime) || p.PropertyType == typeof(DateTime?));
+
+                    foreach (var property in dateTimeProperties)
+                    {
+                        map.ForMember(property.Name, opt => opt.MapFrom(src =>
+                            ConvertToTaipeiTime((DateTime)src.GetType().GetProperty(property.Name).GetValue(src))));
+                    }
                 }
             }
 
@@ -64,6 +74,13 @@ namespace admin_backend.Extensions
 
             CreateMap<CaseRecord, CaseResponse>()
                 .ForMember(dest => dest.Photo, opt => opt.Ignore());
+        }
+
+        private static readonly TimeZoneInfo TaipeiTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+
+        private DateTime ConvertToTaipeiTime(DateTime utcDateTime)
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TaipeiTimeZone);
         }
     }
 }

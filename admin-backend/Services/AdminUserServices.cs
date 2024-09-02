@@ -10,6 +10,7 @@ using CommonLibrary.Extensions;
 using CommonLibrary.Interfaces;
 using CommonLibrary.Services;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
@@ -60,35 +61,44 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            IQueryable<AdminUser> query = _context.AdminUser;
+            var query = from adminUser in _context.AdminUser
+                        join role in _context.Role on adminUser.RoleId equals role.Id into roleGroup
+                        from role in roleGroup.DefaultIfEmpty()
+                        select new
+                        {
+                            adminUser,
+                            role,
+                        };
+
 
             if (dto.Id.HasValue)
             {
-                query = query.Where(x => x.Id == dto.Id);
+                query = query.Where(x => x.adminUser.Id == dto.Id);
             }
 
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
                 string keyword = dto.Keyword.ToLower();
                 query = query.Where(x =>
-                    x.Account.ToLower().Contains(keyword) ||
-                    x.Password.ToLower().Contains(keyword) ||
-                    x.Email.ToLower().Contains(keyword) ||
-                    x.Name.ToLower().Contains(keyword)
+                    x.role.Name.ToLower().Contains(keyword) ||
+                    x.adminUser.Account.ToLower().Contains(keyword) ||
+                    x.adminUser.Email.ToLower().Contains(keyword) ||
+                    x.adminUser.Name.ToLower().Contains(keyword)
                 );
             }
 
             if (dto.RoleId.HasValue)
             {
-                query = query.Where(x => x.RoleId == dto.RoleId);
+                query = query.Where(x => x.adminUser.RoleId == dto.RoleId);
             }
 
             if (dto.Status.HasValue)
             {
-                query = query.Where(x => x.Status == dto.Status);
+                query = query.Where(x => x.adminUser.Status == dto.Status);
             }
 
-            var adminUserResponse = _mapper.Map<List<AdminUserResponse>>(query);
+            var adminUserList = await query.ToListAsync();
+            var adminUserResponse = _mapper.Map<List<AdminUserResponse>>(adminUserList.Select(x => x.adminUser));
 
             var tasks = adminUserResponse.Select(async x =>
             {

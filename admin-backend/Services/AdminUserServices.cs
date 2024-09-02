@@ -230,7 +230,7 @@ namespace admin_backend.Services
                         Content = $"­×§ï«á¥x±b¸¹±K½X-¿é¤J¿ù»~:{adminUser.Name}/{adminUser.Account}",
                         Ip = ipAddress.ToString(),
                     });
-                    throw new ApiException($"­ì±K½X¿é¤J¿ù»~-{Id}");
+                    throw new ApiException($"­ì±K½X¿é¤J¿ù»~");
                 }
 
                 adminUser.Password = dto.pKey;

@@ -99,15 +99,19 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var caseEntity = await _context.Case.FirstOrDefaultAsync(x => x.Id == dto.CaseId);
+            var caseEntity = await _context.CaseRecord.FirstOrDefaultAsync(x => x.Id == dto.CaseId);
             if (caseEntity == null)
                 throw new ApiException($"找不到案件-{dto.CaseId}");
+
+            var caseDiagnosisResult = await _context.CaseDiagnosisResult.FirstOrDefaultAsync(x => x.Id == dto.CaseId);
+            if (caseDiagnosisResult != null)
+                throw new ApiException($"此案件已回覆-案件編號:{dto.CaseId}/案件回覆編號:{caseDiagnosisResult.Id}");
 
             var commonDamage = await _context.CommonDamage.FirstOrDefaultAsync(x => x.Id == dto.CommonDamageId);
             if (commonDamage == null)
                 throw new ApiException($"找不到常見病蟲害-{dto.CommonDamageId}");
 
-            var caseDiagnosisResult = new CaseDiagnosisResult
+             caseDiagnosisResult = new CaseDiagnosisResult
             {
                 CaseId = dto.CaseId,
                 SubmissionMethod = dto.SubmissionMethod,
@@ -176,11 +180,11 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.ReturnReason))
             {
                 caseDiagnosis.ReturnReason = dto.ReturnReason;
-                var caseEntity = await _context.Case.FirstOrDefaultAsync(x => x.Id == caseDiagnosis.CaseId);
+                var caseEntity = await _context.CaseRecord.FirstOrDefaultAsync(x => x.Id == caseDiagnosis.CaseId);
                 if (caseEntity != null)
                 {
                     caseEntity.CaseStatus = CaseStatusEnum.Return;
-                    _context.Case.Update(caseEntity);
+                    _context.CaseRecord.Update(caseEntity);
 
                     // 新增操作紀錄
                     if (await _context.SaveChangesAsync() > 0)
@@ -210,17 +214,17 @@ namespace admin_backend.Services
             return _mapper.Map<CaseDiagnosisResultResponse>(caseDiagnosis);
         }
 
-        public async Task<List<CaseFileDto>> UploadPhoto(List<IFormFile> photo)
+        public async Task<List<CaseRecordFileDto>> UploadPhoto(List<IFormFile> photo)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var fileUploadList = new List<CaseFileDto> { };
+            var fileUploadList = new List<CaseRecordFileDto> { };
 
             foreach (var file in photo)
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
                 var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
-                fileUploadList.Add(new CaseFileDto { File = _fileService.Value.GetFile(fileName, "image") });
+                fileUploadList.Add(new CaseRecordFileDto { File = _fileService.Value.GetFile(fileName, "image") });
             }
 
             return fileUploadList;

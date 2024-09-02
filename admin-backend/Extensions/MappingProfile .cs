@@ -62,7 +62,7 @@ namespace admin_backend.Extensions
                  .ForMember(dest => dest.DamageClassName, opt => opt.Ignore())
                  .ForMember(dest => dest.DamageTypeName, opt => opt.Ignore());
 
-            CreateMap<Case, CaseResponse>()
+            CreateMap<CaseRecord, CaseResponse>()
                 .ForMember(dest => dest.Photo, opt => opt.Ignore());
         }
     }

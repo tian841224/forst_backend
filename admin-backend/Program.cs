@@ -70,7 +70,7 @@ try
     builder.Services.AddScoped<INewsService, NewsService>();
     builder.Services.AddScoped<IAdSettingService, AdSettingService>();
     builder.Services.AddScoped<ICommonServicecs, CommonServicecs>();
-    builder.Services.AddScoped<ICaseService, CaseService>();
+    builder.Services.AddScoped<ICaseRecordService, CaseRecordService>();
     builder.Services.AddScoped<ICaseDiagnosisResultService, CaseDiagnosisResultService>();
     builder.Services.AddScoped<ICaseReportService, CaseReportService>();
     

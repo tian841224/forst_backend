@@ -1,6 +1,6 @@
 ﻿namespace admin_backend.DTOs.CaseReport
 {
-    public class GroupByCountyResponse
+    public class GroupByDamageLocationResponse
     {
         /// <summary>
         /// 縣市
@@ -10,6 +10,6 @@
         /// <summary>
         /// 總數
         /// </summary>
-        public int Count { get; set; } 
+        public int Count { get; set; }
     }
 }

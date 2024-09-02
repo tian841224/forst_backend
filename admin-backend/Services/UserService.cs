@@ -177,7 +177,7 @@ namespace admin_backend.Services
 
             if (user == null)
             {
-                throw new ApiException($"無此使用者-{dto.Email}");
+                throw new ApiException($"查無此信箱，請重新輸入");
             }
 
             //修改密碼

@@ -284,7 +284,7 @@ namespace admin_backend.Services
 
             if (adminUser == null)
             {
-                throw new ApiException("帳號錯誤");
+                throw new ApiException("查無此信箱，請重新輸入");
             }
 
             //修改密碼

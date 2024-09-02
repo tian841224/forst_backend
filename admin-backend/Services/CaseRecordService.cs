@@ -357,10 +357,6 @@ namespace admin_backend.Services
                 throw new ApiException($"找不到此案件資料 - {Id}");
             }
 
-            // 更新資料
-            if (dto.AdminUserId.HasValue)
-                caseEntity.AdminUserId = dto.AdminUserId.Value;
-
             if (!string.IsNullOrEmpty(dto.ApplicationDate))
             {
                 if (!DateTime.TryParse(dto.ApplicationDate, out var ApplicationDate))
@@ -465,6 +461,13 @@ namespace admin_backend.Services
 
             if (dto.CaseStatus.HasValue)
                 caseEntity.CaseStatus = dto.CaseStatus.Value;
+
+            // 更新資料
+            if (dto.AdminUserId.HasValue)
+            {
+                caseEntity.CaseStatus = CaseStatusEnum.Pending_Review;
+                caseEntity.AdminUserId = dto.AdminUserId.Value;
+            }
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 

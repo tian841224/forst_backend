@@ -197,6 +197,9 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.ScientificName))
                 caseDiagnosis.ScientificName = dto.ScientificName;
 
+            if (!string.IsNullOrEmpty(dto.ReportingSuggestion))
+                caseDiagnosis.ReportingSuggestion = dto.ReportingSuggestion;
+
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             //若被退回則修改案件狀態

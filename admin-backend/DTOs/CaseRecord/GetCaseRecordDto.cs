@@ -1,7 +1,5 @@
 ﻿using admin_backend.Enums;
 using CommonLibrary.DTOs;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace admin_backend.DTOs.Case
 {
@@ -32,15 +30,15 @@ namespace admin_backend.DTOs.Case
         /// </summary>
         public string? Case_EndTime { get; set; }
 
-        ///// <summary>
-        ///// 案件開始日期
-        ///// </summary>
-        //public string? Case_StartTime { get; set; }
+        /// <summary>
+        /// 危害類型
+        /// </summary>
+        public int? DamageType { get; set; }
 
-        ///// <summary>
-        ///// 案件結束日期
-        ///// </summary>
-        //public string? Case_EndTime { get; set; }
+        /// <summary>
+        /// 危害種類
+        /// </summary>
+        public int? DamageClass { get; set; }
 
         /// <summary>
         /// 案件狀態

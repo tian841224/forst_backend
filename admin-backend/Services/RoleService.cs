@@ -41,7 +41,7 @@ namespace admin_backend.Services
 
             if (!string.IsNullOrEmpty(dto.Name))
             {
-                role = role.Where(x => x.Name == dto.Name);
+                role = role.Where(x => x.Name.Contains(dto.Name));
             }
 
             var roleResponse = _mapper.Map<List<RoleResponse>>(role);

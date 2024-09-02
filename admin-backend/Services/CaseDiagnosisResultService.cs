@@ -58,6 +58,29 @@ namespace admin_backend.Services
             return caseDiagnosisResultResponse;
         }
 
+        public async Task<CaseDiagnosisResultResponse> GetByCaseId(int CaseId)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            var caseDiagnosis = await _context.CaseDiagnosisResult.FirstOrDefaultAsync(x => x.CaseId == CaseId);
+
+            if (caseDiagnosis == null)
+            {
+                throw new ApiException($"找不到此案件回覆資料 - {CaseId}");
+            }
+
+            var commonDamage = (await _commonDamageService.Get(caseDiagnosis.CommonDamageId)).Items.FirstOrDefault();
+
+            var caseDiagnosisResultResponse = _mapper.Map<CaseDiagnosisResultResponse>(caseDiagnosis);
+
+            caseDiagnosisResultResponse.CommonDamageName = commonDamage?.Name;
+            caseDiagnosisResultResponse.DamageClassName = commonDamage?.DamageClassName;
+            caseDiagnosisResultResponse.DamageTypeName = commonDamage?.DamageTypeName;
+            caseDiagnosisResultResponse.SubmissionMethod = caseDiagnosis.SubmissionMethod;
+            caseDiagnosisResultResponse.DiagnosisMethod = caseDiagnosis.DiagnosisMethod;
+
+            return caseDiagnosisResultResponse;
+        }
+
         public async Task<PagedResult<CaseDiagnosisResultResponse>> Get(GetCaseDiagnosisResultDto dto)
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
@@ -66,9 +89,9 @@ namespace admin_backend.Services
                 .AsNoTracking()
                 .AsQueryable();
 
-            if (dto.CaseId.HasValue)
+            if (dto.CaseNumber.HasValue)
             {
-                query = query.Where(x => x.CaseId == dto.CaseId.Value);
+                query = query.Where(x => x.CaseId == dto.CaseNumber.Value);
             }
 
             if (dto.CommonDamageId.HasValue)
@@ -103,7 +126,7 @@ namespace admin_backend.Services
             if (caseEntity == null)
                 throw new ApiException($"找不到案件-{dto.CaseId}");
 
-            var caseDiagnosisResult = await _context.CaseDiagnosisResult.FirstOrDefaultAsync(x => x.Id == dto.CaseId);
+            var caseDiagnosisResult = await _context.CaseDiagnosisResult.FirstOrDefaultAsync(x => x.CaseId == dto.CaseId);
             if (caseDiagnosisResult != null)
                 throw new ApiException($"此案件已回覆-案件編號:{dto.CaseId}/案件回覆編號:{caseDiagnosisResult.Id}");
 

@@ -7,12 +7,22 @@ namespace admin_backend.DTOs.CaseDiagnosisResult
         /// <summary>
         /// 案件編號
         /// </summary>
-        public int? CaseId { get; set; }
+        public int? CaseNumber { get; set; }
 
         /// <summary>
         /// 常見病蟲害
         /// </summary>
         public int? CommonDamageId { get; set; }
+
+        /// <summary>
+        /// 危害類型ID
+        /// </summary>
+        public int? DamageTypeId { get; set; }
+
+        /// <summary>
+        /// 危害種類ID
+        /// </summary>
+        public int? DamageClassId { get; set; }
 
         /// <summary>
         /// 分頁參數

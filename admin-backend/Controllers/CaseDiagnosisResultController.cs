@@ -28,6 +28,18 @@ namespace admin_backend.Controllers
         }
 
         /// <summary>
+        /// 使用CaseID取得單筆案件回覆
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{caseId}")]
+        [Authorize]
+        public async Task<IActionResult> GetByCaseId(int caseId)
+        {
+            return Ok(await _caseDiagnosisResultService.GetByCaseId(caseId));
+        }
+
+        /// <summary>
         /// 取得案件回覆
         /// </summary>
         /// <returns></returns>

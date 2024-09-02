@@ -10,15 +10,15 @@ namespace admin_backend.DTOs.CommonDamage
         /// </summary>
         public string? Keyword { get; set; } = string.Empty;
 
-        ///// <summary>
-        ///// 危害類型ID
-        ///// </summary>
-        //public int? DamageTypeId { get; set; }
+        /// <summary>
+        /// 危害類型ID
+        /// </summary>
+        public int? DamageTypeId { get; set; }
 
-        ///// <summary>
-        ///// 危害種類ID
-        ///// </summary>
-        //public int? DamageClassId { get; set; }
+        /// <summary>
+        /// 危害種類ID
+        /// </summary>
+        public int? DamageClassId { get; set; }
 
         ///// <summary>
         ///// 病蟲危害名稱

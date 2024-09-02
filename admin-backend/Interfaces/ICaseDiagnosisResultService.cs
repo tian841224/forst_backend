@@ -12,6 +12,9 @@ namespace admin_backend.Interfaces
         /// <summary>取得單筆案件回覆</summary>
         Task<CaseDiagnosisResultResponse> Get(int Id);
 
+        /// <summary>使用CaseID取得單筆案件回覆</summary>
+        Task<CaseDiagnosisResultResponse> GetByCaseId(int CaseId);
+
         /// <summary>取得案件回覆</summary>
         Task<PagedResult<CaseDiagnosisResultResponse>> Get(GetCaseDiagnosisResultDto dto);
 

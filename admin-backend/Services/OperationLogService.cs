@@ -92,6 +92,8 @@ namespace admin_backend.Services
                     Content = item.Content,
                     Ip = item.Ip,
                     Id = item.Id,
+                    CreateTime = item.CreateTime,
+                    UpdateTime = item.UpdateTime,
                 });
             }
             return result.GetPaged(dto.Page!);

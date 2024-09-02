@@ -91,7 +91,7 @@ namespace admin_backend.Entities
         public string ReturnReason { get; set; } = string.Empty;
 
         [ForeignKey("CaseId")]
-        public virtual Case Case { get; set; } = null!;
+        public virtual CaseRecord Case { get; set; } = null!;
 
         [ForeignKey("CommonDamageId")]
         public virtual CommonDamage CommonDamage { get; set; } = null!;

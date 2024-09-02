@@ -8,7 +8,7 @@ namespace admin_backend.Entities
     /// <summary>
     /// 案件
     /// </summary>
-    public class Case : DefaultEntity
+    public class CaseRecord : DefaultEntity
     {
         /// <summary>
         /// 案件編號
@@ -24,11 +24,18 @@ namespace admin_backend.Entities
         public int? AdminUserId { get; set; }
 
         /// <summary>
-        /// 申請人
+        /// 申請人帳號
         /// </summary>
         [Required]
-        [Comment("申請人")]
-        public int UserId { get; set; }
+        [Comment("申請人帳號")]
+        public string ApplicantAccount { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 申請人姓名
+        /// </summary>
+        [Required]
+        [Comment("申請人姓名")]
+        public string ApplicantName { get; set; } = string.Empty;
 
         /// <summary>
         /// 申請日期
@@ -126,28 +133,16 @@ namespace admin_backend.Entities
         public string? ForestSubsection { get; set; }
 
         /// <summary>
-        /// 緯度/TGOS
+        /// 緯度
         /// </summary>
-        [Comment("緯度/TGOS")]
-        public string? LatitudeTgos { get; set; }
+        [Comment("緯度")]
+        public string? Latitude { get; set; }
 
         /// <summary>
-        /// 緯度/Google
+        /// 經度
         /// </summary>
-        [Comment("緯度/Google")]
-        public string? LatitudeGoogle { get; set; }
-
-        /// <summary>
-        /// 經度/TGOS
-        /// </summary>
-        [Comment("經度/TGOS")]
-        public string? LongitudeTgos { get; set; }
-
-        /// <summary>
-        /// 經度/Google
-        /// </summary>
-        [Comment("經度/Google")]
-        public string? LongitudeGoogle { get; set; }
+        [Comment("經度")]
+        public string? Longitude { get; set; }
 
         /// <summary>
         /// 受損面積
@@ -237,7 +232,7 @@ namespace admin_backend.Entities
         /// 樹基部狀況
         /// </summary>
         [Required]
-        [Comment("樹基部狀況 1 = 水泥面 = 2, 柏油面 = 3, 植被泥土面 (地表有草皮或鬆潤木) = 4, 花台內 = 5, 人工鋪面 (水泥面、柏油面以外) = 6")]
+        [Comment("樹基部狀況 1 = 水泥面, 2 = 柏油面, 3 = 植被泥土面 (地表有草皮或鬆潤木), 4 = 花台內, 5 = 人工鋪面 (水泥面、柏油面以外)")]
         public List<TreeBaseConditionEnum> BaseCondition { get; set; } = new();
 
         /// <summary>
@@ -252,9 +247,6 @@ namespace admin_backend.Entities
         [Required]
         [Comment("案件狀態 1 = 暫存, 2 = 待指派, 3 = 待簽核, 4 = 已結案, 5 = 已刪除, 6 = 退回")]
         public CaseStatusEnum CaseStatus { get; set; }
-
-        [ForeignKey("UserId")]
-        public virtual User User { get; set; } = null!;
 
         [ForeignKey("TreeBasicInfoId")]
         public virtual TreeBasicInfo TreeBasicInfo { get; set; } = null!;

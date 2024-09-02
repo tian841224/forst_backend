@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace admin_backend.DTOs.Case
 {
-    public class GetCaseDto
+    public class GetCaseRecordDto
     {
         ///// <summary>
         ///// 關鍵字
@@ -23,14 +23,24 @@ namespace admin_backend.DTOs.Case
         public int? CaseNumber { get; set; }
 
         /// <summary>
-        /// 開始日期
+        /// 案件開始日期
         /// </summary>
-        public string? StartTime { get; set; }
+        public string? Case_StartTime { get; set; }
 
         /// <summary>
-        /// 結束日期
+        /// 案件結束日期
         /// </summary>
-        public string? EndTime { get; set; }
+        public string? Case_EndTime { get; set; }
+
+        ///// <summary>
+        ///// 案件開始日期
+        ///// </summary>
+        //public string? Case_StartTime { get; set; }
+
+        ///// <summary>
+        ///// 案件結束日期
+        ///// </summary>
+        //public string? Case_EndTime { get; set; }
 
         /// <summary>
         /// 案件狀態

@@ -30,7 +30,7 @@ namespace admin_backend.Data
         public DbSet<ForestCompartmentLocation> ForestCompartmentLocation { get; set; }
         public DbSet<ForestDiseasePublications> ForestDiseasePublications { get; set; }
         public DbSet<CommonDamage> CommonDamage { get; set; }
-        public DbSet<Case> Case { get; set; }
+        public DbSet<CaseRecord> CaseRecord { get; set; }
         public DbSet<CaseDiagnosisResult> CaseDiagnosisResult { get; set; }
     }
 }

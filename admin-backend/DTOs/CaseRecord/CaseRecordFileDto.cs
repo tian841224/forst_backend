@@ -1,6 +1,6 @@
 ﻿namespace admin_backend.DTOs.Case
 {
-    public class CaseFileDto
+    public class CaseRecordFileDto
     {
         public int? Id { get; set; }
 

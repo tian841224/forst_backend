@@ -14,16 +14,16 @@ using System.Transactions;
 
 namespace admin_backend.Services
 {
-    public class CaseService : ICaseService
+    public class CaseRecordService : ICaseRecordService
     {
-        private readonly ILogger<CaseService> _log;
+        private readonly ILogger<CaseRecordService> _log;
         private readonly IDbContextFactory<MysqlDbContext> _contextFactory;
         private readonly IMapper _mapper;
         private readonly Lazy<IFileService> _fileService;
         private readonly Lazy<IOperationLogService> _operationLogService;
         private readonly ICaseDiagnosisResultService _caseDiagnosisResultService;
 
-        public CaseService(ILogger<CaseService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, Lazy<IOperationLogService> operationLogService, ICaseDiagnosisResultService caseDiagnosisResultService)
+        public CaseRecordService(ILogger<CaseRecordService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, Lazy<IOperationLogService> operationLogService, ICaseDiagnosisResultService caseDiagnosisResultService)
         {
             _log = log;
             _contextFactory = contextFactory;
@@ -36,25 +36,24 @@ namespace admin_backend.Services
         public async Task<CaseResponse> Get(int Id)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            var caseEntity = await _context.Case.FirstOrDefaultAsync(x => x.Id == Id);
+            var caseEntity = await _context.CaseRecord.FirstOrDefaultAsync(x => x.Id == Id);
 
             if (caseEntity == null)
             {
                 throw new ApiException($"找不到此案件資料 - {Id}");
             }
 
-            var fileList = new List<CaseFileDto>();
+            var fileList = new List<CaseRecordFileDto>();
             if (!string.IsNullOrEmpty(caseEntity.Photo))
             {
-                var fileUpload = JsonSerializer.Deserialize<List<CaseFileDto>>(caseEntity.Photo);
+                var fileUpload = JsonSerializer.Deserialize<List<CaseRecordFileDto>>(caseEntity.Photo);
                 if (fileUpload != null)
                 {
-                    fileList.AddRange(fileUpload.Select(x => new CaseFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File, "image") }));
+                    fileList.AddRange(fileUpload.Select(x => new CaseRecordFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File, "image") }));
                 }
             }
 
             var treeBasicInfoId = await _context.TreeBasicInfo.FirstOrDefaultAsync(x => x.Id == caseEntity.TreeBasicInfoId) ?? new TreeBasicInfo();
-            var user = await _context.User.FirstOrDefaultAsync(x => x.Id == caseEntity.UserId) ?? new User();
             var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == caseEntity.AdminUserId);
             var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.Id == caseEntity.ForestCompartmentLocationId) ?? new ForestCompartmentLocation();
             //案件回覆
@@ -68,8 +67,8 @@ namespace admin_backend.Services
                 CaseNumber = caseEntity.CaseNumber,
                 AdminUserId = caseEntity.AdminUserId,
                 AdminUserName = adminUser?.Name,
-                UserId = caseEntity.UserId,
-                UserName = user.Name,
+                ApplicantAccount = caseEntity.ApplicantAccount,
+                ApplicantName = caseEntity.ApplicantName,
                 ApplicationDate = caseEntity.ApplicationDate,
                 UnitName = caseEntity.UnitName,
                 County = caseEntity.County,
@@ -86,10 +85,8 @@ namespace admin_backend.Services
                 AffiliatedUnit = forestCompartmentLocation.AffiliatedUnit,
                 ForestSection = caseEntity.ForestSection,
                 ForestSubsection = caseEntity.ForestSubsection,
-                LatitudeGoogle = caseEntity.LatitudeGoogle,
-                LatitudeTgos = caseEntity.LatitudeTgos,
-                LongitudeGoogle = caseEntity.LongitudeGoogle,
-                LongitudeTgos = caseEntity.LongitudeTgos,
+                Latitude = caseEntity.Latitude,
+                Longitude = caseEntity.Longitude,
                 DamagedArea = caseEntity.DamagedArea,
                 DamagedCount = caseEntity.DamagedCount,
                 PlantedArea = caseEntity.PlantedArea,
@@ -114,11 +111,11 @@ namespace admin_backend.Services
             return result;
         }
 
-        public async Task<PagedResult<CaseResponse>> Get(GetCaseDto dto)
+        public async Task<PagedResult<CaseResponse>> Get(GetCaseRecordDto dto)
         {
             var result = new List<CaseResponse>();
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            IQueryable<Case> caseEntity = _context.Case;
+            IQueryable<CaseRecord> caseEntity = _context.CaseRecord;
 
             //if (!string.IsNullOrEmpty(dto.Keyword))
             //{
@@ -141,16 +138,17 @@ namespace admin_backend.Services
                 caseEntity = caseEntity.Where(x => x.CaseNumber == dto.CaseNumber.Value);
             }
 
-            if (!string.IsNullOrEmpty(dto.StartTime) && !string.IsNullOrEmpty(dto.EndTime))
+            //案件日期
+            if (!string.IsNullOrEmpty(dto.Case_StartTime) && !string.IsNullOrEmpty(dto.Case_EndTime))
             {
                 //處理時間格式
-                if (!DateTime.TryParse(dto.StartTime, out var StartTime))
+                if (!DateTime.TryParse(dto.Case_StartTime, out var StartTime))
                 {
-                    throw new ArgumentException("Invalid date format", nameof(dto.StartTime));
+                    throw new ArgumentException("Invalid date format", nameof(dto.Case_StartTime));
                 }
-                if (!DateTime.TryParse(dto.EndTime, out var EndTime))
+                if (!DateTime.TryParse(dto.Case_EndTime, out var EndTime))
                 {
-                    throw new ArgumentException("Invalid date format", nameof(dto.EndTime));
+                    throw new ArgumentException("Invalid date format", nameof(dto.Case_EndTime));
                 }
                 caseEntity = caseEntity.Where(x => x.ApplicationDate >= StartTime && x.ApplicationDate < EndTime);
             }
@@ -163,18 +161,17 @@ namespace admin_backend.Services
             foreach (var item in await caseEntity.ToListAsync())
             {
                 //處理上傳檔案
-                var fileList = new List<CaseFileDto>();
+                var fileList = new List<CaseRecordFileDto>();
                 if (!string.IsNullOrEmpty(item.Photo))
                 {
-                    var fileUpload = JsonSerializer.Deserialize<List<CaseFileDto>>(item.Photo);
+                    var fileUpload = JsonSerializer.Deserialize<List<CaseRecordFileDto>>(item.Photo);
                     if (fileUpload != null)
                     {
-                        fileList.AddRange(fileUpload.Select(x => new CaseFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File, "image") }));
+                        fileList.AddRange(fileUpload.Select(x => new CaseRecordFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File, "image") }));
                     }
                 }
 
                 var treeBasicInfoId = await _context.TreeBasicInfo.FirstOrDefaultAsync(x => x.Id == item.TreeBasicInfoId) ?? new TreeBasicInfo();
-                var user = await _context.User.FirstOrDefaultAsync(x => x.Id == item.UserId) ?? new User();
                 var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == item.AdminUserId) ?? new AdminUser();
                 var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.Id == item.ForestCompartmentLocationId) ?? new ForestCompartmentLocation();
                 //案件回覆
@@ -188,8 +185,8 @@ namespace admin_backend.Services
                     CaseNumber = item.CaseNumber,
                     AdminUserId = item.AdminUserId,
                     AdminUserName = adminUser.Name,
-                    UserId = item.UserId,
-                    UserName = user.Name,
+                    ApplicantAccount = item.ApplicantAccount,
+                    ApplicantName = item.ApplicantName,
                     ApplicationDate = item.ApplicationDate,
                     UnitName = item.UnitName,
                     County = item.County,
@@ -206,10 +203,8 @@ namespace admin_backend.Services
                     AffiliatedUnit = forestCompartmentLocation.AffiliatedUnit,
                     ForestSection = item.ForestSection,
                     ForestSubsection = item.ForestSubsection,
-                    LatitudeGoogle = item.LatitudeGoogle,
-                    LatitudeTgos = item.LatitudeTgos,
-                    LongitudeGoogle = item.LongitudeGoogle,
-                    LongitudeTgos = item.LongitudeTgos,
+                    Latitude = item.Latitude,
+                    Longitude = item.Longitude,
                     DamagedArea = item.DamagedArea,
                     DamagedCount = item.DamagedCount,
                     PlantedArea = item.PlantedArea,
@@ -230,16 +225,31 @@ namespace admin_backend.Services
                     CaseDiagnosisResultResponse = caseDiagnosisResult,
                     CaseStatus = item.CaseStatus,
                 });
+
+                ////發布日期
+                //if (!string.IsNullOrEmpty(dto.Case_StartTime) && !string.IsNullOrEmpty(dto.Case_EndTime))
+                //{
+                //    //處理時間格式
+                //    if (!DateTime.TryParse(dto.Case_StartTime, out var StartTime))
+                //    {
+                //        throw new ArgumentException("Invalid date format", nameof(dto.Case_StartTime));
+                //    }
+                //    if (!DateTime.TryParse(dto.Case_EndTime, out var EndTime))
+                //    {
+                //        throw new ArgumentException("Invalid date format", nameof(dto.Case_EndTime));
+                //    }
+                //    caseEntity = caseEntity.Where(x => x.ApplicationDate >= StartTime && x.ApplicationDate < EndTime);
+                //}
             }
 
             return result.GetPaged(dto.Page!);
         }
-        public async Task<CaseResponse> Add(AddCaseDto dto)
+        public async Task<CaseResponse> Add(AddCaseRecordDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
             //編案件編號
-            var maxCaseNumber = await _context.Case
+            var maxCaseNumber = await _context.CaseRecord
                 .MaxAsync(x => (int?)x.CaseNumber) ?? 0;
 
             if (maxCaseNumber == 0)
@@ -251,13 +261,13 @@ namespace admin_backend.Services
             else maxCaseNumber = maxCaseNumber + 1;
 
             //處理上傳檔案
-            var fileUploadList = new List<CaseFileDto>();
+            var fileUploadList = new List<CaseRecordFileDto>();
             var id = 0;
             foreach (var file in dto.Photo)
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file!.FileName)}";
                 var fileUploadDto = await _fileService.Value.UploadFile(fileName, file);
-                fileUploadList.Add(new CaseFileDto { Id = ++id, File = fileName });
+                fileUploadList.Add(new CaseRecordFileDto { Id = ++id, File = fileName });
             }
             var jsonResult = JsonSerializer.Serialize(fileUploadList);
 
@@ -271,10 +281,11 @@ namespace admin_backend.Services
                 throw new ArgumentException("Invalid date format", nameof(dto.FirstDiscoveryDate));
             }
 
-            var caseEntity = new Case
+            var caseEntity = new CaseRecord
             {
                 CaseNumber = maxCaseNumber,
-                UserId = dto.UserId,
+                ApplicantAccount = dto.ApplicantAccount,
+                ApplicantName = dto.ApplicantName,
                 ApplicationDate = ApplicationDate,
                 UnitName = dto.UnitName,
                 County = dto.County,
@@ -289,10 +300,8 @@ namespace admin_backend.Services
                 ForestCompartmentLocationId = dto.ForestCompartmentLocationId,
                 ForestSection = dto.ForestSection,
                 ForestSubsection = dto.ForestSubsection,
-                LatitudeTgos = dto.LatitudeTgos,
-                LatitudeGoogle = dto.LatitudeGoogle,
-                LongitudeTgos = dto.LongitudeTgos,
-                LongitudeGoogle = dto.LongitudeGoogle,
+                Latitude = dto.Latitude,
+                Longitude = dto.Longitude,
                 DamagedArea = dto.DamagedArea,
                 DamagedCount = dto.DamagedCount,
                 PlantedArea = dto.PlantedArea,
@@ -312,7 +321,7 @@ namespace admin_backend.Services
             };
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            await _context.Case.AddAsync(caseEntity);
+            await _context.CaseRecord.AddAsync(caseEntity);
 
             // 新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
@@ -328,11 +337,11 @@ namespace admin_backend.Services
             return _mapper.Map<CaseResponse>(caseEntity);
         }
 
-        public async Task<CaseResponse> Update(int Id, UpdateCaseDto dto)
+        public async Task<CaseResponse> Update(int Id, UpdateCaseRecordDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var caseEntity = await _context.Case.Where(x => x.Id == Id).FirstOrDefaultAsync();
+            var caseEntity = await _context.CaseRecord.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (caseEntity == null)
             {
@@ -391,17 +400,11 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.ForestSubsection))
                 caseEntity.ForestSubsection = dto.ForestSubsection;
 
-            if (!string.IsNullOrEmpty(dto.LatitudeTgos))
-                caseEntity.LatitudeTgos = dto.LatitudeTgos;
+            if (!string.IsNullOrEmpty(dto.Latitude))
+                caseEntity.Latitude = dto.Latitude;
 
-            if (!string.IsNullOrEmpty(dto.LatitudeGoogle))
-                caseEntity.LatitudeGoogle = dto.LatitudeGoogle;
-
-            if (!string.IsNullOrEmpty(dto.LongitudeTgos))
-                caseEntity.LongitudeTgos = dto.LongitudeTgos;
-
-            if (!string.IsNullOrEmpty(dto.LongitudeGoogle))
-                caseEntity.LongitudeGoogle = dto.LongitudeGoogle;
+            if (!string.IsNullOrEmpty(dto.Longitude))
+                caseEntity.Longitude = dto.Longitude;
 
             if (dto.DamagedArea.HasValue)
                 caseEntity.DamagedArea = dto.DamagedArea.Value;
@@ -456,7 +459,7 @@ namespace admin_backend.Services
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            _context.Case.Update(caseEntity);
+            _context.CaseRecord.Update(caseEntity);
 
             // 新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
@@ -476,7 +479,7 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var caseEntity = await _context.Case.Where(x => x.Id == Id).FirstOrDefaultAsync();
+            var caseEntity = await _context.CaseRecord.Where(x => x.Id == Id).FirstOrDefaultAsync();
 
             if (caseEntity == null)
             {
@@ -485,7 +488,7 @@ namespace admin_backend.Services
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            _context.Case.Remove(caseEntity);
+            _context.CaseRecord.Remove(caseEntity);
 
             //新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)

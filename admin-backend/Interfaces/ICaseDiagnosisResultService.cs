@@ -22,7 +22,7 @@ namespace admin_backend.Interfaces
         Task<CaseDiagnosisResultResponse> Update(int Id, UpdateCaseDiagnosisResultDto dto);
 
         /// <summary>上傳圖片</summary>
-        Task<List<CaseFileDto>> UploadPhoto(List<IFormFile> photo);
+        Task<List<CaseRecordFileDto>> UploadPhoto(List<IFormFile> photo);
 
         /// <summary>刪除案件回覆</summary>
         Task<CaseDiagnosisResultResponse> Delete(int Id);

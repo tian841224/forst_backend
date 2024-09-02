@@ -13,14 +13,15 @@ namespace CommonLibrary.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Case",
+                name: "CaseRecord",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     CaseNumber = table.Column<int>(type: "int", nullable: false, comment: "案件編號"),
                     AdminUserId = table.Column<int>(type: "int", nullable: true, comment: "指派人"),
-                    UserId = table.Column<int>(type: "int", nullable: false, comment: "申請人"),
+                    ApplicantAccount = table.Column<string>(type: "longtext", nullable: false, comment: "申請人帳號"),
+                    ApplicantName = table.Column<string>(type: "longtext", nullable: false, comment: "申請人姓名"),
                     ApplicationDate = table.Column<DateTime>(type: "datetime(6)", nullable: false, comment: "申請日期"),
                     UnitName = table.Column<string>(type: "longtext", nullable: true, comment: "單位名稱"),
                     County = table.Column<string>(type: "longtext", nullable: false, comment: "聯絡人縣市"),
@@ -35,10 +36,8 @@ namespace CommonLibrary.Migrations
                     ForestCompartmentLocationId = table.Column<int>(type: "int", nullable: false, comment: "林班位置"),
                     ForestSection = table.Column<string>(type: "longtext", nullable: true, comment: "林班"),
                     ForestSubsection = table.Column<string>(type: "longtext", nullable: true, comment: "小班"),
-                    LatitudeTgos = table.Column<string>(type: "longtext", nullable: true, comment: "緯度/TGOS"),
-                    LatitudeGoogle = table.Column<string>(type: "longtext", nullable: true, comment: "緯度/Google"),
-                    LongitudeTgos = table.Column<string>(type: "longtext", nullable: true, comment: "經度/TGOS"),
-                    LongitudeGoogle = table.Column<string>(type: "longtext", nullable: true, comment: "經度/Google"),
+                    Latitude = table.Column<string>(type: "longtext", nullable: true, comment: "緯度"),
+                    Longitude = table.Column<string>(type: "longtext", nullable: true, comment: "經度"),
                     DamagedArea = table.Column<decimal>(type: "decimal(18,2)", nullable: true, comment: "受損面積"),
                     DamagedCount = table.Column<int>(type: "int", nullable: true, comment: "受損數量"),
                     PlantedArea = table.Column<decimal>(type: "decimal(18,2)", nullable: true, comment: "種植面積"),
@@ -52,7 +51,7 @@ namespace CommonLibrary.Migrations
                     FirstDiscoveryDate = table.Column<DateTime>(type: "datetime(6)", nullable: true, comment: "首次發現受害時間"),
                     DamageDescription = table.Column<string>(type: "longtext", nullable: false, comment: "受害症狀描述"),
                     LocationType = table.Column<string>(type: "longtext", nullable: false, comment: "立地種類 1 = 公園、校園, 人行道 = 2, 花台內 = 3, 建築周邊 = 4, 林地 = 5, 苗圃 = 6, 農地 = 7 , 空地 = 8"),
-                    BaseCondition = table.Column<string>(type: "longtext", nullable: false, comment: "樹基部狀況 1 = 水泥面 = 2, 柏油面 = 3, 植被泥土面 (地表有草皮或鬆潤木) = 4, 花台內 = 5, 人工鋪面 (水泥面、柏油面以外) = 6"),
+                    BaseCondition = table.Column<string>(type: "longtext", nullable: false, comment: "樹基部狀況 1 = 水泥面, 2 = 柏油面, 3 = 植被泥土面 (地表有草皮或鬆潤木), 4 = 花台內, 5 = 人工鋪面 (水泥面、柏油面以外)"),
                     Photo = table.Column<string>(type: "longtext", nullable: false, comment: "圖片"),
                     CaseStatus = table.Column<int>(type: "int", nullable: false, comment: "案件狀態 1 = 暫存, 2 = 待指派, 3 = 待簽核, 4 = 已結案, 5 = 已刪除, 6 = 退回"),
                     CreateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false, comment: "建立日期")
@@ -62,49 +61,90 @@ namespace CommonLibrary.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Case", x => x.Id);
+                    table.PrimaryKey("PK_CaseRecord", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Case_ForestCompartmentLocation_ForestCompartmentLocationId",
+                        name: "FK_CaseRecord_ForestCompartmentLocation_ForestCompartmentLocati~",
                         column: x => x.ForestCompartmentLocationId,
                         principalTable: "ForestCompartmentLocation",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Case_TreeBasicInfo_TreeBasicInfoId",
+                        name: "FK_CaseRecord_TreeBasicInfo_TreeBasicInfoId",
                         column: x => x.TreeBasicInfoId,
                         principalTable: "TreeBasicInfo",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "CaseDiagnosisResult",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    CaseId = table.Column<int>(type: "int", nullable: false, comment: "案件編號"),
+                    SubmissionMethod = table.Column<string>(type: "longtext", nullable: false, comment: "送件方式"),
+                    DiagnosisMethod = table.Column<string>(type: "longtext", nullable: false, comment: "診斷方式"),
+                    HarmPatternDescription = table.Column<string>(type: "longtext", nullable: false, comment: "危害狀況詳細描述"),
+                    CommonDamageId = table.Column<int>(type: "int", nullable: false, comment: "常見病蟲害"),
+                    PreventionSuggestion = table.Column<string>(type: "longtext", nullable: false, comment: "防治建議"),
+                    OldCommonDamageName = table.Column<string>(type: "longtext", nullable: false, comment: "危害病蟲名稱(舊)"),
+                    ScientificName = table.Column<string>(type: "longtext", nullable: false, comment: "學名"),
+                    ReportingSuggestion = table.Column<string>(type: "longtext", nullable: false, comment: "呈報建議"),
+                    ReturnReason = table.Column<string>(type: "longtext", nullable: false, comment: "退回原因"),
+                    CreateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false, comment: "建立日期")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    UpdateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false, comment: "更新時間")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.ComputedColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CaseDiagnosisResult", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Case_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
+                        name: "FK_CaseDiagnosisResult_CaseRecord_CaseId",
+                        column: x => x.CaseId,
+                        principalTable: "CaseRecord",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CaseDiagnosisResult_CommonDamage_CommonDamageId",
+                        column: x => x.CommonDamageId,
+                        principalTable: "CommonDamage",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Case_ForestCompartmentLocationId",
-                table: "Case",
+                name: "IX_CaseDiagnosisResult_CaseId",
+                table: "CaseDiagnosisResult",
+                column: "CaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseDiagnosisResult_CommonDamageId",
+                table: "CaseDiagnosisResult",
+                column: "CommonDamageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CaseRecord_ForestCompartmentLocationId",
+                table: "CaseRecord",
                 column: "ForestCompartmentLocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Case_TreeBasicInfoId",
-                table: "Case",
+                name: "IX_CaseRecord_TreeBasicInfoId",
+                table: "CaseRecord",
                 column: "TreeBasicInfoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Case_UserId",
-                table: "Case",
-                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Case");
+                name: "CaseDiagnosisResult");
+
+            migrationBuilder.DropTable(
+                name: "CaseRecord");
         }
     }
 }

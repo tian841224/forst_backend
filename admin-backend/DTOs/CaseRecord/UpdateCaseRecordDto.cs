@@ -3,30 +3,23 @@ using System.ComponentModel.DataAnnotations;
 
 namespace admin_backend.DTOs.Case
 {
-    public class AddCaseDto
+    public class UpdateCaseRecordDto
     {
+        /// <summary>
+        /// 指派人
+        /// </summary>
+        public int? AdminUserId { get; set; }
+
         ///// <summary>
-        ///// 案件編號
+        ///// 申請人
         ///// </summary>
         //[Required]
-        //public int CaseNumber { get; set; }
-
-        ///// <summary>
-        ///// 指派人
-        ///// </summary>
-        //public int? AdminUserId { get; set; }
-
-        /// <summary>
-        /// 申請人
-        /// </summary>
-        [Required]
-        public int UserId { get; set; }
+        //public int UserId { get; set; }
 
         /// <summary>
         /// 申請日期
         /// </summary>
-        [Required]
-        public string ApplicationDate { get; set; } = string.Empty;
+        public string? ApplicationDate { get; set; }
 
         /// <summary>
         /// 單位名稱
@@ -36,26 +29,22 @@ namespace admin_backend.DTOs.Case
         /// <summary>
         /// 聯絡人縣市
         /// </summary>
-        [Required]
-        public string County { get; set; } = string.Empty;
+        public string? County { get; set; }
 
         /// <summary>
         /// 聯絡人區域
         /// </summary>
-        [Required]
-        public string District { get; set; } = string.Empty;
+        public string? District { get; set; }
 
         /// <summary>
         /// 聯絡人地址
         /// </summary>
-        [Required]
-        public string Address { get; set; } = string.Empty;
+        public string? Address { get; set; }
 
         /// <summary>
         /// 電話
         /// </summary>
-        [Required]
-        public string Phone { get; set; } = string.Empty;
+        public string? Phone { get; set; }
 
         /// <summary>
         /// 傳真
@@ -65,33 +54,28 @@ namespace admin_backend.DTOs.Case
         /// <summary>
         /// Email
         /// </summary>
-        [Required]
         [EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; }
 
         /// <summary>
         /// 受害樹木縣市
         /// </summary>
-        [Required]
-        public string DamageTreeCounty { get; set; } = string.Empty;
+        public string? DamageTreeCounty { get; set; }
 
         /// <summary>
         /// 受害樹木區域
         /// </summary>
-        [Required]
-        public string DamageTreeDistrict { get; set; } = string.Empty;
+        public string? DamageTreeDistrict { get; set; }
 
         /// <summary>
         /// 受害樹木地址
         /// </summary>
-        [Required]
-        public string DamageTreeAddress { get; set; } = string.Empty;
+        public string? DamageTreeAddress { get; set; }
 
         /// <summary>
         /// 林班位置
         /// </summary>
-        [Required]
-        public int ForestCompartmentLocationId { get; set; }
+        public int? ForestCompartmentLocationId { get; set; }
 
         /// <summary>
         /// 林班
@@ -104,24 +88,14 @@ namespace admin_backend.DTOs.Case
         public string? ForestSubsection { get; set; }
 
         /// <summary>
-        /// 緯度/TGOS
+        /// 緯度
         /// </summary>
-        public string? LatitudeTgos { get; set; }
+        public string? Latitude { get; set; }
 
         /// <summary>
-        /// 緯度/Google
+        /// 經度
         /// </summary>
-        public string? LatitudeGoogle { get; set; }
-
-        /// <summary>
-        /// 經度/TGOS
-        /// </summary>
-        public string? LongitudeTgos { get; set; }
-
-        /// <summary>
-        /// 經度/Google
-        /// </summary>
-        public string? LongitudeGoogle { get; set; }
+        public string? Longitude { get; set; }
 
         /// <summary>
         /// 受損面積
@@ -146,8 +120,7 @@ namespace admin_backend.DTOs.Case
         /// <summary>
         /// 樹木基本資料
         /// </summary>
-        [Required]
-        public int TreeBasicInfoId { get; set; }
+        public int? TreeBasicInfoId { get; set; }
 
         /// <summary>
         /// 其他
@@ -157,20 +130,17 @@ namespace admin_backend.DTOs.Case
         /// <summary>
         /// 受害部位 1 = 根, 莖、4 = 枝條, 6 = 樹葉, 7 = 花果, 8 = 全株
         /// </summary>
-        [Required]
-        public List<TreePartEnum> DamagedPart { get; set; } = new();
+        public List<TreePartEnum>? DamagedPart { get; set; }
 
         /// <summary>
         /// 樹木高度
         /// </summary>
-        [Required]
-        public string TreeHeight { get; set; }
+        public string? TreeHeight { get; set; } = string.Empty;
 
         /// <summary>
         /// 樹木直徑
         /// </summary>
-        [Required]
-        public string TreeDiameter { get; set; }
+        public string? TreeDiameter { get; set; } = string.Empty;
 
         /// <summary>
         /// 現地種植時間
@@ -180,36 +150,31 @@ namespace admin_backend.DTOs.Case
         /// <summary>
         /// 首次發現受害時間
         /// </summary>
-        public string? FirstDiscoveryDate { get; set; } = string.Empty;
+        public string? FirstDiscoveryDate { get; set; }
 
         /// <summary>
         /// 受害症狀描述
         /// </summary>
-        [Required]
-        public string DamageDescription { get; set; } = string.Empty;
+        public string? DamageDescription { get; set; }
 
         /// <summary>
         /// 立地種類 1 = 公園、校園, 人行道 = 2, 花台內 = 3, 建築周邊 = 4, 林地 = 5, 苗圃 = 6, 農地 = 7 , 空地 = 8
         /// </summary>
-        [Required]
-        public List<LocationTypeEnum> LocationType { get; set; } = new();
+        public List<LocationTypeEnum>? LocationType { get; set; }
 
         /// <summary>
         /// 樹基部狀況 1 = 水泥面 = 2, 柏油面 = 3, 植被泥土面 (地表有草皮或鬆潤木) = 4, 花台內 = 5, 人工鋪面 (水泥面、柏油面以外) = 6
         /// </summary>
-        [Required]
-        public List<TreeBaseConditionEnum> BaseCondition { get; set; } = new();
+        public List<TreeBaseConditionEnum>? BaseCondition { get; set; }
 
-        /// <summary>
-        /// 圖片
-        /// </summary>
-        [Required]
-        public List<IFormFile> Photo { get; set; } = new();
+        ///// <summary>
+        ///// 圖片
+        ///// </summary>
+        //public string? Photo { get; set; }
 
         /// <summary>
         /// 案件狀態 1 = 暫存, 2 = 待指派, 3 = 待簽核, 4 = 已結案, 5 = 已刪除, 6 = 退回
         /// </summary>
-        [Required]
-        public CaseStatusEnum CaseStatus { get; set; }
+        public CaseStatusEnum? CaseStatus { get; set; }
     }
 }

@@ -10,9 +10,9 @@ namespace admin_backend.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]/[action]")]
-    public class CaseController(ICaseService caseService) : ControllerBase
+    public class CaseRecordController(ICaseRecordService caseService) : ControllerBase
     {
-        private readonly ICaseService _caseService = caseService;
+        private readonly ICaseRecordService _caseService = caseService;
 
         /// <summary>
         /// 取得單筆案件
@@ -32,7 +32,7 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Get(GetCaseDto dto)
+        public async Task<IActionResult> Get(GetCaseRecordDto dto)
         {
             return Ok(await _caseService.Get(dto));
         }
@@ -44,7 +44,7 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Add([FromForm] AddCaseDto dto)
+        public async Task<IActionResult> Add([FromForm] AddCaseRecordDto dto)
         {
             return Ok(await _caseService.Add(dto));
         }
@@ -57,7 +57,7 @@ namespace admin_backend.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(int id, UpdateCaseDto dto)
+        public async Task<IActionResult> Update(int id, UpdateCaseRecordDto dto)
         {
             return Ok(await _caseService.Update(id, dto));
         }

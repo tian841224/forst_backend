@@ -11,8 +11,8 @@ using admin_backend.Data;
 namespace CommonLibrary.Migrations
 {
     [DbContext(typeof(MysqlDbContext))]
-    [Migration("20240901105204_AddCaseDiagnosisResult")]
-    partial class AddCaseDiagnosisResult
+    [Migration("20240902010126_AddCase")]
+    partial class AddCase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

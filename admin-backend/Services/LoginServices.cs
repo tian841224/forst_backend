@@ -41,11 +41,18 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var adminUser = await _context.AdminUser.Where(x => x.Account == dto.Account && x.Password == dto.pKey).FirstOrDefaultAsync();
+            var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Account == dto.Account);
 
             if (adminUser == null)
             {
-                throw new ApiException("帳號密碼錯誤");
+                throw new ApiException("查無此帳號");
+            }
+
+            adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Account == dto.Account && x.Password == dto.pKey);
+
+            if (adminUser == null)
+            {
+                throw new ApiException("密碼錯誤，請重新輸入");
             }
 
             if (adminUser.Status == StatusEnum.Close || adminUser.Status == StatusEnum.Stop)
@@ -127,11 +134,19 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var user = await _context.User.Where(x => x.Account == dto.Account && x.Password == dto.PKey).FirstOrDefaultAsync();
+
+            var user = await _context.User.FirstOrDefaultAsync(x => x.Account == dto.Account);
 
             if (user == null)
             {
-                throw new ApiException("帳號密碼錯誤");
+                throw new ApiException("查無此帳號");
+            }
+
+            user = await _context.User.FirstOrDefaultAsync(x => x.Account == dto.Account && x.Password == dto.PKey);
+
+            if (user == null)
+            {
+                throw new ApiException("密碼錯誤，請重新輸入");
             }
 
             if(user.Status == StatusEnum.Close || user.Status == StatusEnum.Stop)

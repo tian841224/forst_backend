@@ -93,11 +93,21 @@ namespace admin_backend.Services
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var commonDamageList = await _context.CommonDamage.ToListAsync();
+            IQueryable<CommonDamage> commonDamageList =  _context.CommonDamage;
+
+            if (dto.DamageClassId.HasValue)
+            {
+                commonDamageList = commonDamageList.Where(x => x.DamageClassId == dto.DamageClassId);
+            }
+
+            if (dto.DamageTypeId.HasValue)
+            {
+                commonDamageList = commonDamageList.Where(x => x.DamageTypeId == dto.DamageTypeId);
+            }
 
             var commonDamageResponse = new List<CommonDamageResponse>();
 
-            foreach (var value in commonDamageList)
+            foreach (var value in await commonDamageList.ToListAsync())
             {
                 var photo = new List<CommonDamagePhotoResponse>();
                 if (!string.IsNullOrEmpty(value.Photo))

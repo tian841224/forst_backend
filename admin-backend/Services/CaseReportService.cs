@@ -18,7 +18,7 @@ namespace admin_backend.Services
         public async Task<List<GroupByCountyResponse>> GroupByCounty(CaseGroupByCountyDto dto)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            IQueryable<Case> caseEntity = _context.Case;
+            IQueryable<CaseRecord> caseEntity = _context.CaseRecord;
 
             if (!string.IsNullOrEmpty(dto.StartTime) && !string.IsNullOrEmpty(dto.EndTime))
             {

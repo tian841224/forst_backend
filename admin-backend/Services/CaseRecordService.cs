@@ -57,7 +57,7 @@ namespace admin_backend.Services
             var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == caseEntity.AdminUserId);
             var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.Id == caseEntity.ForestCompartmentLocationId) ?? new ForestCompartmentLocation();
             //案件回覆
-            var caseDiagnosisResult = (await _caseDiagnosisResultService.Get(new GetCaseDiagnosisResultDto { CaseId = caseEntity .Id})).Items.FirstOrDefault();
+            var caseDiagnosisResult = (await _caseDiagnosisResultService.Get(new GetCaseDiagnosisResultDto { CaseNumber = caseEntity.Id })).Items.FirstOrDefault();
 
             var result = new CaseResponse
             {
@@ -104,7 +104,7 @@ namespace admin_backend.Services
                 LocationType = caseEntity.LocationType,
                 BaseCondition = caseEntity.BaseCondition,
                 Photo = fileList,
-                CaseDiagnosisResultResponse = caseDiagnosisResult ,
+                CaseDiagnosisResultResponse = caseDiagnosisResult,
                 CaseStatus = caseEntity.CaseStatus,
             };
 
@@ -115,131 +115,140 @@ namespace admin_backend.Services
         {
             var result = new List<CaseResponse>();
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            IQueryable<CaseRecord> caseEntity = _context.CaseRecord;
 
-            //if (!string.IsNullOrEmpty(dto.Keyword))
-            //{
-            //    string keyword = dto.Keyword.ToLower();
-            //    caseEntity = caseEntity.Where(x =>
-            //        x.Unit.ToLower().Contains(keyword) ||
-            //        x.Name.ToLower().Contains(keyword) ||
-            //        x.Author.ToLower().Contains(keyword) ||
-            //        x.Id.ToString().Contains(keyword)
-            //    );
-            //}
+            var query = from caseRecord in _context.CaseRecord
+                        join diagnosis in _context.CaseDiagnosisResult
+                        on caseRecord.Id equals diagnosis.CaseId into caseDiagnosisGroup
+                        from caseDiagnosis in caseDiagnosisGroup.DefaultIfEmpty()
+                        select new { caseRecord, caseDiagnosis };
+
+            if (dto.DamageClassId.HasValue)
+            {
+                var commonIds = await _context.CommonDamage.Where(x => x.DamageClassId == dto.DamageClassId).Select(x => x.Id).ToListAsync();
+                query = query.Where(x => commonIds.Contains(x.caseDiagnosis.CommonDamageId));
+            }
+
+            if (dto.DamageTypeId.HasValue)
+            {
+                var commonIds = await _context.CommonDamage.Where(x => x.DamageTypeId == dto.DamageTypeId).Select(x => x.Id).ToListAsync();
+                query = query.Where(x => commonIds.Contains(x.caseDiagnosis.CommonDamageId));
+            }
+
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                string keyword = dto.Keyword.ToLower();
+                query = query.Where(x =>
+                    x.caseRecord.Address.ToLower().Contains(keyword) ||
+                     x.caseRecord.District.ToLower().Contains(keyword) ||
+                    x.caseRecord.County.ToLower().Contains(keyword) ||
+                    x.caseRecord.ApplicantName.ToLower().Contains(keyword) ||
+                    x.caseRecord.Id.ToString().Contains(keyword)
+                );
+            }
 
             if (dto.AdminUserId.HasValue)
             {
-                caseEntity = caseEntity.Where(x => x.AdminUserId == dto.AdminUserId.Value);
+                query = query.Where(x => x.caseRecord.AdminUserId == dto.AdminUserId.Value);
             }
 
             if (dto.CaseNumber.HasValue)
             {
-                caseEntity = caseEntity.Where(x => x.CaseNumber == dto.CaseNumber.Value);
+                query = query.Where(x => x.caseRecord.CaseNumber == dto.CaseNumber.Value);
             }
 
             //案件日期
-            if (!string.IsNullOrEmpty(dto.Case_StartTime) && !string.IsNullOrEmpty(dto.Case_EndTime))
+            if (!string.IsNullOrEmpty(dto.StartTime) && !string.IsNullOrEmpty(dto.EndTime))
             {
                 //處理時間格式
-                if (!DateTime.TryParse(dto.Case_StartTime, out var StartTime))
+                if (!DateTime.TryParse(dto.StartTime, out var StartTime))
                 {
-                    throw new ArgumentException("Invalid date format", nameof(dto.Case_StartTime));
+                    throw new ArgumentException("Invalid date format", nameof(dto.StartTime));
                 }
-                if (!DateTime.TryParse(dto.Case_EndTime, out var EndTime))
+                if (!DateTime.TryParse(dto.EndTime, out var EndTime))
                 {
-                    throw new ArgumentException("Invalid date format", nameof(dto.Case_EndTime));
+                    throw new ArgumentException("Invalid date format", nameof(dto.EndTime));
                 }
-                caseEntity = caseEntity.Where(x => x.ApplicationDate >= StartTime && x.ApplicationDate < EndTime);
+                query = query.Where(x => x.caseRecord.ApplicationDate >= StartTime && x.caseRecord.ApplicationDate < EndTime);
             }
 
             if (dto.CaseStatus.HasValue)
             {
-                caseEntity = caseEntity.Where(x => x.CaseStatus == dto.CaseStatus.Value);
+                query = query.Where(x => x.caseRecord.CaseStatus == dto.CaseStatus.Value);
             }
 
-            foreach (var item in await caseEntity.ToListAsync())
+            foreach (var item in await query.ToListAsync())
             {
                 //處理上傳檔案
                 var fileList = new List<CaseRecordFileDto>();
-                if (!string.IsNullOrEmpty(item.Photo))
+                if (!string.IsNullOrEmpty(item.caseRecord.Photo))
                 {
-                    var fileUpload = JsonSerializer.Deserialize<List<CaseRecordFileDto>>(item.Photo);
+                    var fileUpload = JsonSerializer.Deserialize<List<CaseRecordFileDto>>(item.caseRecord.Photo);
                     if (fileUpload != null)
                     {
                         fileList.AddRange(fileUpload.Select(x => new CaseRecordFileDto { Id = x.Id, File = _fileService.Value.GetFile(x.File, "image") }));
                     }
                 }
 
-                var treeBasicInfoId = await _context.TreeBasicInfo.FirstOrDefaultAsync(x => x.Id == item.TreeBasicInfoId) ?? new TreeBasicInfo();
-                var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == item.AdminUserId) ?? new AdminUser();
-                var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.Id == item.ForestCompartmentLocationId) ?? new ForestCompartmentLocation();
+                var treeBasicInfoId = await _context.TreeBasicInfo.FirstOrDefaultAsync(x => x.Id == item.caseRecord.TreeBasicInfoId) ?? new TreeBasicInfo();
+                var adminUser = await _context.AdminUser.FirstOrDefaultAsync(x => x.Id == item.caseRecord.AdminUserId) ?? new AdminUser();
+                var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.Id == item.caseRecord.ForestCompartmentLocationId) ?? new ForestCompartmentLocation();
+
                 //案件回覆
-                var caseDiagnosisResult = (await _caseDiagnosisResultService.Get(new GetCaseDiagnosisResultDto { CaseId = item.Id })).Items.FirstOrDefault();
+                var getCaseDiagnosisResultDto = new GetCaseDiagnosisResultDto
+                {
+                    CaseNumber = item.caseRecord.Id
+                };
+
+                var caseDiagnosisResult = (await _caseDiagnosisResultService.Get(getCaseDiagnosisResultDto)).Items.FirstOrDefault();
 
                 result.Add(new CaseResponse
                 {
-                    Id = item.Id,
-                    CreateTime = item.CreateTime,
-                    UpdateTime = item.UpdateTime,
-                    CaseNumber = item.CaseNumber,
-                    AdminUserId = item.AdminUserId,
+                    Id = item.caseRecord.Id,
+                    CreateTime = item.caseRecord.CreateTime,
+                    UpdateTime = item.caseRecord.UpdateTime,
+                    CaseNumber = item.caseRecord.CaseNumber,
+                    AdminUserId = item.caseRecord.AdminUserId,
                     AdminUserName = adminUser.Name,
-                    ApplicantAccount = item.ApplicantAccount,
-                    ApplicantName = item.ApplicantName,
-                    ApplicationDate = item.ApplicationDate,
-                    UnitName = item.UnitName,
-                    County = item.County,
-                    District = item.District,
-                    Address = item.Address,
-                    Phone = item.Phone,
-                    Fax = item.Fax,
-                    Email = item.Email,
-                    DamageTreeCounty = item.DamageTreeCounty,
-                    DamageTreeDistrict = item.DamageTreeDistrict,
-                    DamageTreeAddress = item.DamageTreeAddress,
-                    ForestCompartmentLocationId = item.ForestCompartmentLocationId,
+                    ApplicantAccount = item.caseRecord.ApplicantAccount,
+                    ApplicantName = item.caseRecord.ApplicantName,
+                    ApplicationDate = item.caseRecord.ApplicationDate,
+                    UnitName = item.caseRecord.UnitName,
+                    County = item.caseRecord.County,
+                    District = item.caseRecord.District,
+                    Address = item.caseRecord.Address,
+                    Phone = item.caseRecord.Phone,
+                    Fax = item.caseRecord.Fax,
+                    Email = item.caseRecord.Email,
+                    DamageTreeCounty = item.caseRecord.DamageTreeCounty,
+                    DamageTreeDistrict = item.caseRecord.DamageTreeDistrict,
+                    DamageTreeAddress = item.caseRecord.DamageTreeAddress,
+                    ForestCompartmentLocationId = item.caseRecord.ForestCompartmentLocationId,
                     ForestPostion = forestCompartmentLocation.Postion,
                     AffiliatedUnit = forestCompartmentLocation.AffiliatedUnit,
-                    ForestSection = item.ForestSection,
-                    ForestSubsection = item.ForestSubsection,
-                    Latitude = item.Latitude,
-                    Longitude = item.Longitude,
-                    DamagedArea = item.DamagedArea,
-                    DamagedCount = item.DamagedCount,
-                    PlantedArea = item.PlantedArea,
-                    PlantedCount = item.PlantedCount,
-                    TreeBasicInfoId = item.TreeBasicInfoId,
+                    ForestSection = item.caseRecord.ForestSection,
+                    ForestSubsection = item.caseRecord.ForestSubsection,
+                    Latitude = item.caseRecord.Latitude,
+                    Longitude = item.caseRecord.Longitude,
+                    DamagedArea = item.caseRecord.DamagedArea,
+                    DamagedCount = item.caseRecord.DamagedCount,
+                    PlantedArea = item.caseRecord.PlantedArea,
+                    PlantedCount = item.caseRecord.PlantedCount,
+                    TreeBasicInfoId = item.caseRecord.TreeBasicInfoId,
                     ScientificName = treeBasicInfoId.ScientificName,
                     TreeName = treeBasicInfoId.Name,
-                    Others = item.Others,
-                    DamagedPart = item.DamagedPart,
-                    TreeHeight = item.TreeHeight,
-                    TreeDiameter = item.TreeDiameter,
-                    LocalPlantingTime = item.LocalPlantingTime,
-                    FirstDiscoveryDate = item.FirstDiscoveryDate,
-                    DamageDescription = item.DamageDescription,
-                    LocationType = item.LocationType,
-                    BaseCondition = item.BaseCondition,
+                    Others = item.caseRecord.Others,
+                    DamagedPart = item.caseRecord.DamagedPart,
+                    TreeHeight = item.caseRecord.TreeHeight,
+                    TreeDiameter = item.caseRecord.TreeDiameter,
+                    LocalPlantingTime = item.caseRecord.LocalPlantingTime,
+                    FirstDiscoveryDate = item.caseRecord.FirstDiscoveryDate,
+                    DamageDescription = item.caseRecord.DamageDescription,
+                    LocationType = item.caseRecord.LocationType,
+                    BaseCondition = item.caseRecord.BaseCondition,
                     Photo = fileList,
                     CaseDiagnosisResultResponse = caseDiagnosisResult,
-                    CaseStatus = item.CaseStatus,
+                    CaseStatus = item.caseRecord.CaseStatus,
                 });
-
-                ////發布日期
-                //if (!string.IsNullOrEmpty(dto.Case_StartTime) && !string.IsNullOrEmpty(dto.Case_EndTime))
-                //{
-                //    //處理時間格式
-                //    if (!DateTime.TryParse(dto.Case_StartTime, out var StartTime))
-                //    {
-                //        throw new ArgumentException("Invalid date format", nameof(dto.Case_StartTime));
-                //    }
-                //    if (!DateTime.TryParse(dto.Case_EndTime, out var EndTime))
-                //    {
-                //        throw new ArgumentException("Invalid date format", nameof(dto.Case_EndTime));
-                //    }
-                //    caseEntity = caseEntity.Where(x => x.ApplicationDate >= StartTime && x.ApplicationDate < EndTime);
-                //}
             }
 
             return result.GetPaged(dto.Page!);

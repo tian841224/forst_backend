@@ -5,10 +5,10 @@ namespace admin_backend.DTOs.Case
 {
     public class GetCaseRecordDto
     {
-        ///// <summary>
-        ///// 關鍵字
-        ///// </summary>
-        //public string? Keyword { get; set; } = string.Empty;
+        /// <summary>
+        /// 關鍵字
+        /// </summary>
+        public string? Keyword { get; set; } = string.Empty;
 
         /// <summary>
         /// 指派人ID
@@ -23,22 +23,22 @@ namespace admin_backend.DTOs.Case
         /// <summary>
         /// 案件開始日期
         /// </summary>
-        public string? Case_StartTime { get; set; }
+        public string? StartTime { get; set; }
 
         /// <summary>
         /// 案件結束日期
         /// </summary>
-        public string? Case_EndTime { get; set; }
+        public string? EndTime { get; set; }
 
         /// <summary>
-        /// 危害類型
+        /// 危害類型ID
         /// </summary>
-        public int? DamageType { get; set; }
+        public int? DamageTypeId { get; set; }
 
         /// <summary>
-        /// 危害種類
+        /// 危害種類ID
         /// </summary>
-        public int? DamageClass { get; set; }
+        public int? DamageClassId { get; set; }
 
         /// <summary>
         /// 案件狀態

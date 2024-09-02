@@ -1,5 +1,7 @@
-﻿using admin_backend.DTOs.User;
+﻿using admin_backend.DTOs.AdminUser;
+using admin_backend.DTOs.User;
 using admin_backend.Interfaces;
+using admin_backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -68,5 +70,17 @@ namespace admin_backend.Controllers
             return Ok(await _userService.Update(id, dto));
         }
 
+        /// <summary>
+        /// 忘記密碼
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
+        {
+            await _userService.ResetPassword(dto);
+            return Ok();
+        }
     }
 }

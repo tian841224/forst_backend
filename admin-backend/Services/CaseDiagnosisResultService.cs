@@ -142,7 +142,7 @@ namespace admin_backend.Services
                     throw new ApiException($"找不到常見病蟲害-{dto.CommonDamageId}");
             }
 
-             caseDiagnosisResult = new CaseDiagnosisResult
+            caseDiagnosisResult = new CaseDiagnosisResult
             {
                 CaseId = dto.CaseId,
                 SubmissionMethod = dto.SubmissionMethod,
@@ -157,8 +157,8 @@ namespace admin_backend.Services
             };
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            await _context.CaseDiagnosisResult.AddAsync(caseDiagnosisResult);
 
+            await _context.CaseDiagnosisResult.AddAsync(caseDiagnosisResult);
 
             //若被退回則修改案件狀態
             if (!string.IsNullOrEmpty(dto.ReturnReason))
@@ -177,6 +177,11 @@ namespace admin_backend.Services
                         Description = dto.ReturnReason,
                     });
                 }
+            }
+            else
+            {
+                caseEntity.CaseStatus = CaseStatusEnum.Completed;
+                _context.CaseRecord.Update(caseEntity);
             }
 
             // 新增操作紀錄
@@ -250,6 +255,15 @@ namespace admin_backend.Services
                             Content = $"修改案件狀態 {caseEntity.Id}-{caseEntity.CaseStatus}",
                         });
                     }
+
+                    // 新增案件歷程
+                    await _caseHistoryService.Add(new AddCaseHistoryDto
+                    {
+                        CaseId = caseEntity.Id,
+                        ActionTime = DateTime.Now,
+                        ActionType = ActionTypeEnum.Return,
+                        Description = dto.ReturnReason
+                    });
                 }
             }
 

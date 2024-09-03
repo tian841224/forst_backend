@@ -73,7 +73,8 @@ try
     builder.Services.AddScoped<ICaseRecordService, CaseRecordService>();
     builder.Services.AddScoped<ICaseDiagnosisResultService, CaseDiagnosisResultService>();
     builder.Services.AddScoped<ICaseReportService, CaseReportService>();
-    
+    builder.Services.AddScoped<ICaseHistoryService, CaseHistoryService>();
+
     //©µ¿ð¸ü¤J
     builder.Services.AddScoped(provider =>
         new Lazy<IOperationLogService>(() => provider.GetRequiredService<IOperationLogService>()));

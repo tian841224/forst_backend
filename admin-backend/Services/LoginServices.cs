@@ -115,7 +115,7 @@ namespace admin_backend.Services
                 {
                     Id = adminUser.Id,
                     AccessToken = token,
-                    //RefreshToken = refreshToken,
+                    UserName = adminUser.Name,
                     Expires = (new DateTimeOffset(_jwtConfig.Expiration)).ToUnixTimeSeconds(),
                     RoleId = role.Id,
                     Account = adminUser.Account,
@@ -187,6 +187,7 @@ namespace admin_backend.Services
                 return new IdentityResultDto
                 {
                     Id = user.Id,
+                    UserName = user.Name,
                     AccessToken = token,
                     Expires = (new DateTimeOffset(_jwtConfig.Expiration)).ToUnixTimeSeconds(),
                     Account = user.Account,

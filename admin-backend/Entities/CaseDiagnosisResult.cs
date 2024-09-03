@@ -22,36 +22,31 @@ namespace admin_backend.Entities
         /// 送件方式
         /// </summary>
         [Comment("送件方式")]
-        [Required]
-        public List<SubmissionMethodEnum> SubmissionMethod { get; set; } = new();
+        public List<SubmissionMethodEnum>? SubmissionMethod { get; set; } = new();
 
         /// <summary>
         /// 診斷方式
         /// </summary>
         [Comment("診斷方式")]
-        [Required]
-        public List<DiagnosisMethodEnum> DiagnosisMethod { get; set; } = new();
+        public List<DiagnosisMethodEnum>? DiagnosisMethod { get; set; } = new();
 
         /// <summary>
         /// 危害狀況詳細描述
         /// </summary>
         [Comment("危害狀況詳細描述")]
-        [Required]
-        public string HarmPatternDescription { get; set; } = string.Empty;
+        public string? HarmPatternDescription { get; set; } = string.Empty;
 
         /// <summary>
         /// 常見病蟲害
         /// </summary>
         [Comment("常見病蟲害")]
-        [Required]
-        public int CommonDamageId { get; set; }
+        public int? CommonDamageId { get; set; }
 
         /// <summary>
         /// 防治建議
         /// </summary>
         [Comment("防治建議")]
-        [Required]
-        public string PreventionSuggestion { get; set; } = string.Empty;
+        public string? PreventionSuggestion { get; set; } = string.Empty;
 
         ///// <summary>
         ///// 防治建議圖片
@@ -63,20 +58,19 @@ namespace admin_backend.Entities
         /// 危害病蟲名稱(舊)
         /// </summary>
         [Comment("危害病蟲名稱(舊)")]
-        public string OldCommonDamageName { get; set; } = string.Empty;
+        public string? OldCommonDamageName { get; set; } = string.Empty;
 
         /// <summary>
         /// 學名
         /// </summary>
         [Comment("學名")]
-        public string ScientificName { get; set; } = string.Empty;
+        public string? ScientificName { get; set; } = string.Empty;
 
         /// <summary>
         /// 呈報建議
         /// </summary>
         [Comment("呈報建議")]
-        [Required]
-        public string ReportingSuggestion { get; set; } = string.Empty;
+        public string? ReportingSuggestion { get; set; } = string.Empty;
 
         ///// <summary>
         ///// 呈報建議圖片
@@ -89,7 +83,7 @@ namespace admin_backend.Entities
         /// 退回原因
         /// </summary>
         [Comment("退回原因")]
-        public string ReturnReason { get; set; } = string.Empty;
+        public string? ReturnReason { get; set; } = string.Empty;
 
         [ForeignKey("CaseId")]
         public virtual CaseRecord Case { get; set; } = null!;

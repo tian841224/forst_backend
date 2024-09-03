@@ -1,4 +1,5 @@
 ﻿using admin_backend.Enums;
+using CommonLibrary.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

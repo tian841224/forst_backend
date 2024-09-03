@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using admin_backend.Enums;
+using CommonLibrary.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace admin_backend.Entities

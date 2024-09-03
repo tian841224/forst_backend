@@ -1,9 +1,10 @@
 ﻿using admin_backend.Enums;
+using CommonLibrary.DTOs;
 using CommonLibrary.Extensions;
 
 namespace admin_backend.DTOs.CaseHistory
 {
-    public class CaseHistoryResponse
+    public class CaseHistoryResponse : DefaultResponseDto
     {
         /// <summary>
         /// 案件ID (外鍵)

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using admin_backend.Data;
 
@@ -10,9 +11,11 @@ using admin_backend.Data;
 namespace CommonLibrary.Migrations
 {
     [DbContext(typeof(MysqlDbContext))]
-    partial class MysqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240903144759_AddCaseHistory")]
+    partial class AddCaseHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,34 +156,42 @@ namespace CommonLibrary.Migrations
                         .HasComment("建立日期");
 
                     b.Property<string>("DiagnosisMethod")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasComment("診斷方式");
 
                     b.Property<string>("HarmPatternDescription")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasComment("危害狀況詳細描述");
 
                     b.Property<string>("OldCommonDamageName")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasComment("危害病蟲名稱(舊)");
 
                     b.Property<string>("PreventionSuggestion")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasComment("防治建議");
 
                     b.Property<string>("ReportingSuggestion")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasComment("呈報建議");
 
                     b.Property<string>("ReturnReason")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasComment("退回原因");
 
                     b.Property<string>("ScientificName")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasComment("學名");
 
                     b.Property<string>("SubmissionMethod")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasComment("送件方式");
 
@@ -435,7 +446,6 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -481,7 +491,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("危害類型ID");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -605,7 +614,6 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -624,7 +632,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("狀態 0 = 關閉, 1 = 開啟");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -710,7 +717,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("答案");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -728,7 +734,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("狀態 0 = 關閉, 1 = 開啟");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -752,7 +757,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("所屬管理處");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -767,7 +771,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("排序");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -788,7 +791,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("出版品作者");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -831,7 +833,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("出版單位");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -1147,7 +1148,6 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -1168,7 +1168,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("排序");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 

@@ -32,5 +32,7 @@ namespace admin_backend.Data
         public DbSet<CommonDamage> CommonDamage { get; set; }
         public DbSet<CaseRecord> CaseRecord { get; set; }
         public DbSet<CaseDiagnosisResult> CaseDiagnosisResult { get; set; }
+        public DbSet<CaseHistory> CaseHistory { get; set; }
+        
     }
 }

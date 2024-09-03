@@ -72,10 +72,20 @@ namespace admin_backend.DTOs.Case
         /// </summary>
         public string? DamageTreeAddress { get; set; }
 
+        ///// <summary>
+        ///// 林班位置
+        ///// </summary>
+        //public int? ForestCompartmentLocationId { get; set; }
+
         /// <summary>
         /// 林班位置
         /// </summary>
-        public int? ForestCompartmentLocationId { get; set; }
+        public string? ForestPostion { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 所屬管理處
+        /// </summary>
+        public string? AffiliatedUnit { get; set; } = string.Empty;
 
         /// <summary>
         /// 林班

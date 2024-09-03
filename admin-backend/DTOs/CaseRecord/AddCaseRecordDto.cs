@@ -97,7 +97,7 @@ namespace admin_backend.DTOs.Case
         /// 林班位置
         /// </summary>
         [Required]
-        public string Position { get; set; } = string.Empty;
+        public string ForestPostion { get; set; } = string.Empty;
 
         /// <summary>
         /// 所屬管理處

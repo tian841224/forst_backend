@@ -295,9 +295,9 @@ namespace admin_backend.Services
             }
 
             //取得對應林班資料
-            var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.AffiliatedUnit == dto.AffiliatedUnit && x.Postion == dto.Position);
+            var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.AffiliatedUnit == dto.AffiliatedUnit && x.Postion == dto.ForestPostion);
             if (forestCompartmentLocation == null)
-                throw new ApiException($"找不到對應的林班資料:{dto.Position}/{dto.AffiliatedUnit}");
+                throw new ApiException($"找不到對應的林班資料:{dto.ForestPostion}/{dto.AffiliatedUnit}");
 
             var caseEntity = new CaseRecord
             {
@@ -414,9 +414,16 @@ namespace admin_backend.Services
             if (!string.IsNullOrEmpty(dto.DamageTreeAddress))
                 caseEntity.DamageTreeAddress = dto.DamageTreeAddress;
 
-            if (dto.ForestCompartmentLocationId.HasValue)
-                caseEntity.ForestCompartmentLocationId = dto.ForestCompartmentLocationId.Value;
+            if (!string.IsNullOrEmpty(dto.AffiliatedUnit) && !string.IsNullOrEmpty(dto.ForestPostion))
+            {
+                //取得對應林班資料
+                var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.AffiliatedUnit == dto.AffiliatedUnit && x.Postion == dto.ForestPostion);
+                if (forestCompartmentLocation == null)
+                    throw new ApiException($"找不到對應的林班資料:{dto.ForestPostion}/{dto.AffiliatedUnit}");
 
+                caseEntity.ForestCompartmentLocationId = forestCompartmentLocation.Id;
+            }
+                
             if (!string.IsNullOrEmpty(dto.ForestSection))
                 caseEntity.ForestSection = dto.ForestSection;
 

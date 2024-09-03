@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using admin_backend.Data;
 
@@ -10,9 +11,11 @@ using admin_backend.Data;
 namespace CommonLibrary.Migrations
 {
     [DbContext(typeof(MysqlDbContext))]
-    partial class MysqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240903144759_AddCaseHistory")]
+    partial class AddCaseHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,7 +146,7 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("int")
                         .HasComment("案件編號");
 
-                    b.Property<int>("CommonDamageId")
+                    b.Property<int?>("CommonDamageId")
                         .HasColumnType("int")
                         .HasComment("常見病蟲害");
 
@@ -443,7 +446,6 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -489,7 +491,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("危害類型ID");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -613,7 +614,6 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -632,7 +632,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("狀態 0 = 關閉, 1 = 開啟");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -718,7 +717,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("答案");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -736,7 +734,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("狀態 0 = 關閉, 1 = 開啟");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -760,7 +757,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("所屬管理處");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -775,7 +771,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("排序");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -796,7 +791,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("出版品作者");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -839,7 +833,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("出版單位");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -1035,8 +1028,6 @@ namespace CommonLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdminUserId");
-
                     b.ToTable("OperationLog");
                 });
 
@@ -1157,7 +1148,6 @@ namespace CommonLibrary.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasComment("建立日期");
 
@@ -1178,7 +1168,6 @@ namespace CommonLibrary.Migrations
                         .HasComment("排序");
 
                     b.Property<DateTime>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasComment("更新時間");
 
@@ -1263,9 +1252,7 @@ namespace CommonLibrary.Migrations
 
                     b.HasOne("admin_backend.Entities.CommonDamage", "CommonDamage")
                         .WithMany()
-                        .HasForeignKey("CommonDamageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CommonDamageId");
 
                     b.Navigation("Case");
 

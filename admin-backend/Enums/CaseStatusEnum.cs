@@ -20,24 +20,24 @@ namespace admin_backend.Enums
         Temp = 1,
 
         /// <summary>
-        /// 待指派
+        /// 新建(待指派)
         /// </summary>
-        [EnumMember(Value = "待指派")]
-        [Description("待指派")]
+        [EnumMember(Value = "新建(待指派)")]
+        [Description("新建(待指派)")]
         Pending_Assignment = 2,
 
         /// <summary>
-        /// 待簽核
+        /// 待接收(待審核)
         /// </summary>
-        [EnumMember(Value = "待簽核")]
-        [Description("待簽核")]
+        [EnumMember(Value = "待接收(待審核)")]
+        [Description("待接收(待審核)")]
         Pending_Review = 3,
 
         /// <summary>
-        /// 已結案
+        /// 完成(已結案)
         /// </summary>
-        [EnumMember(Value = "已結案")]
-        [Description("已結案")]
+        [EnumMember(Value = "完成(已結案)")]
+        [Description("完成(已結案)")]
         Completed = 4,
 
         /// <summary>
@@ -48,10 +48,10 @@ namespace admin_backend.Enums
         Delete = 5,
 
         /// <summary>
-        /// 退回
+        /// 退回(待指派)
         /// </summary>
-        [EnumMember(Value = "退回")]
-        [Description("退回")]
+        [EnumMember(Value = "退回(待指派)")]
+        [Description("退回(待指派)")]
         Return = 6,
 
         ///// <summary>

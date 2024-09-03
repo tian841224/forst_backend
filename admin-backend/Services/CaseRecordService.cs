@@ -1,6 +1,7 @@
 ﻿using admin_backend.Data;
 using admin_backend.DTOs.Case;
 using admin_backend.DTOs.CaseDiagnosisResult;
+using admin_backend.DTOs.CaseHistory;
 using admin_backend.DTOs.OperationLog;
 using admin_backend.Entities;
 using admin_backend.Enums;
@@ -22,8 +23,10 @@ namespace admin_backend.Services
         private readonly Lazy<IFileService> _fileService;
         private readonly Lazy<IOperationLogService> _operationLogService;
         private readonly ICaseDiagnosisResultService _caseDiagnosisResultService;
+        private readonly ICaseHistoryService _caseHistoryService;
 
-        public CaseRecordService(ILogger<CaseRecordService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, Lazy<IOperationLogService> operationLogService, ICaseDiagnosisResultService caseDiagnosisResultService)
+        public CaseRecordService(ILogger<CaseRecordService> log, IDbContextFactory<MysqlDbContext> contextFactory, IMapper mapper, Lazy<IFileService> fileService, Lazy<IOperationLogService> operationLogService,
+            ICaseDiagnosisResultService caseDiagnosisResultService, ICaseHistoryService caseHistoryService)
         {
             _log = log;
             _contextFactory = contextFactory;
@@ -31,6 +34,7 @@ namespace admin_backend.Services
             _fileService = fileService;
             _operationLogService = operationLogService;
             _caseDiagnosisResultService = caseDiagnosisResultService;
+            _caseHistoryService = caseHistoryService;
         }
 
         public async Task<CaseResponse> Get(int Id)
@@ -125,13 +129,13 @@ namespace admin_backend.Services
             if (dto.DamageClassId.HasValue)
             {
                 var commonIds = await _context.CommonDamage.Where(x => x.DamageClassId == dto.DamageClassId).Select(x => x.Id).ToListAsync();
-                query = query.Where(x => commonIds.Contains(x.caseDiagnosis.CommonDamageId));
+                query = query.Where(x => commonIds.Contains(x.caseDiagnosis.CommonDamageId ?? 0));
             }
 
             if (dto.DamageTypeId.HasValue)
             {
                 var commonIds = await _context.CommonDamage.Where(x => x.DamageTypeId == dto.DamageTypeId).Select(x => x.Id).ToListAsync();
-                query = query.Where(x => commonIds.Contains(x.caseDiagnosis.CommonDamageId));
+                query = query.Where(x => commonIds.Contains(x.caseDiagnosis.CommonDamageId ?? 0));
             }
 
             if (!string.IsNullOrEmpty(dto.Keyword))
@@ -290,6 +294,11 @@ namespace admin_backend.Services
                 throw new ArgumentException("Invalid date format", nameof(dto.FirstDiscoveryDate));
             }
 
+            //取得對應林班資料
+            var forestCompartmentLocation = await _context.ForestCompartmentLocation.FirstOrDefaultAsync(x => x.AffiliatedUnit == dto.AffiliatedUnit && x.Postion == dto.Position);
+            if (forestCompartmentLocation == null)
+                throw new ApiException($"找不到對應的林班資料:{dto.Position}/{dto.AffiliatedUnit}");
+
             var caseEntity = new CaseRecord
             {
                 CaseNumber = maxCaseNumber,
@@ -306,7 +315,7 @@ namespace admin_backend.Services
                 DamageTreeCounty = dto.DamageTreeCounty,
                 DamageTreeDistrict = dto.DamageTreeDistrict,
                 DamageTreeAddress = dto.DamageTreeAddress,
-                ForestCompartmentLocationId = dto.ForestCompartmentLocationId,
+                ForestCompartmentLocationId = forestCompartmentLocation.Id,
                 ForestSection = dto.ForestSection,
                 ForestSubsection = dto.ForestSubsection,
                 Latitude = dto.Latitude,
@@ -332,9 +341,18 @@ namespace admin_backend.Services
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             await _context.CaseRecord.AddAsync(caseEntity);
 
-            // 新增操作紀錄
+
             if (await _context.SaveChangesAsync() > 0)
             {
+                // 新增案件歷程
+                await _caseHistoryService.Add(new AddCaseHistoryDto
+                {
+                    CaseId = caseEntity.Id,
+                    ActionTime = DateTime.Now,
+                    ActionType = ActionTypeEnum.Add,
+                });
+
+                // 新增操作紀錄
                 await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Add,
@@ -473,9 +491,20 @@ namespace admin_backend.Services
 
             _context.CaseRecord.Update(caseEntity);
 
-            // 新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)
             {
+                if (dto.AdminUserId.HasValue)
+                {
+                    // 新增案件歷程
+                    await _caseHistoryService.Add(new AddCaseHistoryDto
+                    {
+                        CaseId = caseEntity.Id,
+                        ActionTime = DateTime.Now,
+                        ActionType = ActionTypeEnum.Assign,
+                    });
+                }
+
+                // 新增操作紀錄
                 await _operationLogService.Value.Add(new AddOperationLogDto
                 {
                     Type = ChangeTypeEnum.Edit,

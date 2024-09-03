@@ -1,6 +1,7 @@
 ﻿using admin_backend.Data;
 using admin_backend.DTOs.Case;
 using admin_backend.DTOs.CaseDiagnosisResult;
+using admin_backend.DTOs.CaseHistory;
 using admin_backend.DTOs.OperationLog;
 using admin_backend.Entities;
 using admin_backend.Enums;
@@ -24,8 +25,11 @@ namespace admin_backend.Services
         private readonly IMapper _mapper;
         private readonly Lazy<IFileService> _fileService;
         private readonly ICommonDamageService _commonDamageService;
+        private readonly ICaseHistoryService _caseHistoryService;
 
-        public CaseDiagnosisResultService(ILogger<CaseDiagnosisResultService> log, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService, IMapper mapper, Lazy<IFileService> fileService, ICommonDamageService commonDamageService)
+        public CaseDiagnosisResultService(ILogger<CaseDiagnosisResultService> log, IDbContextFactory<MysqlDbContext> contextFactory, Lazy<IOperationLogService> operationLogService, IMapper mapper, Lazy<IFileService> fileService,
+            ICommonDamageService commonDamageService, ICaseHistoryService caseHistoryServic
+)
         {
             _log = log;
             _contextFactory = contextFactory;
@@ -33,6 +37,7 @@ namespace admin_backend.Services
             _mapper = mapper;
             _fileService = fileService;
             _commonDamageService = commonDamageService;
+            _caseHistoryService = caseHistoryServic;
         }
 
         public async Task<CaseDiagnosisResultResponse> Get(int Id)
@@ -130,9 +135,12 @@ namespace admin_backend.Services
             if (caseDiagnosisResult != null)
                 throw new ApiException($"此案件已回覆-案件編號:{dto.CaseId}/案件回覆編號:{caseDiagnosisResult.Id}");
 
-            var commonDamage = await _context.CommonDamage.FirstOrDefaultAsync(x => x.Id == dto.CommonDamageId);
-            if (commonDamage == null)
-                throw new ApiException($"找不到常見病蟲害-{dto.CommonDamageId}");
+            if (dto.CommonDamageId.HasValue)
+            {
+                var commonDamage = await _context.CommonDamage.FirstOrDefaultAsync(x => x.Id == dto.CommonDamageId);
+                if (commonDamage == null)
+                    throw new ApiException($"找不到常見病蟲害-{dto.CommonDamageId}");
+            }
 
              caseDiagnosisResult = new CaseDiagnosisResult
             {
@@ -145,10 +153,31 @@ namespace admin_backend.Services
                 OldCommonDamageName = dto.OldCommonDamageName,
                 ScientificName = dto.ScientificName,
                 ReportingSuggestion = dto.ReportingSuggestion,
+                ReturnReason = dto.ReturnReason,
             };
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             await _context.CaseDiagnosisResult.AddAsync(caseDiagnosisResult);
+
+
+            //若被退回則修改案件狀態
+            if (!string.IsNullOrEmpty(dto.ReturnReason))
+            {
+                if (caseEntity != null)
+                {
+                    caseEntity.CaseStatus = CaseStatusEnum.Return;
+                    _context.CaseRecord.Update(caseEntity);
+
+                    // 新增案件歷程
+                    await _caseHistoryService.Add(new AddCaseHistoryDto
+                    {
+                        CaseId = caseEntity.Id,
+                        ActionTime = DateTime.Now,
+                        ActionType = ActionTypeEnum.Return,
+                        Description = dto.ReturnReason,
+                    });
+                }
+            }
 
             // 新增操作紀錄
             if (await _context.SaveChangesAsync() > 0)

@@ -7,7 +7,7 @@ namespace admin_backend.DTOs.ForestCompartmentLocation
         /// <summary>
         /// 位置
         /// </summary>
-        public string Postion { get; set; } = string.Empty;
+        public string Position { get; set; } = string.Empty;
 
         /// <summary>
         /// 所屬管理處

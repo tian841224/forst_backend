@@ -52,7 +52,7 @@ namespace admin_backend.Services
                 string keyword = dto.Keyword.ToLower();
                 forestCompartmentLocations = forestCompartmentLocations.Where(x =>
                     x.AffiliatedUnit.ToLower().Contains(keyword) ||
-                    x.Postion.ToLower().Contains(keyword) ||
+                    x.Position.ToLower().Contains(keyword) ||
                     x.Id.ToString().Contains(keyword)
                 );
             }
@@ -68,7 +68,7 @@ namespace admin_backend.Services
 
             var forestCompartmentLocation = new ForestCompartmentLocation
             {
-                Postion = dto.Postion,
+                Position = dto.Position,
                 AffiliatedUnit = dto.AffiliatedUnit,
                 Sort = dto.Sort,
             };
@@ -102,8 +102,8 @@ namespace admin_backend.Services
                 throw new ApiException($"無此資料-{Id}");
             }
 
-            if (!string.IsNullOrEmpty(dto.Postion))
-                forestCompartmentLocation.Postion = dto.Postion;
+            if (!string.IsNullOrEmpty(dto.Position))
+                forestCompartmentLocation.Position = dto.Position;
 
             if (!string.IsNullOrEmpty(dto.AffiliatedUnit))
                 forestCompartmentLocation.AffiliatedUnit = dto.AffiliatedUnit;

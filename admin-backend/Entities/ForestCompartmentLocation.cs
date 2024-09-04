@@ -15,7 +15,7 @@ namespace admin_backend.Entities
         [Required]
         [Comment("位置")]
         [StringLength(100)]
-        public string Postion { get; set; } = string.Empty;
+        public string Position { get; set; } = string.Empty;
 
         /// <summary>
         /// 所屬管理處

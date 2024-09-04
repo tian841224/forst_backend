@@ -11,7 +11,7 @@ using admin_backend.Data;
 namespace CommonLibrary.Migrations
 {
     [DbContext(typeof(MysqlDbContext))]
-    [Migration("20240904055742_EditForestCompartmentLocation_RenamePosition")]
+    [Migration("20240904060640_EditForestCompartmentLocation_RenamePosition")]
     partial class EditForestCompartmentLocation_RenamePosition
     {
         /// <inheritdoc />
